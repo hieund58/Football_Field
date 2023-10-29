@@ -47,7 +47,7 @@
               <div>
                 <h1 class="text-sm font-medium text-gray-1000">
                   <!-- Điều hướng đến chi tiết sản phẩm -->
-                  <router-link :to="'/detailball/' + product.id" class="absolute inset-0"></router-link>
+                  <router-link :to="'/detailball/' +  product._id" class="absolute inset-0"></router-link>
                   {{ product.name }}
                 </h1>
               </div>
@@ -70,7 +70,24 @@ import { ref, computed, onMounted } from 'vue';
 import PaginationBall from './PaginationBall.vue';
 import { getProducts } from "../../productService";
 
-const products = ref([]);
+const products = ref([{
+  name: '',
+      address: '',
+      people: '', // Add this field
+      price: '', // Add this field
+      area: '',
+  description: {
+    facilities: '',
+    prices: '',
+    transportation: '',
+  },
+  schedules: {
+    date: '',
+    time: '',
+    status: '',
+    totalCourts: '',
+  },
+}]);
 const areas = computed(() => {
   // Lấy danh sách khu vực từ products
   const uniqueAreas = Array.from(new Set(products.value.map(product => product.area)));

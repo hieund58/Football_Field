@@ -5,16 +5,7 @@ const jwt = require('jsonwebtoken');
 const router = express.Router();
 const User = require('../../db/user');
 
-// Route GET để lấy tất cả các giá trị người dùng từ cơ sở dữ liệu
-router.get('/', async (req, res) => {
-  try {
-    const users = await User.find(); // Sử dụng phương thức find() để lấy tất cả các người dùng
-    res.status(200).json(users);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Đã xảy ra lỗi' });
-  }
-});
+
 router.post('/', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -35,7 +26,7 @@ router.post('/', async (req, res) => {
       expiresIn: '1h',
     });
 
-    return res.status(200).json({ message: 'Đăng nhập thành công', token });
+    return res.status(200).json({ message: 'Đăng nhập thành công', token, user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Đã xảy ra lỗi' });

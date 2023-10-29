@@ -61,8 +61,8 @@
             required=""
             class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           >
-            <option value="nguoi-dung">Người Dùng</option>
-            <option value="nguoi-quan-ly">Người Quản Lý</option>
+            <option value="Người dùng">Người Dùng</option>
+            <option value="Người Quản Lý">Người Quản Lý</option>
           </select>
         </div>
       </div>
@@ -88,14 +88,15 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
-  
-  const user = ref({
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
+
+const user = ref({
   email: '',
   password: '',
   password_confirmation: '',
-  role: 'nguoi-dung', // Mặc định là người dùng
+  role: 'Người dùng', // Mặc định là người dùng
 });
 
 const router = useRouter();
@@ -107,32 +108,27 @@ const registerUser = () => {
     return;
   }
 
-  // Gửi dữ liệu người dùng đăng ký đến máy chủ (backend) bằng API hoặc axios
+  // Tạo một đối tượng newUser để đăng ký
+  const newUser = {
+    email: user.value.email,
+    password: user.value.password,
+    role: user.value.role,
+  };
 
-  // Sau khi đăng ký thành công, bạn có thể lưu trữ thông tin người dùng vào cơ sở dữ liệu
-  // Và sau đó, chuyển hướng người dùng đến trang đăng nhập
-  // Ví dụ:
-  // const newUser = {
-  //   email: user.value.email,
-  //   password: user.value.password,
-  //   role: user.value.role,
-  // };
-  // axios.post('/api/register', newUser)
-  //   .then(response => {
-  //     // Xử lý phản hồi từ máy chủ
-  //     alert('Đăng ký thành công!');
-  //     router.push('/login'); // Chuyển hướng đến trang đăng nhập
-  //   })
-  //   .catch(error => {
-  //     // Xử lý lỗi nếu có
-  //     console.error('Lỗi đăng ký:', error);
-  //   });
-
-  // Trong ví dụ này, chúng tôi sử dụng alert() để thông báo đăng ký thành công.
-  // Bạn nên sử dụng API thực tế để gửi dữ liệu và xử lý phản hồi từ máy chủ.
-
-  alert('Đăng ký thành công!');
-  router.push('/login'); // Chuyển hướng đến trang đăng nhập
+  // Gửi yêu cầu đăng ký đến backend
+  axios
+    .post('http://localhost:5000/api/signup', newUser)
+    .then((response) => {
+      // Xử lý phản hồi từ máy chủ
+      alert(response.data.message);
+      if (response.data.success) {
+        router.push('/login'); // Chuyển hướng đến trang đăng nhập nếu đăng ký thành công
+      }
+    })
+    .catch((error) => {
+      // Xử lý lỗi nếu có
+      console.error('Lỗi đăng ký:', error);
+    });
 };
-  </script>
+</script>
   

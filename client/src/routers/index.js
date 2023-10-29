@@ -29,7 +29,25 @@ const routes = [
       },{
         path:"register",
         component:() => import("../components/Account/Register.vue")
-      }
+      },
+      {
+        path: '/home',
+        name: 'Home',
+        component:() => import ("../components/TheHeader.vue")
+      },
+      {
+        path: "user",
+        component: () => import("../components/Profile/UserProfile.vue"),
+      },
+      {
+        path:"manage",
+        component: () => import("../components/Profile/Managers/ManageProfile.vue")
+      },
+      {
+        path: "contact",
+        component: () => import("../components/ConTact.vue"),
+      },
+      
     ],
   },
 ];

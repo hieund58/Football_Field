@@ -4,9 +4,12 @@ const bcrypt = require('bcrypt');
 
 // Tạo schema cho User
 const userSchema = new mongoose.Schema({
+  id : String,
   email: { type: String, unique: true },
   password: String,
   role: String,
+  phone: String,
+  fullName:String,
 });
 
 // Phương thức để hash mật khẩu

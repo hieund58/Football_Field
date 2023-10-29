@@ -64,16 +64,23 @@
                 <a href="#" class="header-btn text-sm font-semibold leading-6 text-gray-900">Hỗ Trợ</a>
             </PopoverGroup>
             <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-                        <router-link to="/login" class="header-btn  text-sm font-semibold leading-6 text-gray-900">Log in</router-link>
+          <button v-if="!isLoggedIn" @click="redirectToLogin">Log in</button>
+          <div v-else class="user-profile">
+          <n-avatar 
+            round
+            size="medium"
+            src="https://png.pngtree.com/png-vector/20190909/ourlarge/pngtree-outline-user-icon-png-image_1727916.jpg"
+          />
+          <!-- Hiển thị thông tin người dùng sau khi đăng nhập thành công -->
+          <div class="user-info">
+            <span class="user-email">{{ user ? user.email : '' }}</span>
+            <!-- Hiển thị tùy chọn "Edit Profile" và "Logout" -->
+            <router-link v-if="user && user.role === 'Người dùng'" to="/user" class="edit-profile-button">Edit Profile</router-link>
+            <router-link v-else-if="user && user.role === 'Người Quản Lý'" to="/manage" class="edit-profile-button">Edit Manage</router-link>
+            <button class="logout-button" @click="logout">Logout</button>
+          </div>
+        </div>
             </div>
-            
-            <n-dropdown :options="options">
-        <n-avatar 
-          round
-          size="medium"
-          src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
-        />
-      </n-dropdown>" 
         </nav>
        
   
@@ -107,7 +114,47 @@
       icon: renderIcon(LogoutIcon),
     },
   ]);
+ 
   import { ref } from "vue";
+  import { useRouter } from 'vue-router';
+  import { onMounted, onUnmounted } from 'vue';
+  import Cookies from 'js-cookie';
+
+// Khai báo biến isLoggedIn và cập nhật ban đầu
+const isLoggedIn = ref(false);
+const user = ref(null); // Thay thế bằng null ban đầu
+onMounted(() => {
+  const loginSuccessHandler = () => {
+    isLoggedIn.value = true;
+    // Đoạn code khôi phục thông tin người dùng từ sessionStorage
+    const userData = sessionStorage.getItem('userData');
+    if (userData) {
+      user.value = JSON.parse(userData);
+    }
+  };
+  window.addEventListener('login-success', loginSuccessHandler);
+
+  // Kiểm tra xem có thông tin người dùng trong sessionStorage khi trang được tải lại
+  const userData = sessionStorage.getItem('userData');
+  if (userData) {
+    user.value = JSON.parse(userData);
+    isLoggedIn.value = true;
+  }
+});
+
+  const router = useRouter();
+
+  const redirectToLogin = () => {
+  router.push('/login');
+  };
+
+  const logout = () => {
+  // Xóa thông tin người dùng từ sessionStorage
+  sessionStorage.removeItem('userData');
+  isLoggedIn.value = false;
+  user.value = null;
+};
+
   import {
   Dialog,
   DialogPanel,
@@ -138,7 +185,6 @@
   { name: "Nước Uống", href: "#" },
   ];
   
-  
   </script>
   <style scoped>
   .header-content {
@@ -164,4 +210,34 @@
     color: rgb(235, 25, 25);
     border-bottom: 1px solid #000;
   }
+  .user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-email {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.edit-profile-button,
+.logout-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.edit-profile-button:hover,
+.logout-button:hover {
+  background-color: #0056b3;
+}
   </style>
