@@ -53,6 +53,8 @@ import HomeAdmin from './components/Admin/home.vue';
 import Fields from './components/Admin/Fields.vue';
 import BookingDetail from './components/Admin/Bookings.vue';
 import Revenue from './components/Admin/Revenue.vue';
+import userManager from './components/Admin/userManager.vue';
+
 import { create } from "naive-ui";
 const router = createRouter({
   history: createWebHistory(),
@@ -76,6 +78,7 @@ const router = createRouter({
     { path: "/Fields", component: Fields },
     { path: "/bookingDetail", component: BookingDetail },
     { path: "/Revenue", component: Revenue },
+    { path: "/userManager", component: userManager }
   ],
 });
 

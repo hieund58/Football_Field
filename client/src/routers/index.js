@@ -29,6 +29,9 @@ const routes = [
       },{
         path:"register",
         component:() => import("../components/Account/Register.vue")
+      },{
+        path:"UserManager",
+        component:() => import("../components/Admin/UserManager.vue")
       }
     ],
   },

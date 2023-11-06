@@ -16,6 +16,9 @@
         <router-link to="/bookingDetail" class="block text-gray-300 hover:bg-gray-700 py-2 px-4">
           Sân đang được đặt
         </router-link>
+        <router-link to="/UserManager" class="block text-gray-300 hover:bg-gray-700 py-2 px-4">
+             Trạng thái người dùng
+           </router-link>
         <router-link to="/revenue" class="block text-gray-300 hover:bg-gray-700 py-2 px-4">
           Doanh Thu
         </router-link>
