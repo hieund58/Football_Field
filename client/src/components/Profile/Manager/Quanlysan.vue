@@ -102,7 +102,7 @@
     <div v-else-if="showViewContent">
       <!-- Nội dung xem sân bóng -->
       <n-message-provider>
-        <ViewSanBong :data="viewData" />
+        <ViewSanBong :data="viewData" :sanId="viewData._id" />
         <button class="btn-close" @click="showViewContent = false">Đóng</button>
       </n-message-provider>
     </div>
@@ -129,7 +129,7 @@
             <td>{{ san.price }}</td>
             <td>{{ san.people }}</td>
             <td>
-              <button class="btn-xem" @click="viewSan(san)">
+              <button class="btn-xem" @click="viewSan(san._id)">
                 <font-awesome-icon :icon="['fas', 'eye']" />
               </button>
               <button class="btn-sua" @click="editSan(san)">
@@ -291,10 +291,16 @@ export default {
       },
       // Thêm các trường khác tương tự
     });
-    const viewSan = (san) => {
-      viewData.value = san;
-      showViewContent.value = true;
-    };
+   // Trong component QuanLySan.vue
+const viewSan = (id) => {
+  const san = data.value.find((item) => item._id === id);
+  if (san) {
+    viewData.value = san;
+    viewData.value.sanId = id; // Thêm ID của sân vào viewData
+    showViewContent.value = true;
+  }
+};
+
     const editSan = (san) => {
       data.value = { ...data.value, ...san }; // Sao chép dữ liệu của sân bóng để chỉnh sửa
       selectedTab.value = "sua-san"; // Chuyển sang tab chỉnh sửa sân bóng
@@ -333,6 +339,7 @@ export default {
       people: "", // Add this field
       price: "", // Add this field
       area: "", // Add this field
+      imageSrc: "",
       description: {
         facilities: "",
         prices: "",

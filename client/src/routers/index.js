@@ -16,9 +16,11 @@ const routes = [
         component: () => import("../components/ChiTietSan/DetailBall.vue"),
       },
       {
-        path: ":id/thanhtoanball",
+        path: 'detailball/:id/thanhtoanball/:sanId/:selectDate/:selectTime',
+        name: 'thanhtoanball',
         component: () =>
           import("../components/ThanhToan/ThanhToanBall.vue"),
+          props: true,
       },{
         path:'aboutus',
         component:()=> import("../components/AboutUs.vue")

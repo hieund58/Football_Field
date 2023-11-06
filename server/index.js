@@ -24,12 +24,21 @@ const loginRouter = require('../server/routes/api/login');
 const productRouter = require('../server/routes/api/products');
 const schedule = require('../server/routes/api/schedules');
 const editProfile = require('../server/routes/api/editprofile');
+const order = require('./routes/api/urlpay');
+const payment = require('../server/routes/api/detailball');
+const urlpay = require('../server/routes/api/urlpay');
+const ipnurl = require('../server/routes/api/ipnurl');
+const returnurl = require('../server/routes/api/returnurl');
+app.use('/api/vnpay_ipn', ipnurl);
+app.use('/api/vnpay_return', returnurl);
+app.use('/api/create_payment_url', urlpay);
 app.use('/api/products', productRouter);
 app.use('/api/schedule', schedule);
 app.use('/api/signup', signupRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/userinfo', editProfile);
-
+app.use('/api/createOrder', order);
+app.use('/api/process-payment', payment);
 // ... Các phần khác của ứng dụng ...
 
 const port = process.env.port || 5000;

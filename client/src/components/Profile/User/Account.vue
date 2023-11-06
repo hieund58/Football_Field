@@ -13,8 +13,8 @@
         <n-gi span="3">
           <ul>
             <li>{{ user ? user.email : '' }}</li>
-            <li>{{ userInfo.fullName }}</li>
-            <li>{{ userInfo.phone }}</li>
+            <li>{{ userInfo ? userInfo.fullName : '' }}</li>
+            <li>{{ userInfo ? userInfo.phone : '' }}</li>
           </ul>
         </n-gi>
       </n-grid>
@@ -37,7 +37,7 @@
         </n-gi>
         <n-gi span="3">
           <ul>
-            <li><input v-model="userInfo.email" placeholder="Email" class="edit-form" /></li>
+            <li>{{ user ? user.email : '' }}</li>
             <li><input v-model="userInfo.fullName" placeholder="Họ Tên" class="edit-form" /></li>
             <li><input v-model="userInfo.phone" placeholder="Số Điện Thoại" class="edit-form" /></li>
           </ul>
@@ -71,32 +71,53 @@ export default {
   methods: {
     async fetchUserInfo() {
       // Lấy thông tin người dùng từ sessionStorage
-      const userData = sessionStorage.getItem('userData');
-      if (userData) {
-        this.user = JSON.parse(userData);
-        this.userInfo.fullName = this.user.fullName;
-        this.userInfo.phone = this.user.phone;
-      } else {
-        console.error('Không tìm thấy thông tin người dùng.');
+      let userData = sessionStorage.getItem('userData');
+
+      if (!userData) {
+        // Nếu userInfo chưa tồn tại, tạo một đối tượng mặc định
+        const defaultUserInfo = {
+          email: '',
+          fullName: '',
+          phone: ''
+        };
+
+        // Lưu đối tượng userInfo vào sessionStorage
+        userData = JSON.stringify(defaultUserInfo);
+        sessionStorage.setItem('userData', userData);
       }
+
+      // Gán giá trị từ sessionStorage vào userInfo
+      this.user = JSON.parse(userData);
+      this.userInfo.fullName = this.user.fullName;
+      this.userInfo.phone = this.user.phone;
     },
+
     startEditing() {
       this.isEditing = true;
     },
+
     async saveEditing() {
+      if (!this.userInfo) {
+        this.userInfo = {}; // Khởi tạo userInfo nếu nó chưa tồn tại
+      }
       // Gửi thông tin chỉnh sửa lên máy chủ thông qua API
       try {
-        await axios.put("http://localhost:5000/api/userinfo", {
+        const data = {
           email: this.user.email,
           fullName: this.userInfo.fullName,
           phone: this.userInfo.phone,
-        });
-        this.isEditing = false;
+        };
+
+        await axios.put("http://localhost:5000/api/userinfo", data);
+
         // Cập nhật thông tin người dùng sau khi chỉnh sửa
         this.user.fullName = this.userInfo.fullName;
         this.user.phone = this.userInfo.phone;
+
         // Cập nhật thông tin người dùng trong sessionStorage
         sessionStorage.setItem('userData', JSON.stringify(this.user));
+
+        this.isEditing = false; // Kết thúc chế độ chỉnh sửa
       } catch (error) {
         console.error(error);
       }
@@ -107,6 +128,10 @@ export default {
   },
 };
 </script>
+
+
+
+
 
 <style scoped>
 .wrapper {

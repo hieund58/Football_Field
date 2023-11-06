@@ -37,25 +37,20 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-// Thêm sản phẩm mới kèm theo hình ảnh
-router.post('/', upload.single('image'), async (req, res) => {
+router.post('/', async (req, res) => {
   try {
-    if (req.file) {
-      const newProduct = new Product({
-        ...req.body,
-        imageSrc: '/uploads/' + req.file.filename, // URL đến hình ảnh trên máy chủ
-      });
+    const newProduct = new Product({
+      ...req.body,
+    });
 
-      await newProduct.save();
-      res.status(201).json(newProduct);
-    } else {
-      res.status(400).json({ message: 'Hình ảnh không hợp lệ' });
-    }
+    await newProduct.save();
+    res.status(201).json(newProduct);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Đã xảy ra lỗi' });
   }
 });
+
 
 // Cập nhật sản phẩm kèm theo cập nhật hình ảnh
 router.put('/:id', upload.single('image'), async (req, res) => {

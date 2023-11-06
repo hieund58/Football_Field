@@ -6,7 +6,7 @@ const User = require('../../db/user'); // Đảm bảo bạn đã định nghĩa
 router.get('/', async (req, res) => {
   try {
     // Trích xuất email của người dùng từ yêu cầu
-    const { email } = req.body;
+    const { email } = req.query; // Sửa req.body thành req.query để trích xuất email từ query parameters
 
     // Tìm người dùng dựa trên email
     const user = await User.findOne({ email });
@@ -21,20 +21,33 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: 'Đã xảy ra lỗi.' });
   }
 });
+
 // Thêm vào phương thức PUT trong editprofile.js
-router.put('', async (req, res) => {
+router.put('/', async (req, res) => {
   try {
     const { email, fullName, phone } = req.body;
 
-    // Tìm và cập nhật người dùng dựa trên email
-    const updatedUser = await User.findOneAndUpdate({ email }, { fullName, phone }, { new: true });
+    // Tìm người dùng dựa trên email
+    const existingUser = await User.findOne({ email });
 
-    if (!updatedUser) {
+    if (!existingUser) {
       return res.status(404).json({ message: 'Người dùng không tồn tại' });
     }
 
+    // Kiểm tra và ngăn chặn việc cập nhật trường email
+    if (email !== existingUser.email) {
+      return res.status(400).json({ message: 'Không được phép cập nhật email.' });
+    }
+
+    // Cập nhật các trường khác ngoài email
+    existingUser.fullName = fullName;
+    existingUser.phone = phone;
+
+    // Lưu thông tin người dùng đã cập nhật
+    await existingUser.save();
+
     // Cập nhật sessionStorage sau khi lưu thành công vào cơ sở dữ liệu
-    req.session.userInfo = { email: updatedUser.email, fullName: updatedUser.fullName, phone: updatedUser.phone };
+    req.session.userInfo = { email: existingUser.email, fullName: existingUser.fullName, phone: existingUser.phone };
 
     res.status(200).json({ message: 'Thông tin cá nhân đã được cập nhật.' });
   } catch (error) {
@@ -42,6 +55,5 @@ router.put('', async (req, res) => {
     res.status(500).json({ message: 'Đã xảy ra lỗi.' });
   }
 });
-
 
 module.exports = router;

@@ -47,6 +47,11 @@ import Login from "./components/Account/Login.vue";
 import Register from "./components/Account/Register.vue";
 import UserProfile from "./components/Profile/User/UserProfile.vue";
 import ManageProfile from "./components/Profile/Manager/ManageProfile.vue";
+import LoginAdmin from './components/Admin/login.vue';
+import HomeAdmin from './components/Admin/home.vue';
+import Fields from './components/Admin/Fields.vue';
+import BookingDetail from './components/Admin/Bookings.vue';
+import Revenue from './components/Admin/Revenue.vue';
 import { create } from "naive-ui";
 const router = createRouter({
   history: createWebHistory(),
@@ -58,12 +63,19 @@ const router = createRouter({
     },
     { path: "/bookingball", component: BookingBallLayout },
     { path: "/detailball/:id", component: DetailBall },
-    { path: "/thanhtoanball", component: ThanhToanBall },
+    { path: "/detailball/:id/thanhtoanball/:sanId/:selectDate/:selectTime", component: ThanhToanBall,name:'thanhtoanball',props: true, },
     { path: "/aboutus", component: AboutUsVue },
     { path: "/login", component: Login },
     { path: "/register", component: Register },
     { path: "/user", component: UserProfile },
     { path: "/manage", component: ManageProfile },
+    
+    { path: "/admin", component: LoginAdmin },
+    { path: "/admin/home", component: HomeAdmin },
+    { path: "/Fields", component: Fields },
+    { path: "/bookingDetail", component: BookingDetail },
+    { path: "/Revenue", component: Revenue },
+    
   ],
 });
 

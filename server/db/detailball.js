@@ -1,22 +1,18 @@
-// detailModel.js
 const mongoose = require('mongoose');
-const Schedule = require('../db/schedule');
 
-const detailSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
-  _idProduct: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product' // Tham chiếu đến mô hình Product
-  },
+const paymentSchema = new mongoose.Schema({
   name: String,
-  description: {
-    facilities: String,
-    prices: String,
-    transportation: String,
-  },
-  schedules: [Schedule.schema], // Mảng lưu trữ lịch sân cho từng ngày trong tháng
+ people: String,
+  address:String,
+  username: String,
+  sanId: String,
+  selectDate: String,
+  selectTime: String,
+  price: Number,
+  paymentMethod: String,
+  status: String,
 });
 
-const Detail = mongoose.model('Detail', detailSchema);
+const Payment = mongoose.model('Payment', paymentSchema);
 
-module.exports = Detail;
+module.exports = Payment;

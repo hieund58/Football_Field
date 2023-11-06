@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Schedule = require('../db/schedule');
+// const Schedule = require('../db/schedule');
 const productSchema = new mongoose.Schema({
   email:String,
   name: String,
@@ -14,7 +14,7 @@ const productSchema = new mongoose.Schema({
     prices: String,
     transportation: String,
   },
-  schedules: [Schedule.schema],
+ // schedules: [Schedule.schema],
 });
 
 const Product = mongoose.model('Product', productSchema);
