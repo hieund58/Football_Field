@@ -37,7 +37,7 @@
               <td>{{ field.name }}</td>
               <td>{{ field.people }}</td>
               <td>{{ field.description && field.description.facilities }}</td>
-
+              <td></td>
               <td>
                 <img :src="field.imageSrc" alt="Hình ảnh sân" style="max-width: 100px" />
               </td>

@@ -1,10 +1,11 @@
-import { createApp,ref } from "vue";
+import { createApp, ref } from "vue";
 import "./assets/css/style.css";
 import App from "./App.vue";
 import naive from "naive-ui";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import {faLocationDot,faEnvelope,faPhone,faCreditCard,faUser,faArrowRightFromBracket,faUserPen,faTag,faHeadphones,faFileInvoiceDollar,faFutbol,faFilePen,faSave,faArrowRight,faArrowLeft,faTrash,faFloppyDisk,faEye
+import {
+  faLocationDot, faEnvelope, faPhone, faCreditCard, faUser, faArrowRightFromBracket, faUserPen, faTag, faHeadphones, faFileInvoiceDollar, faFutbol, faFilePen, faSave, faArrowRight, faArrowLeft, faTrash, faFloppyDisk, faEye
 } from "@fortawesome/free-solid-svg-icons";
 
 import {
@@ -52,6 +53,11 @@ import HomeAdmin from './components/Admin/home.vue';
 import Fields from './components/Admin/Fields.vue';
 import BookingDetail from './components/Admin/Bookings.vue';
 import Revenue from './components/Admin/Revenue.vue';
+
+
+import userManager from './components/Admin/userManager.vue';
+
+
 import { create } from "naive-ui";
 const router = createRouter({
   history: createWebHistory(),
@@ -69,13 +75,13 @@ const router = createRouter({
     { path: "/register", component: Register },
     { path: "/user", component: UserProfile },
     { path: "/manage", component: ManageProfile },
-    
     { path: "/admin", component: LoginAdmin },
     { path: "/admin/home", component: HomeAdmin },
     { path: "/Fields", component: Fields },
     { path: "/bookingDetail", component: BookingDetail },
     { path: "/Revenue", component: Revenue },
-    
+    { path: "/userManager", component: userManager }
+
   ],
 });
 
