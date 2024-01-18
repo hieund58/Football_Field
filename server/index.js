@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 
 
-// Chỉ định router cho /api/signup và /api/login
+// Chỉ định router cho cacs tuyến đường routes/api
 const signupRouter = require('../server/routes/api/signup');
 const loginRouter = require('../server/routes/api/login');
 const productRouter = require('../server/routes/api/products');
@@ -29,6 +29,8 @@ const payment = require('../server/routes/api/detailball');
 const urlpay = require('../server/routes/api/urlpay');
 const ipnurl = require('../server/routes/api/ipnurl');
 const returnurl = require('../server/routes/api/returnurl');
+const users = require('../server/routes/api/users');
+const paypal = require('../server/routes/api/paypal');
 app.use('/api/vnpay_ipn', ipnurl);
 app.use('/api/vnpay_return', returnurl);
 app.use('/api/create_payment_url', urlpay);
@@ -39,6 +41,8 @@ app.use('/api/login', loginRouter);
 app.use('/api/userinfo', editProfile);
 app.use('/api/createOrder', order);
 app.use('/api/process-payment', payment);
+app.use('/api/users', users);
+app.use('/api/paypal', paypal);
 // ... Các phần khác của ứng dụng ...
 
 const port = process.env.port || 5000;

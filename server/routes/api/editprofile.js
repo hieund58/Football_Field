@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../../db/user'); // Đảm bảo bạn đã định nghĩa User schema ở đây
-
+const session = require('express-session');
 // Lấy thông tin người dùng từ cơ sở dữ liệu
 router.get('/', async (req, res) => {
   try {
@@ -22,7 +22,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Thêm vào phương thức PUT trong editprofile.js
 router.put('/', async (req, res) => {
   try {
     const { email, fullName, phone } = req.body;
@@ -45,9 +44,6 @@ router.put('/', async (req, res) => {
 
     // Lưu thông tin người dùng đã cập nhật
     await existingUser.save();
-
-    // Cập nhật sessionStorage sau khi lưu thành công vào cơ sở dữ liệu
-    req.session.userInfo = { email: existingUser.email, fullName: existingUser.fullName, phone: existingUser.phone };
 
     res.status(200).json({ message: 'Thông tin cá nhân đã được cập nhật.' });
   } catch (error) {

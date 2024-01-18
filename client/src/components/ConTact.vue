@@ -8,7 +8,7 @@
             style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)" />
         </div>
         <div class="mx-auto max-w-2xl text-center">
-          <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl" style="font-size:60px">Contact Us</h2>
+          <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl" style="font-size:60px">Hỗ trợ </h2>
     
         </div>
         <form action="#" method="POST" class="mx-auto mt-16 max-w-xl sm:mt-20">
@@ -28,7 +28,7 @@
               </div>
             </div>
             <div class="sm:col-span-2">
-              <label for="adress" class="block text-sm font-semibold leading-6 text-gray-900">Adress</label>
+              <label for="adress" class="block text-sm font-semibold leading-6 text-gray-900">Địa chỉ</label>
               <div class="mt-2.5">
                 <input type="text" name="adress" id="adress" autocomplete="organization"
                   class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
@@ -49,7 +49,7 @@
               </div>
             </div>
             <div class="sm:col-span-2">
-              <label for="message" class="block text-sm font-semibold leading-6 text-gray-900">Message</label>
+              <label for="message" class="block text-sm font-semibold leading-6 text-gray-900">Tin nhắn</label>
               <div class="mt-2.5">
                 <textarea name="message" id="message" rows="4"
                   class="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />

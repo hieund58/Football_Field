@@ -140,4 +140,46 @@ router.put('/update-price/:date', async (req, res) => {
   }
 });
 
+// Route to update court information for a specific date
+router.put('/update-court/:date/:sanId/delete', async (req, res) => {
+  try {
+    const isoDateString = req.params.date;
+    const selectTime = req.body.selectTime;
+    const sanId = req.params.sanId;
+
+    // Chuyển đổi isoDateString thành định dạng YYYY-MM-DD
+    const date = new Date(isoDateString);
+    if (isNaN(date)) {
+      throw new Error('Invalid date format');
+    }
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+
+    // Tìm lịch sân dựa trên date và sanId
+    const schedule = await Schedule.findOne({ date: formattedDate, sanId });
+
+    if (schedule) {
+      // Tìm slot cần cập nhật
+      const slotIndex = schedule.slots.findIndex(slot => slot.hour === selectTime);
+
+      if (slotIndex !== -1 && schedule.slots[slotIndex].court > 0) {
+        // Giảm số sân còn trống đi 1
+        schedule.slots[slotIndex].court -= 1;
+
+        // Lưu cập nhật vào CSDL
+        await schedule.save();
+        return res.json({ message: 'Cập nhật số sân thành công' });
+      }
+    }
+
+    res.status(400).json({ message: 'Không thể cập nhật số sân cho lịch sân.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Lỗi khi cập nhật số sân.' });
+  }
+});
+
+
 module.exports = router;

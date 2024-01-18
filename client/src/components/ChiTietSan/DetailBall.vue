@@ -4,8 +4,8 @@
       <h1>{{ detail.name }}</h1>
       <h2><font-awesome-icon icon="location-dot" /> {{ detail.area }}</h2>
       <n-carousel effect="card" prev-slide-style="transform: translateX(-150%) translateZ(-800px);"
-                  next-slide-style="transform: translateX(50%) translateZ(-800px);" style="height: 500px" :show-dots="false">
-                  <n-carousel-item :style="{ width: '60%' }">
+        next-slide-style="transform: translateX(50%) translateZ(-800px);" style="height: 500px" :show-dots="false">
+        <n-carousel-item :style="{ width: '60%' }">
           <img class="carousel-img" :src="detail.imageSrc" />
         </n-carousel-item>
         <n-carousel-item :style="{ width: '60%' }">
@@ -28,7 +28,7 @@
           </div>
           <div class="detail">
             <div class="detail-2">
-              <ul >
+              <ul>
                 <span class="detail-header">Cơ Sở Vật Chất Và Tiện Ích Tại Sân</span>
                 <li class="detail-content">{{ detail.description.facilities }}</li>
               </ul>
@@ -36,7 +36,7 @@
                 <span class="detail-header">Giá Thuê</span>
                 <li class="detail-content">{{ detail.description.prices }}</li>
               </ul>
-              <ul >
+              <ul>
                 <span class="detail-header">Cách Thức Di Chuyển</span>
                 <li class="detail-content">{{ detail.description.transportation }}</li>
               </ul>
@@ -58,11 +58,11 @@
                 </tr>
               </thead>
               <tbody>
-                   <tr v-for="(slot, index) in selectedInfo" :key="slot.hour">
-                    <td>{{ slot.hour }}</td>
-                    <td>{{ slot.status }}</td>
-             <td>{{ slot.court }}</td>
-             <td>{{ slot.price }}</td>
+                <tr v-for="(slot, index) in selectedInfo" :key="slot.hour">
+                  <td>{{ slot.hour }}</td>
+                  <td>{{ slot.status }}</td>
+                  <td>{{ slot.court }}</td>
+                  <td>{{ slot.price }}</td>
                 </tr>
               </tbody>
             </n-table>
@@ -70,21 +70,20 @@
           <div class="css-content-datetime">
             <span class="header-datsan">Đặt Sân Tại Đây</span>
             <div class="content-datetime">
-              <n-date-picker v-model="selectedDate" type="date" @update:value="onDateChange"  format="yyyy-MM-dd"></n-date-picker>
-              <select v-model="selectedTime" class="date-time"  @change="handleTimeChange">
+              <n-date-picker v-model="selectedDate" type="date" @update:value="onDateChange"
+                format="yyyy-MM-dd"></n-date-picker>
+              <select v-model="selectedTime" class="date-time" @change="handleTimeChange">
                 <option value="">Chọn giờ</option>
                 <option v-for="hour in hoursList" :key="hour" :value="hour">{{ hour }}</option>
               </select>
-            <router-link :to="getThanhToanBallLink">
-  <button class="bt-datsan" @click="submitDateTime" :disabled="!isFormValid || !selectedDate || !selectedTime">Đặt Sân</button>
-</router-link>
-
-
-
+              <router-link :to="getThanhToanBallLink">
+                <button class="bt-datsan" @click="submitDateTime"
+                  :disabled="!isFormValid || !selectedDate || !selectedTime">Đặt Sân</button>
+              </router-link>
             </div>
             <p v-if="!isFormValid && (!selectedDate || !selectedTime)" style="color: red; padding-left: 140px;">
               {{ formErrorMessage }}
-</p>
+            </p>
 
           </div>
         </n-gi>
@@ -96,7 +95,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
-import { useRoute, useRouter  } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 const router = useRouter();
 const route = useRoute();
 const _id = computed(() => route.params.id);
@@ -125,12 +124,12 @@ const productInfo = ref({
     prices: '',
     transportation: '',
   },
- 
+
 });
 const selectedInfo = ref([
   {
-  date: '',
-  sanId:'',
+    date: '',
+    sanId: '',
     slots: [{
       hour: '',
       status: '',
@@ -175,7 +174,7 @@ const fetchDetail = async () => {
     if (detail.value && detail.value._id) {
       // In ra detail theo _id hiện tại
       console.log('Detail cho _id hiện tại:', detail.value);
-      
+
       // Gọi hàm fetchScheduleByDate ở đây
       fetchScheduleByDate(selectedDate.value);
     } else {
@@ -190,12 +189,12 @@ const fetchDetail = async () => {
 
 const fetchScheduleByDate = async (selectedDateValue, sanId) => {
   try {
-    if (!selectedDateValue || !sanId ) {
+    if (!selectedDateValue || !sanId) {
       console.error('Vui lòng chọn sản phẩm và ngày trước khi lấy lịch sân.');
       return;
     }
 
-    const isoDateString = selectedDateValue.toISODate(); 
+    const isoDateString = selectedDateValue.toISODate();
     const axiosInstance = axios.create({
       baseURL: 'http://localhost:5000/api/schedule/',
     });
@@ -208,7 +207,7 @@ const fetchScheduleByDate = async (selectedDateValue, sanId) => {
     const response = await axiosInstance.get(`get-schedule-by-date/${isoDateString}/${sanId}`, { params: { selectedDateValue: isoDateString } });
 
     if (response.data.schedule) {
-   
+
       selectedInfo.value = response.data.schedule.slots;
     } else {
       console.error('Không tìm thấy lịch sân cho sản phẩm này.');
@@ -240,7 +239,7 @@ const onDateChange = (date) => {
   } else {
     console.error('Ngày không hợp lệ:', date);
   }
- 
+
 };
 
 
@@ -286,17 +285,38 @@ const submitDateTime = () => {
     isFormValid.value = false;
     formErrorMessage.value = 'Vui lòng chọn ngày và giờ trước khi đặt sân.';
   } else {
-    isFormValid.value = true;// Chuyển hướng bằng router
-    
-    router.push(getThanhToanBallLink.value);
+    const userData = getUserDataFromSessionStorage();
+    if (userData && userData.email) {
+      isFormValid.value = true;
+      router.push(getThanhToanBallLink.value);
+    } else {
+      formErrorMessage.value = 'Bạn phải đăng nhập và cung cấp địa chỉ email trước khi đặt sân.';
+    }
   }
+};
+
+const getUserDataFromSessionStorage = () => {
+  // Kiểm tra xem có dữ liệu userData trong sessionStorage không
+  const userDataString = sessionStorage.getItem('userData');
+  if (userDataString) {
+    try {
+      // Parse dữ liệu userData từ JSON
+      const userData = JSON.parse(userDataString);
+      console.log('Dữ liệu userData:', userData); // In dữ liệu userData vào console
+      return userData;
+    } catch (error) {
+      console.error('Lỗi khi phân tích dữ liệu userData từ sessionStorage:', error);
+    }
+  }
+  return null;
 };
 
 
 const getThanhToanBallLink = computed(() => {
   return {
     name: 'thanhtoanball',
-    params: { id: _id.value,detailData:detail,     selectTime: selectedTime.value,
+    params: {
+      id: _id.value, detailData: detail, selectTime: selectedTime.value,
       selectDate: selectedDate.value.toISODate(), sanId: _id.value,
     },
     query: {
@@ -320,7 +340,7 @@ const getSanIdFromSelectedInfo = (selectedInfo) => {
 onMounted(() => {
   console.log("_id:", _id.value);
   console.log("detail:", detail.value);
-   // Lấy sanId từ mảng selectedInfo
+  // Lấy sanId từ mảng selectedInfo
   const sanId = getSanIdFromSelectedInfo(selectedInfo.value);
   console.log("sanId:", sanId);
   fetchDetail();
@@ -369,7 +389,8 @@ onMounted(() => {
 }
 
 .status-header {
-  width: 33.33%; /* Điều chỉnh chiều rộng cột tại đây */
+  width: 33.33%;
+  /* Điều chỉnh chiều rộng cột tại đây */
   text-align: center;
 }
 
@@ -437,16 +458,19 @@ onMounted(() => {
   border: 1px solid #ccc;
   box-sizing: border-box;
   float: left;
+  margin: 0px 5px;
   border-radius: 0.3rem;
 }
 
 .bt-datsan {
+  width: 100px;
+  margin: 0px 10px;
   padding: 5px;
   border: none;
   background-color: #fa4516;
   color: #fff;
   cursor: pointer;
-  font-size: 17px;
+  font-size: 15px;
   transition: background-color 0.3s ease;
   border-radius: 0.3rem;
 }

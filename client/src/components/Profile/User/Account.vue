@@ -61,8 +61,9 @@ export default {
   data() {
     return {
       isEditing: false,
-      user: {}, // Thay đổi đối tượng user này để lưu thông tin người dùng
+      user: {},
       userInfo: {
+        email: "",
         fullName: "",
         phone: "",
       },
@@ -71,25 +72,26 @@ export default {
   methods: {
     async fetchUserInfo() {
       // Lấy thông tin người dùng từ sessionStorage
-      let userData = sessionStorage.getItem('userData');
+      let userData = sessionStorage.getItem("userData");
 
       if (!userData) {
         // Nếu userInfo chưa tồn tại, tạo một đối tượng mặc định
         const defaultUserInfo = {
-          email: '',
-          fullName: '',
-          phone: ''
+          email: "",
+          fullName: "",
+          phone: "",
         };
 
         // Lưu đối tượng userInfo vào sessionStorage
         userData = JSON.stringify(defaultUserInfo);
-        sessionStorage.setItem('userData', userData);
+        sessionStorage.setItem("userData", userData);
       }
 
       // Gán giá trị từ sessionStorage vào userInfo
       this.user = JSON.parse(userData);
       this.userInfo.fullName = this.user.fullName;
       this.userInfo.phone = this.user.phone;
+      this.userInfo.email = this.user.email;
     },
 
     startEditing() {
@@ -97,38 +99,41 @@ export default {
     },
 
     async saveEditing() {
-      if (!this.userInfo) {
-        this.userInfo = {}; // Khởi tạo userInfo nếu nó chưa tồn tại
-      }
-      // Gửi thông tin chỉnh sửa lên máy chủ thông qua API
-      try {
-        const data = {
-          email: this.user.email,
-          fullName: this.userInfo.fullName,
-          phone: this.userInfo.phone,
-        };
+  try {
+    // Lưu thông tin chỉnh sửa vào sessionStorage
+    this.user.fullName = this.userInfo.fullName;
+    this.user.phone = this.userInfo.phone;
 
-        await axios.put("http://localhost:5000/api/userinfo", data);
+    // Lưu thông tin người dùng trong sessionStorage
+    sessionStorage.setItem("userData", JSON.stringify(this.user));
 
-        // Cập nhật thông tin người dùng sau khi chỉnh sửa
-        this.user.fullName = this.userInfo.fullName;
-        this.user.phone = this.userInfo.phone;
+    // Chuẩn bị dữ liệu để gửi lên máy chủ
+    const data = {
+      email: this.userInfo.email,
+      fullName: this.userInfo.fullName,
+      phone: this.userInfo.phone,
+    };
 
-        // Cập nhật thông tin người dùng trong sessionStorage
-        sessionStorage.setItem('userData', JSON.stringify(this.user));
+    // Gửi yêu cầu PUT đến API
+    const response = await axios.put('http://localhost:5000/api/userinfo', data);
 
-        this.isEditing = false; // Kết thúc chế độ chỉnh sửa
-      } catch (error) {
-        console.error(error);
-      }
-    },
+    if (response.status === 200) {
+      this.isEditing = false; // Kết thúc chế độ chỉnh sửa
+    } else {
+      console.error('Lỗi khi cập nhật thông tin người dùng.');
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
   },
   created() {
     this.fetchUserInfo();
   },
 };
 </script>
-
 
 
 

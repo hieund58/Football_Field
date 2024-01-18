@@ -4,8 +4,8 @@
       <n-gi span="1" class="menu">
         <div class="menu-up">
           <img :src="userImage.url" alt="">
-          <h1>Vũ Văn Hiến</h1>
-          <small>Người Quản Lý</small>
+          <h1>{{ userEmail }}</h1>
+          <small>{{ userRole }}</small>
         </div>
         <div class="menu-down">
           <ul>
@@ -48,14 +48,25 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onBeforeMount } from "vue";
 import Account from "./Account.vue"
 import QuanLySan from '../Manager/Quanlysan.vue'
 const selectedTab = ref("account");
 const userImage = ref({
   url: "https://th.bing.com/th/id/OIP.Fogk0Q6C7GEQEdVyrbV9MwHaHa?pid=ImgDet&rs=1"
 });
+const userEmail = ref(""); // Biến chứa email
+const userRole = ref(""); // Biến chứa role
+onBeforeMount(() => {
+  // Lấy giá trị email và role từ sessionStorage
+  const userData = sessionStorage.getItem("userData");
 
+  if (userData) {
+    const { email, role } = JSON.parse(userData);
+    userEmail.value = email;
+    userRole.value = role;
+  }
+});
 </script>
 
 <style scoped>

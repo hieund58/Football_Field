@@ -1,91 +1,122 @@
 <template>
-    <div class="wrapper">
-      <div class="header">
-        <n-row>
-          <n-col span="24">
-            <font-awesome-icon class="icon-credit" :icon="['fas', 'credit-card']" />
-          </n-col>
-        </n-row>
-        <n-row>
-          <n-col span="24">
-            <h1 id="the-h1">Thanh Toán</h1>
-            <span>Vui lòng kiểm tra kĩ thông tin sân trước khi đặt sân.</span>
-          </n-col>
-        </n-row>
-      </div>
-      <div class="content">
-        <n-grid cols="2">
-          <n-gi class="content-anh" span="1">
-            <img class="carousel-img" :src="currentDetail && currentDetail.imageSrc" />
-          </n-gi>
-          <n-gi class="content-thongtin" span="1">
-            <n-table :bordered="true" :single-line="false">
-              <thead>
-                <th class="thongtin-cangiua">Thông Tin</th>
-                <th></th>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="thongtin-cangiua">Tên</td>
-                  <td>{{ currentDetail && currentDetail.name }}</td>
-                </tr>
-                <tr>
-                  <td class="thongtin-cangiua">Loại Sân</td>
-                  <td>{{ currentDetail && currentDetail.people }}</td>
-                </tr>
-                <tr>
-                  <td class="thongtin-cangiua">Địa Chỉ</td>
-                  <td>{{ currentDetail && currentDetail.address }}</td>
-                </tr>
-                <tr>
-                  <td class="thongtin-cangiua">Ngày</td>
-                  <td>{{ selectDate }}</td>
-                </tr>
-                <tr>
-                  <td class="thongtin-cangiua">Thời gian</td>
-                  <td>{{ selectTime }}</td>
-                </tr>
-                <tr>
-                  <td class="thongtin-cangiua">Giá tiền</td>
-                  <td>{{ $route.query.price }}</td>
-                </tr>
-                <!-- Thêm các thuộc tính khác của detail theo cùng mẫu -->
-              </tbody>
-            </n-table>
-            <div class="payment-methods">
-              <h1>Hình Thức Thanh Toán</h1>
-              <div class="cash-banking">
-                <label>
-                  <input type="checkbox" value="banking" v-model="bankingSelected" class="input-checkbox"
-                    @change="handleCheckboxChange('banking')" />
-                  Banking
-                </label>
-              </div>
-              <iframe id="invoiceFrame" style="display: none;"></iframe>
-  
-              <div v-if="bankingSelected" style="display: flex; justify-content: center">
-                <img src="../../assets/images/qrthanhtoan.png" alt="Banking" style="width: 50%; height: 50%;" />
-              </div>
-              <button @click="showPaymentDialog">Thanh toán</button>
-              <div class="dialog-overlay" v-if="isPaymentDialogVisible">
-                <div class="dialog-content">
-                  <!-- Hiển thị hóa đơn và nút xác nhận -->
-                  <div class="invoice-content">
-                    <!-- Nội dung hóa đơn được hiển thị ở đây -->
-                    <button @click="confirmPayment">Xác nhận thanh toán</button>
-                    <button @click="closePaymentDialog">Hủy</button>
-                  </div>
-                </div>
-              </div>
-              <button @click="createOrderAndRedirectToVnPay">In hóa đơn</button>
-              <div v-if="!isPaymentValid && paymentClicked" style="color: red;">Vui lòng chọn phương thức thanh toán !</div>
-              <div v-if="isPaymentValid && paymentClicked" style="color: rgb(0, 218, 0)">Đặt sân thành công !</div>
-            </div>
-          </n-gi>
-        </n-grid>
-      </div>
+  <div class="wrapper bg-gray-100 p-6">
+    <div class="header text-center">
+      <n-row>
+        <n-col span="24">
+          <font-awesome-icon class="icon-credit text-5xl" :icon="['fas', 'credit-card']" />
+        </n-col>
+      </n-row>
+      <n-row>
+        <n-col span="24">
+          <h1 id="the-h1" class="text-2xl font-semibold">Thanh Toán</h1>
+          <span>Vui lòng kiểm tra kĩ thông tin sân trước khi đặt sân.</span>
+        </n-col>
+      </n-row>
     </div>
-  </template>
+    <div class="content mt-6">
+      <n-grid cols="1 sm:2">
+        <n-gi class="content-anh" span="1">
+          <img class="carousel-img" :src="currentDetail && currentDetail.imageSrc" />
+        </n-gi>
+        <n-gi class="content-thongtin" span="1">
+          <n-table :bordered="true" :single-line="false">
+            <thead>
+              <th class="thongtin-cangiua">Thông Tin</th>
+              <th></th>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="thongtin-cangiua">Tên</td>
+                <td>{{ currentDetail && currentDetail.name }}</td>
+              </tr>
+              <tr>
+                <td class="thongtin-cangiua">Loại Sân</td>
+                <td>{{ currentDetail && currentDetail.people }}</td>
+              </tr>
+              <tr>
+                <td class="thongtin-cangiua">Địa Chỉ</td>
+                <td>{{ currentDetail && currentDetail.address }}</td>
+              </tr>
+              <tr>
+                <td class="thongtin-cangiua">Ngày</td>
+                <td>{{ selectDate }}</td>
+              </tr>
+              <tr>
+                <td class="thongtin-cangiua">Thời gian</td>
+                <td>{{ selectTime }}</td>
+              </tr>
+              <tr>
+                <td class="thongtin-cangiua">Giá tiền</td>
+                <td>{{ $route.query.price }}</td>
+              </tr>
+              <!-- Thêm các thuộc tính khác của detail theo cùng mẫu -->
+            </tbody>
+          </n-table>
+          <div class="payment-methods mt-4 mx-auto my-auto">
+            <h1 class="text-lg font-semibold">Hình Thức Thanh Toán</h1>
+            <iframe id="invoiceFrame" style="display: none;"></iframe>
+            
+            <button @click="showPaymentDialog">́          Xác nhận đã thanh toán QR</button>
+            <div class="dialog-overlay" v-if="isPaymentDialogVisible">
+                                    <div class="dialog-content">
+            <!-- Hiển thị hóa đơn và nút xác nhận -->
+            <div class="invoice-content">
+            <!-- Nội dung hóa đơn được hiển thị ở đây -->
+            <button @click="confirmPayment">Xác nhận thanh toán</button>
+                                        <button @click="closePaymentDialog">Hủy</button>
+            </div>
+            </div>
+            </div>
+            <div style="display: flex; justify-content: space-between;margin:5px;padding:5px">
+              <n-grid cols="2">
+                <n-gi span="1">
+                  <h1>Thanh toán qua mã QR</h1>
+                  <img src="../../assets/images/qrthanhtoan.png" alt="Banking" style="" />
+                </n-gi>
+                <n-gi span="1">
+                  <div class="paypal">
+                    <h1>Thanh toán qua cổng PayPal</h1>
+                    <img src="https://irp.cdn-website.com/621d057d/dms3rep/multi/Paypal.png" alt="">
+                    <form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
+  
+                      <!-- Nhập địa chỉ email người nhận tiền (người bán) -->
+                      <input type="hidden" name="business" value="sb-h4etk28111132@business.example.com">
+  
+                      <!-- tham số cmd có giá trị _xclick chỉ rõ cho paypal biết là người dùng nhất nút thanh toán -->
+                      <input type="hidden" name="cmd" value="_xclick">
+  
+                      <!-- Thông tin mua hàng. -->
+                      <input type="hidden" name="item_name" value="Hóa Đơn Mua Hàng">
+                      <!--Loại tiền-->
+                      <input type="hidden" name="currency_code" value="USD">
+                      <!--Đường link mình cung cấp cho Paypal biết để sau khi xử lí thành công nó sẽ chuyển về theo đường link này-->
+                      <input type="hidden" name="return" value="http://localhost:5173">
+                      <!--Đường link mình cung cấp cho Paypal biết để nếu  xử lí KHÔNG thành công nó sẽ chuyển về theo đường link này-->
+                      <input type="hidden" name="cancel_return" value="http://localhost/demothanhtoanonline/loi.html">
+                      <!-- Nút bấm. -->
+                      <button type="submit" name="submit" value="Thanh toán quay Paypal">Thanh Toan</button>
+                      <!-- <input > -->
+                    </form>
+  
+                  </div>
+                </n-gi>
+              </n-grid>
+              <div></div>
+              <!-- Thêm thanh toán bằng Paypal  -->
+  
+            </div>
+            <router-link to="/bookedball">
+              <button @click="handlePayment" class="btn-xemchitiet">
+                Xem Thông Tin Sân Đã Đặt
+              </button>
+            </router-link>
+            <!-- <button @click="createOrderAndRedirectToVnPay" >In hóa đơn</button> -->
+          </div>
+        </n-gi>
+      </n-grid>
+    </div>
+  </div>
+</template>
   
   <script>
   import { ref, onMounted, computed, watch } from 'vue';
@@ -171,6 +202,7 @@
         } catch (error) {
           console.error('Lỗi khi xử lý thanh toán:', error);
           // Xử lý lỗi (hiển thị thông báo lỗi cho người dùng)
+          alert('Bạn phải đăng nhập mới thanh toán được');
         }
       },
       createOrderAndRedirectToVnPay() {

@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 // Lấy danh sách sản phẩm
 router.get('/', async (req, res) => {
   try {
-    const products_field = await Product.find(); // Sử dụng phương thức find() để lấy tất cả các người dùng
+    const products_field = await Product.find(); 
     res.status(200).json(products_field);
   } catch (error) {
     console.error(error);
@@ -79,18 +79,23 @@ router.put('/:id', upload.single('image'), async (req, res) => {
 });
 
 
-// Xóa sản phẩm
 router.delete('/:id', async (req, res) => {
   try {
-    const deletedProduct = await Product.findByIdAndRemove(req.params.id);
+    const id = req.params.id;
+    if (!id) {
+      return res.status(400).json({ message: 'Giá trị _id không hợp lệ' });
+    }
+    
+    const deletedProduct = await Product.findByIdAndRemove(id);
     if (!deletedProduct) {
       return res.status(404).json({ message: 'Không tìm thấy sản phẩm để xóa' });
     }
-    res.status(204).end(); // 204 No Content
+    res.status(200).json({ message: 'Xóa sản phẩm thành công' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Đã xảy ra lỗi' });
   }
 });
+
 
 module.exports = router;

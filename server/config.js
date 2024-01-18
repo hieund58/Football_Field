@@ -1,8 +1,10 @@
-module.exports = {
-    "vnp_TmnCode":"2QXUI4J4",
-    "vnp_HashSecret":"HMACSHA512",
-    "vnp_Url":"https://sandbox.vnpayment.vn/paymentv2/vpcpay.html",
-    "vnp_Api":"https://sandbox.vnpayment.vn/merchant_webapi/api/transaction",
-    "vnp_ReturnUrl": "http://localhost:5000/order/vnpay_return"
-  };
-  
+// paypalConfig.js
+const paypal = require('paypal-rest-sdk');
+
+paypal.configure({
+  mode: 'sandbox', // 'sandbox' hoặc 'live' tùy thuộc vào môi trường
+  client_id: 'AZVrnOh3W54OTZnnRhjbqGaV-YEUKJQzKtd4VcG5kDVQmqpxzlk7D_oWC52qsMIOyJFAlFZwh_vPKBJL',
+  client_secret: 'YOUR_PAYPAL_CLIENT_SECRET',
+});
+
+module.exports = paypal;

@@ -4,8 +4,8 @@
         <n-gi span="1" class="menu">
           <div class="menu-up">
             <img :src="userImage.url" alt="">
-            <h1>{{ userInfo.email }}</h1> <!-- Hiển thị email từ sessionStorage -->
-            <small>{{ userInfo.role }}</small> <!-- Hiển thị role từ sessionStorage -->
+            <h1>{{ userEmail }}</h1>
+          <small>{{ userRole }}</small><!-- Hiển thị role từ sessionStorage -->
           </div>
           <div class="menu-down">
             <ul>
@@ -46,7 +46,7 @@
   </template>
 
   <script setup>
-  import { ref, onMounted } from "vue";
+  import { ref, onBeforeMount} from "vue";
   import Account from "./Account.vue";
   import BookedBall from "./BookedBall.vue";
 
@@ -54,21 +54,18 @@
   const userImage = ref({
     url: "https://th.bing.com/th/id/OIP.Fogk0Q6C7GEQEdVyrbV9MwHaHa?pid=ImgDet&rs=1",
   });
+  const userEmail = ref(""); // Biến chứa email
+const userRole = ref(""); // Biến chứa role
+onBeforeMount(() => {
+  // Lấy giá trị email và role từ sessionStorage
+  const userData = sessionStorage.getItem("userData");
 
-  const userInfo = ref({
-    email: "",
-    role: "",
-  });
-
-  onMounted(() => {
-    // Lấy dữ liệu từ sessionStorage
-    const userData = JSON.parse(sessionStorage.getItem("userData"));
-    console.log(userData);
-    if (userData) {
-      userInfo.email = userData.email;
-      userInfo.role = userData.role;
-    }
-  });
+  if (userData) {
+    const { email, role } = JSON.parse(userData);
+    userEmail.value = email;
+    userRole.value = role;
+  }
+});
   </script>
   
   <style scoped>

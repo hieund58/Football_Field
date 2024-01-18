@@ -62,4 +62,6 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Lỗi khi lấy thông tin các sân đã được đặt' });
   }
 });
+
+
 module.exports = router;

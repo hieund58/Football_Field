@@ -53,11 +53,11 @@ import HomeAdmin from './components/Admin/home.vue';
 import Fields from './components/Admin/Fields.vue';
 import BookingDetail from './components/Admin/Bookings.vue';
 import Revenue from './components/Admin/Revenue.vue';
-
-
+import FieldRevenue from './components/Admin/FieldRevenue.vue'; 
+import ConTact from "./components/ConTact.vue";
 import userManager from './components/Admin/userManager.vue';
-
-
+import DetailNew from "./components/FootBallNews/DetailNew.vue";
+import CategoryVue from "./components/QuanAo/Category.vue";
 import { create } from "naive-ui";
 const router = createRouter({
   history: createWebHistory(),
@@ -73,6 +73,7 @@ const router = createRouter({
     { path: "/aboutus", component: AboutUsVue },
     { path: "/login", component: Login },
     { path: "/register", component: Register },
+    { path: "/contact", component: ConTact },
     { path: "/user", component: UserProfile },
     { path: "/manage", component: ManageProfile },
     { path: "/admin", component: LoginAdmin },
@@ -80,8 +81,10 @@ const router = createRouter({
     { path: "/Fields", component: Fields },
     { path: "/bookingDetail", component: BookingDetail },
     { path: "/Revenue", component: Revenue },
-    { path: "/userManager", component: userManager }
-
+    { path: "/userManager", component: userManager },
+    { path: '/Revenue/:name', name: 'FieldRevenue', component: FieldRevenue, },
+    { path: "/tintuc", component: DetailNew },
+    { path: "/quanao", component: CategoryVue }
   ],
 });
 
