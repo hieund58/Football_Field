@@ -2,7 +2,7 @@
   <footer class="footer-content bg-white text-black py-1 sm:py-6">
     <div class="container mx-auto grid grid-cols-1 sm:grid-cols-2">
       <div class="footer-left border-b sm:border-b-0 sm:border-r border-gray-300">
-        <div class="flex flex-col items-center items-center mb-7">
+        <div class="flex flex-col items-center mb-7">
           <p class="text-sm font-semibold text-center mb-2">
             Trung Tâm Cho Thuê Sân Bóng Ace
           </p>

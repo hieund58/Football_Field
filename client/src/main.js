@@ -5,7 +5,11 @@ import naive from "naive-ui";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
-  faLocationDot, faEnvelope, faPhone, faCreditCard, faUser, faArrowRightFromBracket, faUserPen, faTag, faHeadphones, faFileInvoiceDollar, faFutbol, faFilePen, faSave, faArrowRight, faArrowLeft, faTrash, faFloppyDisk, faEye
+  faLocationDot, faEnvelope, faPhone, faCreditCard, faUser,
+  faArrowRightFromBracket, faUserPen, faTag, faHeadphones,
+  faFileInvoiceDollar, faFutbol, faFilePen, faSave,
+  faArrowRight, faArrowLeft, faTrash, faFloppyDisk, faEye,
+  faCartShopping, faGear
 } from "@fortawesome/free-solid-svg-icons";
 
 import {
@@ -36,7 +40,9 @@ library.add(
   faArrowLeft,
   faTrash,
   faFloppyDisk,
-  faEye
+  faEye,
+  faCartShopping,
+  faGear
 );
 import { createRouter, createWebHistory } from "vue-router";
 import BookingBallLayout from "./components/DatSanBong/BookingBallLayout.vue";

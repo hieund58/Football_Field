@@ -7,7 +7,7 @@
         alt="Your Company"
         style="height: 200px; width: 200px;"
       /> -->
-      <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Đăng Nhập</h2>
+      <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-[#FA4516]">Đăng Nhập</h2>
     </div>
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
