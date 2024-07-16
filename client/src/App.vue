@@ -1,8 +1,12 @@
 <template>
   <div class="wrapper">
-    <TheHeader />
-    <router-view class="bookingball" />
-    <FooterBall />
+    <n-loading-bar-provider>
+      <n-message-provider>
+        <TheHeader />
+        <router-view class="bookingball" />
+        <FooterBall />
+      </n-message-provider>
+    </n-loading-bar-provider>
   </div>
 </template>
 
