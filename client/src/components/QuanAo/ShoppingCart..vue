@@ -175,7 +175,7 @@ const products = [
     price: "300.000",
     quantity: 1,
     imageSrc:
-      "https://th.bing.com/th/id/R.50c7934bd6541abbb51e48f4d9a3f87e?rik=t%2bUklWGK5pLWJA&riu=http%3a%2f%2fbelo.vn%2fwp-content%2fuploads%2f2018%2f11%2fz1188384674228_416a3f7ef7a51b72f6098f6a68536743.jpg&ehk=c%2fSM4moCTUr04VPvYN%2bT6incwFEJHXADwZ6kJmDKyHA%3d&risl=&pid=ImgRaw&r=0",
+      "https://th.bing.com/th/id/R.50c7934bd6541abbb51e48f4d9a3f87e?rik=t%2bUklWGK5pLWJA&riu=http%3a%2f%2fbelo.vn%2fwp-content%2fuploads%2f2018%2f11%2fz1188384674228_416a3f7ef7a51b72f6098f6a68536743.jpg",
   },
   {
     id: 2,

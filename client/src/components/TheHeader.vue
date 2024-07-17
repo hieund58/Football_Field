@@ -12,8 +12,7 @@
             style="
               color: rgb(235, 25, 25);
               font-size: 40px;
-              font-family: &quot;Gill Sans&quot;, &quot;Gill Sans MT&quot;,
-                Calibri, &quot;Trebuchet MS&quot;, sans-serif;
+              font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
               font-weight: 800;
             "
             >Ace</span
@@ -203,7 +202,7 @@
         </div>
       </div>
     </nav>
-    <ShoppingCart :open="open" />
+    <ShoppingCart :open="open" @close="open = false" />
   </header>
 </template>
 
@@ -213,7 +212,7 @@ import { useRouter } from "vue-router";
 import { onMounted } from "vue";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/vue";
 import { Bars3Icon } from "@heroicons/vue/24/outline";
-import ShoppingCart from "../components/QuanAo/ShoppingCart..vue";
+import ShoppingCart from "../components/QuanAo/ShoppingCart.vue";
 
 const router = useRouter();
 const open = ref(false);
