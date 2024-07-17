@@ -11,13 +11,11 @@
 </template>
 
 <script setup>
-
-import TheHeader from './components/TheHeader.vue';
-import FooterBall from './components/FooterBall.vue';
-
+import TheHeader from "./components/TheHeader.vue";
+import FooterBall from "./components/FooterBall.vue";
 </script>
 <style scoped>
 .bookingball {
   padding-top: 70px;
 }
-</style>  
+</style>

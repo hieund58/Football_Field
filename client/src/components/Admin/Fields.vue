@@ -4,18 +4,27 @@
       <div class="text-white p-4">
         <h2 class="text-xl font-bold">Trang chủ Admin</h2>
         <div class="user-info">
-          <p> User: {{ getUsernameFromSession }} </p>
+          <p>User: {{ getUsernameFromSession }}</p>
           <button @click="logout">Logout</button>
         </div>
       </div>
       <div class="my-4">
-        <router-link to="/fields" class="block text-gray-300 hover:bg-gray-700 py-2 px-4">
+        <router-link
+          to="/fields"
+          class="block text-gray-300 hover:bg-gray-700 py-2 px-4"
+        >
           Thống kê các sân bóng
         </router-link>
-        <router-link to="/bookingDetail" class="block text-gray-300 hover.bg-gray-700 py-2 px-4">
+        <router-link
+          to="/bookingDetail"
+          class="block text-gray-300 hover.bg-gray-700 py-2 px-4"
+        >
           Sân đang được đặt
         </router-link>
-        <router-link to="/revenue" class="block text-gray-300 hover.bg-gray-700 py-2 px-4">
+        <router-link
+          to="/revenue"
+          class="block text-gray-300 hover.bg-gray-700 py-2 px-4"
+        >
           Doanh Thu
         </router-link>
       </div>
@@ -40,7 +49,11 @@
               <td>{{ field.description && field.description.facilities }}</td>
               <td>{{ field.price }}</td>
               <td>
-                <img :src="field.imageSrc" alt="Hình ảnh sân" style="max-width: 100px" />
+                <img
+                  :src="field.imageSrc"
+                  alt="Hình ảnh sân"
+                  style="max-width: 100px"
+                />
               </td>
             </tr>
           </tbody>
@@ -52,12 +65,14 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
 
 export default {
   computed: {
     getUsernameFromSession() {
-      return sessionStorage.getItem('isLoggedIn') === 'true' ? sessionStorage.getItem('userLogin') : 'Chưa đăng nhập';
+      return sessionStorage.getItem("isLoggedIn") === "true"
+        ? sessionStorage.getItem("userLogin")
+        : "Chưa đăng nhập";
     },
   },
   data() {
@@ -71,16 +86,16 @@ export default {
   methods: {
     async fetchFields() {
       try {
-        const response = await axios.get('http://localhost:5000/api/products');
+        const response = await axios.get("http://localhost:5000/api/products");
         this.fields = response.data;
       } catch (error) {
         console.error(error);
       }
     },
     logout() {
-      sessionStorage.removeItem('isLoggedIn');
-      sessionStorage.removeItem('userLogin');
-      this.$router.push('/admin');
+      sessionStorage.removeItem("isLoggedIn");
+      sessionStorage.removeItem("userLogin");
+      this.$router.push("/admin");
     },
   },
 };

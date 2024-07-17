@@ -1,47 +1,76 @@
 <template>
   <div class="warraper">
-    <div class="search-content shadow-xl bg-white rounded-lg p-4 sm:p-6 lg:p-12">
+    <div
+      class="search-content shadow-xl bg-white rounded-lg p-4 sm:p-6 lg:p-12"
+    >
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div class="filter">
           <h1 class="content-btn">Khu Vực</h1>
-          <n-checkbox v-for="area in areas" :key="area" :checked="isChecked(area, 'area')"
-            @update:checked="updateChecked(area, 'area')" :value="area" :label="area" />
+          <n-checkbox
+            v-for="area in areas"
+            :key="area"
+            :checked="isChecked(area, 'area')"
+            @update:checked="updateChecked(area, 'area')"
+            :value="area"
+            :label="area"
+          />
         </div>
         <div class="filter">
           <h1 class="content-btn">Giá</h1>
-          <n-checkbox v-for="price in prices" :key="price" :checked="isChecked(price, 'price')"
-            @update:checked="updateChecked(price, 'price')" :value="price" :label="price" />
-  
+          <n-checkbox
+            v-for="price in prices"
+            :key="price"
+            :checked="isChecked(price, 'price')"
+            @update:checked="updateChecked(price, 'price')"
+            :value="price"
+            :label="price"
+          />
         </div>
         <div class="filter">
           <h1 class="content-btn">Loại Sân</h1>
-          <n-checkbox v-for="person in people" :key="person" :checked="isChecked(person, 'person')"
-            @update:checked="updateChecked(person, 'person')" :value="person" :label="person" />
-  
+          <n-checkbox
+            v-for="person in people"
+            :key="person"
+            :checked="isChecked(person, 'person')"
+            @update:checked="updateChecked(person, 'person')"
+            :value="person"
+            :label="person"
+          />
         </div>
       </div>
     </div>
-  
-  
-  
+
     <div class="bg-white">
-      <div class="mx-auto max-w-full px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+      <div
+        class="mx-auto max-w-full px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8"
+      >
         <h2 class="text-2xl font-bold tracking-tight text-gray-900 text-center">
           Sân Bóng Đá
         </h2>
         <div class="mt-6 grid gap-4 sm:gap-5 lg:grid-cols-2 xl:grid-cols-4">
-          <div v-for="product in filteredProducts " :key="product.id" class="group relative">
+          <div
+            v-for="product in filteredProducts"
+            :key="product.id"
+            class="group relative"
+          >
             <div
-              class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
-              <img :src="product.imageSrc" :alt="product.imageAlt"
-                class="h-full w-full object-cover object-center lg:h-full lg:w-full" />
+              class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80"
+            >
+              <img
+                :src="product.imageSrc"
+                :alt="product.imageAlt"
+                class="h-full w-full object-cover object-center lg:h-full lg:w-full"
+              />
             </div>
             <div class="mt-4 flex justify-between">
               <div>
                 <h1 class="text-sm font-medium text-gray-1000">
                   <!-- Điều hướng đến chi tiết sản phẩm -->
-  
-                  <router-link :to="'/detailball/' +  product._id" class="absolute inset-0"></router-link>
+
+                  <router-link
+                    :to="'/detailball/' + product._id"
+                    class="absolute inset-0"
+                  ></router-link>
                   {{ product.name }}
                 </h1>
               </div>
@@ -50,45 +79,52 @@
             <p class="text-sm text-black-900">Sân : {{ product.people }}</p>
             <p class="text-sm text-black-900">Giá : {{ product.price }}/Trận</p>
           </div>
-          
         </div>
       </div>
     </div>
     <div class="pagination flex justify-center items-center p-4 lg:p-8">
-            <button @click="prevPage" :disabled="page === 1">
-              <font-awesome-icon class="icon-pagination" :icon="['fas', 'arrow-left']" />
-            </button>
-            <span>Trang {{ page }}</span>
-            <button @click="nextPage" :disabled="page >= totalPages">
-              <font-awesome-icon class="icon-pagination" :icon="['fas', 'arrow-right']" />
-            </button>
-          </div>
+      <button @click="prevPage" :disabled="page === 1">
+        <font-awesome-icon
+          class="icon-pagination"
+          :icon="['fas', 'arrow-left']"
+        />
+      </button>
+      <span>Trang {{ page }}</span>
+      <button @click="nextPage" :disabled="page >= totalPages">
+        <font-awesome-icon
+          class="icon-pagination"
+          :icon="['fas', 'arrow-right']"
+        />
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted } from "vue";
 import { getProducts } from "../../productService";
 const page = ref(1);
 const pageSize = 12;
-const products = ref([{
-  name: '',
-      address: '',
-      people: '', // Add this field
-      price: '', // Add this field
-      area: '',
-  description: {
-    facilities: '',
-    prices: '',
-    transportation: '',
+const products = ref([
+  {
+    name: "",
+    address: "",
+    people: "", // Add this field
+    price: "", // Add this field
+    area: "",
+    description: {
+      facilities: "",
+      prices: "",
+      transportation: "",
+    },
+    schedules: {
+      date: "",
+      time: "",
+      status: "",
+      totalCourts: "",
+    },
   },
-  schedules: {
-    date: '',
-    time: '',
-    status: '',
-    totalCourts: '',
-  },
-}]);
+]);
 const totalPages = computed(() => Math.ceil(products.length / pageSize));
 
 const prevPage = () => {
@@ -113,19 +149,25 @@ onMounted(() => {
 });
 const areas = computed(() => {
   // Lấy danh sách khu vực từ products
-  const uniqueAreas = Array.from(new Set(products.value.map(product => product.area)));
+  const uniqueAreas = Array.from(
+    new Set(products.value.map((product) => product.area)),
+  );
   return uniqueAreas;
 });
 
 const prices = computed(() => {
   // Lấy danh sách giá từ products
-  const uniquePrices = Array.from(new Set(products.value.map(product => product.price)));
+  const uniquePrices = Array.from(
+    new Set(products.value.map((product) => product.price)),
+  );
   return uniquePrices;
 });
 
 const people = computed(() => {
   // Lấy danh sách loại sân từ products
-  const uniquePeople = Array.from(new Set(products.value.map(product => product.people)));
+  const uniquePeople = Array.from(
+    new Set(products.value.map((product) => product.people)),
+  );
   return uniquePeople;
 });
 
@@ -134,31 +176,33 @@ const checkedPrice = ref([]);
 const checkedPerson = ref([]);
 
 const isChecked = (value, column) => {
-  if (column === 'area') {
+  if (column === "area") {
     return checkedArea.value.includes(value);
-  } else if (column === 'price') {
+  } else if (column === "price") {
     return checkedPrice.value.includes(value);
-  } else if (column === 'person') {
+  } else if (column === "person") {
     return checkedPerson.value.includes(value);
   }
 };
 
 const updateChecked = (value, column) => {
-  if (column === 'area') {
+  if (column === "area") {
     if (checkedArea.value.includes(value)) {
-      checkedArea.value = checkedArea.value.filter(item => item !== value);
+      checkedArea.value = checkedArea.value.filter((item) => item !== value);
     } else {
       checkedArea.value.push(value);
     }
-  } else if (column === 'price') {
+  } else if (column === "price") {
     if (checkedPrice.value.includes(value)) {
-      checkedPrice.value = checkedPrice.value.filter(item => item !== value);
+      checkedPrice.value = checkedPrice.value.filter((item) => item !== value);
     } else {
       checkedPrice.value.push(value);
     }
-  } else if (column === 'person') {
+  } else if (column === "person") {
     if (checkedPerson.value.includes(value)) {
-      checkedPerson.value = checkedPerson.value.filter(item => item !== value);
+      checkedPerson.value = checkedPerson.value.filter(
+        (item) => item !== value,
+      );
     } else {
       checkedPerson.value.push(value);
     }
@@ -167,11 +211,19 @@ const updateChecked = (value, column) => {
 const searchQuery = ref("");
 
 const filteredProducts = computed(() => {
-  return products.value.filter(product => {
-    const areaMatch = checkedArea.value.length === 0 || checkedArea.value.includes(product.area);
-    const priceMatch = checkedPrice.value.length === 0 || checkedPrice.value.includes(product.price);
-    const personMatch = checkedPerson.value.length === 0 || checkedPerson.value.includes(product.people);
-    const searchMatch = !searchQuery.value || product.name.toLowerCase().includes(searchQuery.value.toLowerCase());
+  return products.value.filter((product) => {
+    const areaMatch =
+      checkedArea.value.length === 0 ||
+      checkedArea.value.includes(product.area);
+    const priceMatch =
+      checkedPrice.value.length === 0 ||
+      checkedPrice.value.includes(product.price);
+    const personMatch =
+      checkedPerson.value.length === 0 ||
+      checkedPerson.value.includes(product.people);
+    const searchMatch =
+      !searchQuery.value ||
+      product.name.toLowerCase().includes(searchQuery.value.toLowerCase());
     return areaMatch && priceMatch && personMatch && searchMatch;
   });
 });
@@ -181,7 +233,7 @@ onMounted(async () => {
     products.value = await getProducts();
     console.log(products.value);
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error("Error fetching products:", error);
   }
 });
 </script>
@@ -198,7 +250,8 @@ onMounted(async () => {
   padding: 0 0 15px 15px;
 }
 
-.bg-white {}
+.bg-white {
+}
 
 .group {
   border-radius: 0.5rem;

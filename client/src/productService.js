@@ -1,8 +1,8 @@
 // services/productService.js
 
-import axios from 'axios';
+import axios from "axios";
 
-const apiUrl = 'http://localhost:5000/api/products'; // Định nghĩa đường dẫn API
+const apiUrl = "http://localhost:5000/api/products"; // Định nghĩa đường dẫn API
 
 // Hàm lấy danh sách sản phẩm
 export async function getProducts() {

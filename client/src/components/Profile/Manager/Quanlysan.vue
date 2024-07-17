@@ -251,7 +251,7 @@ export default {
         if (file.size > maxFileSize) {
           // Hiển thị thông báo lỗi nếu kích thước vượt quá giới hạn
           console.error(
-            "Kích thước tệp quá lớn. Vui lòng chọn một tệp nhỏ hơn 5MB."
+            "Kích thước tệp quá lớn. Vui lòng chọn một tệp nhỏ hơn 5MB.",
           );
           // Xoá tệp đang chọn (tùy chọn)
           event.target.value = "";
@@ -291,15 +291,15 @@ export default {
       },
       // Thêm các trường khác tương tự
     });
-   // Trong component QuanLySan.vue
-const viewSan = (id) => {
-  const san = data.value.find((item) => item._id === id);
-  if (san) {
-    viewData.value = san;
-    viewData.value.sanId = id; // Thêm ID của sân vào viewData
-    showViewContent.value = true;
-  }
-};
+    // Trong component QuanLySan.vue
+    const viewSan = (id) => {
+      const san = data.value.find((item) => item._id === id);
+      if (san) {
+        viewData.value = san;
+        viewData.value.sanId = id; // Thêm ID của sân vào viewData
+        showViewContent.value = true;
+      }
+    };
 
     const editSan = (san) => {
       data.value = { ...data.value, ...san }; // Sao chép dữ liệu của sân bóng để chỉnh sửa
@@ -353,7 +353,7 @@ const viewSan = (id) => {
       try {
         const response = await axios.get("http://localhost:5000/api/products");
         data.value = response.data.filter(
-          (san) => san.email === userEmail.value
+          (san) => san.email === userEmail.value,
         );
         console.log(data);
         console.log("Email từ sessionStorage:", userEmail.value);
@@ -369,7 +369,7 @@ const viewSan = (id) => {
 
         const response = await axios.post(
           "http://localhost:5000/api/products",
-          newSan.value
+          newSan.value,
         );
         if (response.status === 201) {
           // Lưu sản phẩm mới thành công
@@ -394,7 +394,7 @@ const viewSan = (id) => {
       try {
         const response = await axios.put(
           `http://localhost:5000/api/products/${data.value._id}`,
-          data.value
+          data.value,
         );
         if (response.status === 200) {
           // Cập nhật sản phẩm thành công
@@ -412,7 +412,7 @@ const viewSan = (id) => {
     const deleteSan = async (_id) => {
       try {
         const response = await axios.delete(
-          `http://localhost:5000/api/products/${_id}`
+          `http://localhost:5000/api/products/${_id}`,
         );
         if (response.status === 200) {
           // Xóa thành công, cập nhật danh sách sản phẩm hoặc thực hiện các thao tác khác

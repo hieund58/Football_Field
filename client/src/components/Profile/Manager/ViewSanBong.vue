@@ -8,7 +8,11 @@
         <div class="content">
           <h2>{{ viewData && viewData.name }}</h2>
           <p>{{ viewData && viewData.address }}</p>
-          <n-date-picker v-model="selectedDate" type="date" @update:value="onDateChange"></n-date-picker>
+          <n-date-picker
+            v-model="selectedDate"
+            type="date"
+            @update:value="onDateChange"
+          ></n-date-picker>
         </div>
       </n-gi>
       <n-gi class="view-san-bong">
@@ -25,10 +29,18 @@
             <tr v-for="(hour, index) in selectedInfo" :key="index">
               <td>{{ hour.hour }}</td>
               <td>
-                <input v-model="hour.court" type="text" @input="updateCourt(hour)" />
+                <input
+                  v-model="hour.court"
+                  type="text"
+                  @input="updateCourt(hour)"
+                />
               </td>
               <td>
-                <input v-model="hour.price" type="text" @input="updatePrice(hour)" />
+                <input
+                  v-model="hour.price"
+                  type="text"
+                  @input="updatePrice(hour)"
+                />
               </td>
               <td>{{ hour.status }}</td>
             </tr>
@@ -40,30 +52,32 @@
 </template>
 
 <script>
-import { ref, onMounted, defineProps } from 'vue';
-import { useMessage } from 'naive-ui';
-import axios from 'axios';
-import { DateTime } from 'luxon';
+import { ref, onMounted, defineProps } from "vue";
+import { useMessage } from "naive-ui";
+import axios from "axios";
+import { DateTime } from "luxon";
 export default {
   props: {
     viewData: Object,
     sanId: String,
   },
   setup(props) {
-    const selectedDate =  ref(DateTime.now());
+    const selectedDate = ref(DateTime.now());
     const showCalendar = ref(true);
     const isDataAvailable = ref(false);
 
     // Use ref for selectedInfo and initialize it with an empty array
     const selectedInfo = ref([
       {
-    slots: [{
-    hour: '',
-    status: '',
-    court:'',
-    price: '', // Thêm trường giá tiền
-  }],
-      }
+        slots: [
+          {
+            hour: "",
+            status: "",
+            court: "",
+            price: "", // Thêm trường giá tiền
+          },
+        ],
+      },
     ]);
 
     const message = useMessage();
@@ -76,121 +90,121 @@ export default {
       const hours = [];
       for (let i = 5; i <= 23; i++) {
         const hour = i < 10 ? `0${i}:00 AM` : `${i}:00 AM`;
-        hours.push({ hour, court: '', price: '', status: 'Trống' });
+        hours.push({ hour, court: "", price: "", status: "Trống" });
       }
       selectedInfo.value = hours; // Use selectedInfo.value for assignment
     };
 
     const fetchScheduleByDate = async (selectedDateValue) => {
-  try {
-    if (!selectedDateValue|| !props.sanId) {
-      isDataAvailable.value = false;
-      return;
-    }
+      try {
+        if (!selectedDateValue || !props.sanId) {
+          isDataAvailable.value = false;
+          return;
+        }
 
-    const isoDateString = selectedDateValue.toISODate(); 
-    const axiosInstance = axios.create({
-      baseURL: 'http://localhost:5000/api/schedule/',
-    });
+        const isoDateString = selectedDateValue.toISODate();
+        const axiosInstance = axios.create({
+          baseURL: "http://localhost:5000/api/schedule/",
+        });
 
-    const params = {
-      selectedDateValue: isoDateString,
+        const params = {
+          selectedDateValue: isoDateString,
+        };
+
+        // Truyền props.sanId như một tham số trong URL
+        const response = await axiosInstance.get(
+          `get-schedule-by-date/${isoDateString}/${props.sanId}`,
+          { params: { selectedDateValue: isoDateString } },
+        );
+
+        if (response.status === 200) {
+          selectedInfo.value = response.data.schedule.slots; // Use selectedInfo.value for assignment
+          isDataAvailable.value = true;
+          console.log(props.sanId);
+        } else {
+          isDataAvailable.value = false;
+          message.error("Lỗi khi lấy thông tin lịch sân.");
+        }
+      } catch (error) {
+        isDataAvailable.value = false;
+        console.error(error);
+        message.error("Lỗi khi lấy thông tin lịch sân.");
+      }
     };
 
-    // Truyền props.sanId như một tham số trong URL
-    const response = await axiosInstance.get(`get-schedule-by-date/${isoDateString}/${props.sanId}`, { params: { selectedDateValue: isoDateString } });
-
-
-    if (response.status === 200) {
-      selectedInfo.value = response.data.schedule.slots; // Use selectedInfo.value for assignment
-      isDataAvailable.value = true;
-      console.log(props.sanId);
-    } else {
-      isDataAvailable.value = false;
-      message.error('Lỗi khi lấy thông tin lịch sân.');
-    }
-  } catch (error) {
-    isDataAvailable.value = false;
-    console.error(error);
-    message.error('Lỗi khi lấy thông tin lịch sân.');
-  }
-};
-
-// Hàm xử lý sự kiện khi ngày thay đổi
-const onDateChange = (date) => {
-  if (date instanceof Date) {
-    selectedDate.value = DateTime.fromJSDate(date); // Chuyển đổi sang đối tượng DateTime của Luxon
-    // Truyền sanId từ sản phẩm hiện tại và selectedDate.value từ date picker
-    fetchScheduleByDate(selectedDate.value);
-   
-  } else if (typeof date === 'number') {
-    const dateInMilliseconds = DateTime.fromMillis(date); // Chuyển đổi sang đối tượng DateTime của Luxon
-    selectedDate.value = dateInMilliseconds;
-    // Truyền sanId từ sản phẩm hiện tại và dateInMilliseconds từ date picker
-    fetchScheduleByDate(dateInMilliseconds);
- 
-  } else {
-    console.error('Ngày không hợp lệ:', date);
-  }
-};
-
-
-
-
+    // Hàm xử lý sự kiện khi ngày thay đổi
+    const onDateChange = (date) => {
+      if (date instanceof Date) {
+        selectedDate.value = DateTime.fromJSDate(date); // Chuyển đổi sang đối tượng DateTime của Luxon
+        // Truyền sanId từ sản phẩm hiện tại và selectedDate.value từ date picker
+        fetchScheduleByDate(selectedDate.value);
+      } else if (typeof date === "number") {
+        const dateInMilliseconds = DateTime.fromMillis(date); // Chuyển đổi sang đối tượng DateTime của Luxon
+        selectedDate.value = dateInMilliseconds;
+        // Truyền sanId từ sản phẩm hiện tại và dateInMilliseconds từ date picker
+        fetchScheduleByDate(dateInMilliseconds);
+      } else {
+        console.error("Ngày không hợp lệ:", date);
+      }
+    };
 
     const updateCourt = (hour) => {
-  const updatedCourt = hour.court;
-  const formattedDate = selectedDate.value.toISODate();
-  const sanId = props.sanId;
+      const updatedCourt = hour.court;
+      const formattedDate = selectedDate.value.toISODate();
+      const sanId = props.sanId;
 
-  // Sử dụng axios.put để gửi yêu cầu cập nhật số sân
-  axios
-    .put(`http://localhost:5000/api/schedule/update-court/${formattedDate}`, {
-      date: formattedDate,
-      hour: hour.hour,
-      court: updatedCourt,
-      sanId: sanId,
-    })
-    .then((response) => {
-      if (response.status === 200) {
-        // Sau khi cập nhật thành công, gọi fetchScheduleByDate để cập nhật trạng thái bảng
-        fetchScheduleByDate(selectedDate.value);
-        message.success('Cập nhật số sân thành công');
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      message.error('Lỗi khi cập nhật số sân');
-    });
-};
+      // Sử dụng axios.put để gửi yêu cầu cập nhật số sân
+      axios
+        .put(
+          `http://localhost:5000/api/schedule/update-court/${formattedDate}`,
+          {
+            date: formattedDate,
+            hour: hour.hour,
+            court: updatedCourt,
+            sanId: sanId,
+          },
+        )
+        .then((response) => {
+          if (response.status === 200) {
+            // Sau khi cập nhật thành công, gọi fetchScheduleByDate để cập nhật trạng thái bảng
+            fetchScheduleByDate(selectedDate.value);
+            message.success("Cập nhật số sân thành công");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          message.error("Lỗi khi cập nhật số sân");
+        });
+    };
 
+    const updatePrice = (hour) => {
+      const updatedPrice = hour.price;
+      const formattedDate = selectedDate.value.toISODate();
+      const sanId = props.sanId;
 
-   const updatePrice = (hour) => {
-  const updatedPrice = hour.price;
-  const formattedDate = selectedDate.value.toISODate();
-  const sanId = props.sanId;
-
-  // Sử dụng axios.put để gửi yêu cầu cập nhật giá tiền
-  axios
-    .put(`http://localhost:5000/api/schedule/update-price/${formattedDate}`, {
-      date: formattedDate,
-      hour: hour.hour,
-      price: updatedPrice,
-      sanId: sanId,
-    })
-    .then((response) => {
-      if (response.status === 200) {
-        // Sau khi cập nhật thành công, gọi fetchScheduleByDate để cập nhật trạng thái bảng
-        fetchScheduleByDate(selectedDate.value);
-        message.success('Cập nhật giá tiền thành công');
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      message.error('Lỗi khi cập nhật giá tiền');
-    });
-};
-
+      // Sử dụng axios.put để gửi yêu cầu cập nhật giá tiền
+      axios
+        .put(
+          `http://localhost:5000/api/schedule/update-price/${formattedDate}`,
+          {
+            date: formattedDate,
+            hour: hour.hour,
+            price: updatedPrice,
+            sanId: sanId,
+          },
+        )
+        .then((response) => {
+          if (response.status === 200) {
+            // Sau khi cập nhật thành công, gọi fetchScheduleByDate để cập nhật trạng thái bảng
+            fetchScheduleByDate(selectedDate.value);
+            message.success("Cập nhật giá tiền thành công");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          message.error("Lỗi khi cập nhật giá tiền");
+        });
+    };
 
     onMounted(() => {
       generateSchedule();
@@ -212,7 +226,7 @@ const onDateChange = (date) => {
 </script>
 
 <style scoped>
-  /* CSS giữ nguyên */
+/* CSS giữ nguyên */
 </style>
 
 <style scoped>

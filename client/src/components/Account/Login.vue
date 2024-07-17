@@ -1,5 +1,7 @@
 <template>
-  <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+  <div
+    class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8"
+  >
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
       <!-- <img
         class="mx-auto h-10 w-auto"
@@ -7,11 +9,14 @@
         alt="Your Company"
         style="height: 200px; width: 200px;"
       /> -->
-      <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-[#FA4516]">Đăng Nhập</h2>
+      <h2
+        class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-[#FA4516]"
+      >
+        Đăng Nhập
+      </h2>
     </div>
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-
       <div class="mb-2 ml-1">
         <span style="font-size: 14px">Email</span>
         <span style="color: #d03050">&nbsp;*</span>
@@ -19,7 +24,11 @@
 
       <n-form ref="formRef" :model="user" :rules="rules">
         <n-form-item path="email" label="Email" :show-label="false">
-          <n-input v-model:value="user.email" placeholder="Email" @keydown.enter.prevent />
+          <n-input
+            v-model:value="user.email"
+            placeholder="Email"
+            @keydown.enter.prevent
+          />
         </n-form-item>
 
         <div class="flex items-center justify-between mb-2 ml-1">
@@ -27,12 +36,7 @@
             <span style="font-size: 14px">Mật khẩu</span>
             <span style="color: #d03050">&nbsp;*</span>
           </div>
-          <a
-            href="#"
-            class="font-semibold text-[#FA4516]"
-          >
-            Quên Mật Khẩu ?
-          </a>
+          <a href="#" class="font-semibold text-[#FA4516]"> Quên Mật Khẩu ? </a>
         </div>
 
         <n-form-item path="password" :show-label="false">
@@ -44,14 +48,14 @@
           />
         </n-form-item>
 
-        <n-button type="info" block @click="handleLogin">
-          Đăng nhập
-        </n-button>
+        <n-button type="info" block @click="handleLogin"> Đăng nhập </n-button>
       </n-form>
 
       <p class="mt-5 text-center text-sm text-[#FA4516]">
         Nếu Bạn Chưa Có Tài Khoản?
-        <router-link to="/register" class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+        <router-link
+          to="/register"
+          class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
           >Đăng Ký Tại Đây</router-link
         >
       </p>
@@ -60,76 +64,78 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import axios from 'axios';
-import { useLoadingBar, useMessage } from 'naive-ui'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import axios from "axios";
+import { useLoadingBar, useMessage } from "naive-ui";
 
 const router = useRouter();
-const loadingBar = useLoadingBar()
-const message = useMessage()
+const loadingBar = useLoadingBar();
+const message = useMessage();
 
-
-const formRef = ref(null)
+const formRef = ref(null);
 const user = ref({
-  email: '',
-  password: '',
+  email: "",
+  password: "",
 });
 
 const rules = {
   email: [
     {
       required: true,
-      message: 'Email bắt buộc',
-      trigger: ['input', 'blur']
-    }
+      message: "Email bắt buộc",
+      trigger: ["input", "blur"],
+    },
   ],
   password: [
     {
       required: true,
-      message: 'Mật khẩu bắt buộc',
-      trigger: ['input', 'blur']
-    }
-  ]
+      message: "Mật khẩu bắt buộc",
+      trigger: ["input", "blur"],
+    },
+  ],
 };
 const handleLogin = () => {
-  formRef.value?.validate((errors) => {
-    if (errors) return;
-    loadingBar.start()
-    // Tạo một đối tượng user để đăng nhập
-    const loginUser = {
-      email: user.value.email,
-      password: user.value.password,
-    };
-    // Gửi yêu cầu đăng nhập đến backend
-    axios
-      .post('http://localhost:5000/api/login', loginUser)
-      .then((response) => {
-        if (response.status === 200) {
-          message.success('Đăng nhập thành công')
-          // Lưu token và thông tin người dùng vào sessionStorage
-          sessionStorage.setItem('userToken', response.data.token); // Lưu token trong sessionStorage
-          sessionStorage.setItem('userData', JSON.stringify(response.data.user)); // Lưu thông tin người dùng trong sessionStorage
-          console.log(response.data.user);
-          const loginSuccessEvent = new Event('login-success');
-          window.dispatchEvent(loginSuccessEvent);
-          // Chuyển hướng đến trang sau khi đăng nhập thành công
-          loadingBar.finish()
-          router.push('/home');
-        } else {
-          message.error(response.data.message)
-        }
-      })
-      .catch((error) => {
-        // Xử lý lỗi nếu có
-        console.error('Đăng nhập thất bại:', error);
-        message.error(error?.response?.data?.message || 'Đăng nhập thất bại')
-      })
-      .finally(() => {
-        loadingBar.finish()
-      });
-  }).catch(() => {})
-
+  formRef.value
+    ?.validate((errors) => {
+      if (errors) return;
+      loadingBar.start();
+      // Tạo một đối tượng user để đăng nhập
+      const loginUser = {
+        email: user.value.email,
+        password: user.value.password,
+      };
+      // Gửi yêu cầu đăng nhập đến backend
+      axios
+        .post("http://localhost:5000/api/login", loginUser)
+        .then((response) => {
+          if (response.status === 200) {
+            message.success("Đăng nhập thành công");
+            // Lưu token và thông tin người dùng vào sessionStorage
+            sessionStorage.setItem("userToken", response.data.token); // Lưu token trong sessionStorage
+            sessionStorage.setItem(
+              "userData",
+              JSON.stringify(response.data.user),
+            ); // Lưu thông tin người dùng trong sessionStorage
+            console.log(response.data.user);
+            const loginSuccessEvent = new Event("login-success");
+            window.dispatchEvent(loginSuccessEvent);
+            // Chuyển hướng đến trang sau khi đăng nhập thành công
+            loadingBar.finish();
+            router.push("/home");
+          } else {
+            message.error(response.data.message);
+          }
+        })
+        .catch((error) => {
+          // Xử lý lỗi nếu có
+          console.error("Đăng nhập thất bại:", error);
+          message.error(error?.response?.data?.message || "Đăng nhập thất bại");
+        })
+        .finally(() => {
+          loadingBar.finish();
+        });
+    })
+    .catch(() => {});
 };
-
 </script>

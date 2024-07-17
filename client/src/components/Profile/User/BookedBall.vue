@@ -11,11 +11,16 @@
             <th>Thời Gian Giao Dịch</th>
             <th>Số tiền</th>
             <th>Trạng thái giao dịch</th>
-            <th>Hoá Đơn</th> <!-- Thêm cột Hoá Đơn -->
+            <th>Hoá Đơn</th>
+            <!-- Thêm cột Hoá Đơn -->
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(san, index) in filteredData" :key="index" class="content-tt">
+          <tr
+            v-for="(san, index) in filteredData"
+            :key="index"
+            class="content-tt"
+          >
             <td>{{ index + 1 }}</td>
             <td>{{ san.name }}</td>
             <td>{{ san.address }}</td>
@@ -23,7 +28,8 @@
             <td>{{ san.price }}</td>
             <td>{{ san.status }}</td>
             <td>
-              <button @click="viewInvoice(san)">Xem Hoá Đơn</button> <!-- Thêm nút Xem Hoá Đơn -->
+              <button @click="viewInvoice(san)">Xem Hoá Đơn</button>
+              <!-- Thêm nút Xem Hoá Đơn -->
             </td>
           </tr>
         </tbody>
@@ -32,14 +38,23 @@
 
     <div class="pagination">
       <button @click="prevPage" :disabled="currentPage === 1">
-        <font-awesome-icon class="pagination-icon" :icon="['fas', 'arrow-left']" />
+        <font-awesome-icon
+          class="pagination-icon"
+          :icon="['fas', 'arrow-left']"
+        />
       </button>
       <span>Trang {{ currentPage }}</span>
-      <button @click="nextPage" :disabled="currentPage * 10 >= filteredData.length">
-        <font-awesome-icon class=" pagination-icon" :icon="['fas', 'arrow-right']" />
+      <button
+        @click="nextPage"
+        :disabled="currentPage * 10 >= filteredData.length"
+      >
+        <font-awesome-icon
+          class="pagination-icon"
+          :icon="['fas', 'arrow-right']"
+        />
       </button>
     </div>
-    
+
     <div class="modal" v-if="showInvoice">
       <div class="modal-content">
         <h2>Hoá Đơn</h2>
@@ -49,14 +64,32 @@
             <p class="invoice-date">Ngày: {{ formattedDate }}</p>
           </div>
           <div class="invoice-body">
-            <p><strong>Tên Sân:</strong> {{ selectedReservation ? selectedReservation.name : '' }}</p>
-            <p><strong>Địa Chỉ:</strong> {{ selectedReservation ? selectedReservation.address : '' }}</p>
-            <p><strong>Thời Gian Giao Dịch:</strong> {{ selectedReservation ? selectedReservation.time : '' }}</p>
-            <p><strong>Số tiền:</strong> {{ selectedReservation ? selectedReservation.price : '' }}</p>
-            <p><strong>Trạng thái giao dịch:</strong> {{ selectedReservation ? selectedReservation.status : '' }}</p>
+            <p>
+              <strong>Tên Sân:</strong>
+              {{ selectedReservation ? selectedReservation.name : "" }}
+            </p>
+            <p>
+              <strong>Địa Chỉ:</strong>
+              {{ selectedReservation ? selectedReservation.address : "" }}
+            </p>
+            <p>
+              <strong>Thời Gian Giao Dịch:</strong>
+              {{ selectedReservation ? selectedReservation.time : "" }}
+            </p>
+            <p>
+              <strong>Số tiền:</strong>
+              {{ selectedReservation ? selectedReservation.price : "" }}
+            </p>
+            <p>
+              <strong>Trạng thái giao dịch:</strong>
+              {{ selectedReservation ? selectedReservation.status : "" }}
+            </p>
           </div>
           <div class="invoice-footer">
-            <p class="total-amount"><strong>Tổng cộng:</strong> {{ selectedReservation ? selectedReservation.price : '' }}</p>
+            <p class="total-amount">
+              <strong>Tổng cộng:</strong>
+              {{ selectedReservation ? selectedReservation.price : "" }}
+            </p>
           </div>
         </div>
       </div>
@@ -66,8 +99,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
+import { ref, computed, onMounted } from "vue";
+import axios from "axios";
 
 const page = ref(1);
 const data = ref([]);
@@ -82,8 +115,8 @@ const paginationRef = computed(() => ({
   page: page.value,
 }));
 
-const userData = JSON.parse(sessionStorage.getItem('userData'));
-const statusFilter = 'Đã thanh toán';
+const userData = JSON.parse(sessionStorage.getItem("userData"));
+const statusFilter = "Đã thanh toán";
 let filteredData = ref([]);
 const showInvoice = ref(false);
 const selectedReservation = ref(null);
@@ -99,12 +132,17 @@ const closeInvoice = () => {
 
 onMounted(async () => {
   try {
-    const response = await axios.get('http://localhost:5000/api/process-payment');
+    const response = await axios.get(
+      "http://localhost:5000/api/process-payment",
+    );
     const allData = response.data;
-    filteredData.value = allData.filter(item => item.status === statusFilter && item.username === userData.email);
+    filteredData.value = allData.filter(
+      (item) =>
+        item.status === statusFilter && item.username === userData.email,
+    );
     data.value = filteredData.value;
   } catch (error) {
-    console.error('Lỗi khi lấy thông tin các sân đã được đặt:', error);
+    console.error("Lỗi khi lấy thông tin các sân đã được đặt:", error);
   }
 });
 </script>
@@ -164,7 +202,7 @@ onMounted(async () => {
   border: none;
   cursor: pointer;
   font-size: 18px;
-  color: #007BFF;
+  color: #007bff;
 }
 
 .pagination-button:disabled {
@@ -234,4 +272,3 @@ onMounted(async () => {
   font-weight: bold;
 }
 </style>
-

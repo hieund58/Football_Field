@@ -4,21 +4,33 @@
       <div class="text-white p-4">
         <h2 class="text-xl font-bold">Trang chủ Admin</h2>
         <div class="user-info">
-          <p> User: {{ getUsernameFromSession }} </p>
-          <button @click="logout">Logout </button>
+          <p>User: {{ getUsernameFromSession }}</p>
+          <button @click="logout">Logout</button>
         </div>
       </div>
       <div class="my-4">
-        <router-link to="/fields" class="block text-gray-300 hover:bg-gray-700 py-2 px-4">
+        <router-link
+          to="/fields"
+          class="block text-gray-300 hover:bg-gray-700 py-2 px-4"
+        >
           Thống kê các sân bóng
         </router-link>
-        <router-link to="/bookingDetail" class="block text-gray-300 hover:bg-gray-700 py-2 px-4">
+        <router-link
+          to="/bookingDetail"
+          class="block text-gray-300 hover:bg-gray-700 py-2 px-4"
+        >
           Sân đang được đặt
         </router-link>
-        <router-link to="/UserManager" class="block text-gray-300 hover:bg-gray-700 py-2 px-4">
+        <router-link
+          to="/UserManager"
+          class="block text-gray-300 hover:bg-gray-700 py-2 px-4"
+        >
           Quản lý người dùng
         </router-link>
-        <router-link to="/revenue" class="block text-gray-300 hover:bg-gray-700 py-2 px-4">
+        <router-link
+          to="/revenue"
+          class="block text-gray-300 hover:bg-gray-700 py-2 px-4"
+        >
           Doanh Thu
         </router-link>
       </div>
@@ -26,7 +38,9 @@
     <div class="w-4/5 bg-white p-4">
       <div class="fields-container">
         <h2>Thống kê người dùng</h2>
-        <button class="btn btn-primary mb-3" @click="openDialog">Thêm người dùng</button>
+        <button class="btn btn-primary mb-3" @click="openDialog">
+          Thêm người dùng
+        </button>
 
         <table>
           <thead>
@@ -46,7 +60,9 @@
               <td>{{ user.role }}</td>
               <td>
                 <button class="edit btn" @click="editUser(user)">Sửa</button>
-                <button class="del btn" @click="deleteUser(user._id)">Xóa</button>
+                <button class="del btn" @click="deleteUser(user._id)">
+                  Xóa
+                </button>
               </td>
             </tr>
           </tbody>
@@ -57,20 +73,26 @@
         <div class="dialog-content" @click.stop>
           <form @submit.prevent="addUser" class="dialog-form">
             <label for="fullName">Full Name:</label>
-            <input type="text" v-model="newUser.fullName" required>
+            <input type="text" v-model="newUser.fullName" required />
 
             <label for="phone">Phone:</label>
-            <input type="text" v-model="newUser.phone" required>
+            <input type="text" v-model="newUser.phone" required />
 
             <label for="email">Email:</label>
-            <input type="email" v-model="newUser.email" required>
+            <input type="email" v-model="newUser.email" required />
 
             <label for="role">Role:</label>
-            <input type="text" v-model="newUser.role" required>
+            <input type="text" v-model="newUser.role" required />
 
             <div class="dialog-btn">
               <button type="submit" class="btn btn-primary">Thêm</button>
-              <button type="cancel" class="btn btn-cancel" @click="cancelAddUser">Hủy</button>
+              <button
+                type="cancel"
+                class="btn btn-cancel"
+                @click="cancelAddUser"
+              >
+                Hủy
+              </button>
             </div>
           </form>
         </div>
@@ -80,7 +102,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
 
 export default {
   data() {
@@ -88,10 +110,10 @@ export default {
       users: [],
       showDialog: false,
       newUser: {
-        fullName: '',
-        phone: '',
-        email: '',
-        role: '',
+        fullName: "",
+        phone: "",
+        email: "",
+        role: "",
       },
     };
   },
@@ -100,7 +122,8 @@ export default {
   },
   methods: {
     getUsers() {
-      axios.get('http://localhost:5000/api/users')
+      axios
+        .get("http://localhost:5000/api/users")
         .then((response) => {
           this.users = response.data;
         })
@@ -109,11 +132,13 @@ export default {
         });
     },
     editUser(user) {
-      this.$router.push({ name: '/EditUser/', params: { id: user._id } });
+      this.$router.push({ name: "/EditUser/", params: { id: user._id } });
     },
     async deleteUser(userId) {
       try {
-        const confirmed = window.confirm('Are you sure you want to delete this user?');
+        const confirmed = window.confirm(
+          "Are you sure you want to delete this user?",
+        );
 
         if (!confirmed) {
           return;
@@ -133,7 +158,8 @@ export default {
       this.resetNewUser();
     },
     addUser() {
-      axios.post('http://localhost:5000/api/users', this.newUser)
+      axios
+        .post("http://localhost:5000/api/users", this.newUser)
         .then((response) => {
           console.log(response.data);
           this.closeDialog();
@@ -145,10 +171,10 @@ export default {
     },
     resetNewUser() {
       this.newUser = {
-        fullName: '',
-        phone: '',
-        email: '',
-        role: '',
+        fullName: "",
+        phone: "",
+        email: "",
+        role: "",
       };
     },
     cancelAddUser() {
