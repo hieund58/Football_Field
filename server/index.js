@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const path = require('path');
 const app = express();
 
 // Kết nối tới MongoDB
@@ -31,6 +32,8 @@ const ipnurl = require('../server/routes/api/ipnurl');
 const returnurl = require('../server/routes/api/returnurl');
 const users = require('../server/routes/api/users');
 const paypal = require('../server/routes/api/paypal');
+const field = require('../server/routes/api/field')
+
 app.use('/api/vnpay_ipn', ipnurl);
 app.use('/api/vnpay_return', returnurl);
 app.use('/api/create_payment_url', urlpay);
@@ -43,7 +46,13 @@ app.use('/api/createOrder', order);
 app.use('/api/process-payment', payment);
 app.use('/api/users', users);
 app.use('/api/paypal', paypal);
+app.use('/api/field', field);
 // ... Các phần khác của ứng dụng ...
+
+// Biến folder uploads thành tĩnh để truy cập ảnh
+app.use(express.static(path.join(__dirname, '..', 'uploads')));
+
+
 
 const port = process.env.port || 5000;
 app.listen(port, () => {

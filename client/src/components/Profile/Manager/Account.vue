@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div>
     <div v-if="!isEditing" class="content">
       <h1>Thông Tin Tài Khoản</h1>
       <n-grid cols="4">

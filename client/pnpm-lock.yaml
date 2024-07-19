@@ -32,15 +32,15 @@ dependencies:
   '@vicons/ionicons5':
     specifier: ^0.12.0
     version: 0.12.0
-  D:
-    specifier: ^1.0.0
-    version: 1.0.0
   chart.js:
     specifier: ^4.4.0
     version: 4.4.3
   font-awesome:
     specifier: ^4.7.0
     version: 4.7.0
+  lodash:
+    specifier: 4.17.21
+    version: 4.17.21
   sass:
     specifier: ^1.77.8
     version: 1.77.8
@@ -616,11 +616,6 @@ packages:
   /@vue/shared@3.4.31:
     resolution: {integrity: sha512-Yp3wtJk//8cO4NItOPpi3QkLExAr/aLBGZMmTtW9WpdwBCJpRM6zj9WgWktXAl8IDIozwNMByT45JP3tO3ACWA==}
 
-  /D@1.0.0:
-    resolution: {integrity: sha512-nQvrCBu7K2pSSEtIM0EEF03FVjcczCXInMt3moLNFbjlWx6bZrX72uT6/1uAXDbnzGUAx9gTyDiQ+vrFi663oA==}
-    deprecated: Package no longer supported. Contact support@npmjs.com for more info.
-    dev: false
-
   /ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
@@ -1038,7 +1033,6 @@ packages:
 
   /lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-    dev: true
 
   /loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
