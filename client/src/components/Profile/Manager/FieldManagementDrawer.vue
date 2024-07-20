@@ -13,7 +13,7 @@
               <span v-else>{{ formModel.address }}</span>
             </n-form-item-gi>
             <n-form-item-gi :span="1" path="area" label="Thuộc khu vực">
-              <n-input v-if="!detailMode" v-model:value="formModel.area" placeholder="Thuộc khu vực" />
+              <n-select v-if="!detailMode" v-model:value="formModel.area" placeholder="Thuộc khu vực" :options="areaList" clearable />
               <span v-else>{{ formModel.area }}</span>
             </n-form-item-gi>
             <n-form-item-gi :span="1" path="price" label="Giá">
@@ -85,6 +85,9 @@ import { useMessage } from 'naive-ui';
 import axios from 'axios';
 import { cloneDeep } from 'lodash';
 
+import { areaList } from '../../../utils/constant';
+
+
 const props = defineProps({
   open: Boolean,
   mode: { type: String, default: 'create' },
@@ -97,7 +100,7 @@ const userData = JSON.parse(sessionStorage.getItem('userData'));
 const formInit = {
   name: '',
   address: '',
-  area: '',
+  area: undefined,
   imageSrc: '',
   price: '',
   playerNum: '',

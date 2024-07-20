@@ -1,39 +1,18 @@
 <template>
   <div class="warraper">
-    <div class="search-content shadow-xl bg-white rounded-lg p-4 sm:p-6 lg:p-12">
+    <div class="search-content shadow-xl bg-white rounded-lg p-4 sm:p-1 lg:p-2">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div class="filter">
           <h1 class="content-btn">Khu Vực</h1>
-          <n-checkbox
-            v-for="area in areas"
-            :key="area"
-            :checked="isChecked(area, 'area')"
-            @update:checked="updateChecked(area, 'area')"
-            :value="area"
-            :label="area"
-          />
+          <n-select v-model:value="searchForm.area" :options="areaList" multiple clearable placeholder="Chọn khu vực" />
         </div>
         <div class="filter">
           <h1 class="content-btn">Giá</h1>
-          <n-checkbox
-            v-for="price in prices"
-            :key="price"
-            :checked="isChecked(price, 'price')"
-            @update:checked="updateChecked(price, 'price')"
-            :value="price"
-            :label="price"
-          />
+          <n-select v-model:value="searchForm.priceRange" :options="priceRange" multiple clearable placeholder="Chọn khoảng giá" />
         </div>
         <div class="filter">
           <h1 class="content-btn">Loại Sân</h1>
-          <n-checkbox
-            v-for="person in people"
-            :key="person"
-            :checked="isChecked(person, 'person')"
-            @update:checked="updateChecked(person, 'person')"
-            :value="person"
-            :label="person"
-          />
+          <n-select v-model:value="searchForm.playerNumRange" :options="playerNumRange" multiple clearable placeholder="Chọn loại sân" />
         </div>
       </div>
     </div>
@@ -42,12 +21,12 @@
       <div class="mx-auto max-w-full px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
         <h2 class="text-2xl font-bold tracking-tight text-gray-900 text-center">Sân Bóng Đá</h2>
         <div class="mt-6 grid gap-4 sm:gap-5 lg:grid-cols-2 xl:grid-cols-4">
-          <div v-for="product in filteredProducts" :key="product.id" class="group relative">
+          <div v-for="product in currentPageFields" :key="product.id" class="group relative">
             <div
               class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80"
             >
               <img
-                :src="product.imageSrc"
+                :src="getImgUrl(product.imageSrc)"
                 :alt="product.imageAlt"
                 class="h-full w-full object-cover object-center lg:h-full lg:w-full"
               />
@@ -63,7 +42,7 @@
               </div>
             </div>
             <p class="text-sm text-black-900">Khu Vực : {{ product.area }}</p>
-            <p class="text-sm text-black-900">Sân : {{ product.people }}</p>
+            <p class="text-sm text-black-900">Sân : {{ product.playerNum }}</p>
             <p class="text-sm text-black-900">Giá : {{ product.price }}/Trận</p>
           </div>
         </div>
@@ -82,11 +61,20 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { getProducts } from '../../productService';
+import { ref, computed, onMounted, watch } from 'vue';
+import { cloneDeep } from 'lodash';
+import { getFields } from '../../utils/service';
+import { getImgUrl } from '../../utils/common';
+import { areaList, priceRange, playerNumRange } from '../../utils/constant';
+
+const searchForm = ref({
+  area: undefined,
+  priceRange: undefined,
+  playerNumRange: undefined
+})
 const page = ref(1);
 const pageSize = 12;
-const products = ref([
+const fields = ref([
   {
     name: '',
     address: '',
@@ -95,7 +83,6 @@ const products = ref([
     area: '',
     description: {
       facilities: '',
-      prices: '',
       transportation: ''
     },
     schedules: {
@@ -106,7 +93,8 @@ const products = ref([
     }
   }
 ]);
-const totalPages = computed(() => Math.ceil(products.length / pageSize));
+const filteredFields = ref([])
+const totalPages = computed(() => Math.ceil(fields.value.length / pageSize));
 
 const prevPage = () => {
   if (page.value > 1) {
@@ -120,87 +108,50 @@ const nextPage = () => {
   }
 };
 
-const currentPageProducts = computed(() => {
+const currentPageFields = computed(() => {
   const startIdx = (page.value - 1) * pageSize;
   const endIdx = startIdx + pageSize;
-  return filteredProducts.slice(startIdx, endIdx);
-});
-onMounted(() => {
-  filteredProducts.value = products;
-});
-const areas = computed(() => {
-  // Lấy danh sách khu vực từ products
-  const uniqueAreas = Array.from(new Set(products.value.map(product => product.area)));
-  return uniqueAreas;
-});
-
-const prices = computed(() => {
-  // Lấy danh sách giá từ products
-  const uniquePrices = Array.from(new Set(products.value.map(product => product.price)));
-  return uniquePrices;
-});
-
-const people = computed(() => {
-  // Lấy danh sách loại sân từ products
-  const uniquePeople = Array.from(new Set(products.value.map(product => product.people)));
-  return uniquePeople;
-});
-
-const checkedArea = ref([]);
-const checkedPrice = ref([]);
-const checkedPerson = ref([]);
-
-const isChecked = (value, column) => {
-  if (column === 'area') {
-    return checkedArea.value.includes(value);
-  } else if (column === 'price') {
-    return checkedPrice.value.includes(value);
-  } else if (column === 'person') {
-    return checkedPerson.value.includes(value);
-  }
-};
-
-const updateChecked = (value, column) => {
-  if (column === 'area') {
-    if (checkedArea.value.includes(value)) {
-      checkedArea.value = checkedArea.value.filter(item => item !== value);
-    } else {
-      checkedArea.value.push(value);
-    }
-  } else if (column === 'price') {
-    if (checkedPrice.value.includes(value)) {
-      checkedPrice.value = checkedPrice.value.filter(item => item !== value);
-    } else {
-      checkedPrice.value.push(value);
-    }
-  } else if (column === 'person') {
-    if (checkedPerson.value.includes(value)) {
-      checkedPerson.value = checkedPerson.value.filter(item => item !== value);
-    } else {
-      checkedPerson.value.push(value);
-    }
-  }
-};
-const searchQuery = ref('');
-
-const filteredProducts = computed(() => {
-  return products.value.filter(product => {
-    const areaMatch = checkedArea.value.length === 0 || checkedArea.value.includes(product.area);
-    const priceMatch = checkedPrice.value.length === 0 || checkedPrice.value.includes(product.price);
-    const personMatch = checkedPerson.value.length === 0 || checkedPerson.value.includes(product.people);
-    const searchMatch = !searchQuery.value || product.name.toLowerCase().includes(searchQuery.value.toLowerCase());
-    return areaMatch && priceMatch && personMatch && searchMatch;
-  });
+  return filteredFields.value.slice(startIdx, endIdx);
 });
 
 onMounted(async () => {
   try {
-    products.value = await getProducts();
-    console.log(products.value);
+    const res = await getFields();
+    fields.value = res;
+    filteredFields.value = cloneDeep(res)
   } catch (error) {
     console.error('Error fetching products:', error);
   }
 });
+
+watch(() => searchForm.value, val => {
+  console.log(val.area?.includes('Cầu Giấy'))
+  console.log(val.playerNumRange)
+    filteredFields.value = fields.value.filter(field => {
+      if (!val.area?.length) return true
+      return val.area.includes(field.area)
+    })
+    .filter(field => {
+      if (!val.priceRange?.length) return true
+      return val.priceRange.some(price => {
+        const [priceFrom, priceTo] = price.split(',')
+        if (priceFrom === '0') return field.price < Number(priceTo)
+        if (priceTo === '0') return field.price > Number(priceFrom)
+        return Number(priceFrom) <= field.price && field.price <=Number(priceTo)
+      })
+    })
+    .filter(field => {
+      if (!val.playerNumRange?.length) return true
+      return val.playerNumRange.some(playerNum => {
+        const [numFrom, numTo] = playerNum.split(',')
+        if (numFrom === '0') return field.playerNum < Number(numTo)
+        if (numTo === '0') return field.playerNum > Number(numFrom)
+        return Number(numFrom) <= field.playerNum && field.playerNum <=Number(numTo)
+      })
+    })
+}, {
+  deep: true
+})
 </script>
 
 <style scoped>
@@ -232,7 +183,6 @@ onMounted(async () => {
   width: 100%;
   height: auto;
   margin: 15px auto;
-  padding: 50px;
 }
 
 * {
@@ -256,6 +206,7 @@ onMounted(async () => {
 
 .content-btn {
   border-bottom: 1px solid #000;
+  margin-bottom: 6px;
   font-size: 18px;
   font-weight: 650;
 }

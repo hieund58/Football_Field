@@ -43,7 +43,7 @@
               </ul>
               <ul>
                 <span class="detail-header">Giá Thuê</span>
-                <li class="detail-content">{{ detail.description.prices }}</li>
+                <li class="detail-content">{{ detail.price }}</li>
               </ul>
               <ul>
                 <span class="detail-header">Cách Thức Di Chuyển</span>
@@ -197,7 +197,7 @@ import { DateTime } from "luxon";
 const fetchDetail = async () => {
   try {
     const response = await axios.get(
-      `http://localhost:5000/api/products/${_id.value}`,
+      `http://localhost:5000/api/field/${_id.value}`,
     );
     detail.value = response.data;
 
