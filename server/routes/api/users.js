@@ -1,7 +1,5 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
 const router = express.Router();
-const mongoose = require('mongoose');
 const User = require('../../db/user');
 // Route để lấy tất cả người dùng, quản lí
 router.get('/', async (req, res) => {

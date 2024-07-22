@@ -1,7 +1,7 @@
 // paymentController.js
 const express = require('express');
 const router = express.Router();
-const Payment = require('../../db/detailball'); // Import your Payment model
+const Payment = require('../../db/payment'); // Import your Payment model
 const paypal = require('../../config');
 // Tạo đơn hàng mới
 router.post('/create', async (req, res) => {
