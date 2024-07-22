@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Payment = require('../../db/detailball');
+const Payment = require('../../db/payment');
 
 router.post('/', async (req, res) => {
   try {
