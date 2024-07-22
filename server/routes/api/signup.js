@@ -1,12 +1,10 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
 const router = express.Router();
-const mongoose = require('mongoose');
 const User = require('../../db/user');
 
 router.post('/', async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    const { email, password } = req.body;
 
     if (!password) {
       return res.status(400).json({ message: 'Password is required' });
@@ -17,7 +15,8 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Email đã tồn tại' });
     }
 
-    const newUser = new User({ email, password, role });
+    // Chỉ cho đăng ký làm user
+    const newUser = new User({ email, password, role: 'user' });
 
     await newUser.hashPassword();
 

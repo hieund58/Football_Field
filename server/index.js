@@ -5,7 +5,7 @@ const cors = require('cors');
 const path = require('path');
 const app = express();
 
-const makeDefaultAdmin = require('./utils');
+const User = require('./db/user');
 
 // Kết nối tới MongoDB
 mongoose.connect('mongodb://127.0.0.1:27017/mydb', { useNewUrlParser: true, useUnifiedTopology: true });
@@ -55,7 +55,7 @@ app.use('/api/field', field);
 app.use(express.static(path.join(__dirname, '..', 'uploads')));
 
 // Tạo user admin default
-makeDefaultAdmin()
+User.makeDefaultAdmin()
 
 const port = process.env.port || 5000;
 app.listen(port, () => {

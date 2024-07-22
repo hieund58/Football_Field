@@ -23,6 +23,20 @@ userSchema.methods.hashPassword = async function () {
   this.password = await bcrypt.hash(this.password, 10);
 };
 
+// Tạo default admin
+userSchema.statics.makeDefaultAdmin = async function () {
+  const existingAdmin = await User.findOne({ email: 'admin' });
+  if (!existingAdmin) {
+    const defaultPassword = await bcrypt.hash('admin123', 10);
+    const defaultAdmin = new User({
+      email: 'admin',
+      password: defaultPassword,
+      role: 'admin'
+    })
+    await defaultAdmin.save()
+  }
+}
+
 // Tạo model User từ schema
 const User = mongoose.model('User', userSchema);
 
