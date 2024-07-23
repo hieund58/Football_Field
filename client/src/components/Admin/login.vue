@@ -1,64 +1,75 @@
 <template>
-  <div v-if="!isLoggedIn" class="login-container">
-    <div class="login-container">
-      <h2>Đăng nhập</h2>
-      <input type="text" v-model="username" placeholder="Username" />
-      <input type="password" v-model="password" placeholder="Password" />
-      <button @click="login">Đăng nhập</button>
+  <div>
+    <div v-if="!adminLoggedIn" class="login-container">
+        <h2>Đăng nhập admin</h2>
+        <input type="text" v-model="loginData.email" placeholder="Username" />
+        <input type="password" v-model="loginData.password" placeholder="Password" />
+        <button @click="login">Đăng nhập</button>
     </div>
-  </div>
-  <div v-else class="login-container">
-    <h2>Bạn đã đăng nhập!</h2>
-    <p>Xin chào, {{ getUsernameFromSession }}</p>
-    <router-link to="/fields" class="block py-2 px-4">
-      Truy cập trang chủ admin
-    </router-link>
-    <!-- Nút logout -->
+    <div v-else class="login-container">
+      <h2>Bạn đã đăng nhập!</h2>
+      <p>Xin chào, {{ getUsernameFromSession }}</p>
+      <router-link to="/fields" class="block py-2 px-4 text-blue-500 underline">Truy cập trang chủ admin</router-link>
+      <!-- Nút logout -->
+    </div>
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      username: "",
-      password: "",
-    };
-  },
+<script setup>
+import axios from 'axios';
+import { ref, computed } from 'vue';
+import { useLoadingBar, useMessage } from 'naive-ui';
+import { useRouter } from 'vue-router';
 
-  methods: {
-    login() {
-      if (this.username === "admin" && this.password === "admin") {
-        sessionStorage.setItem("isLoggedIn", "true");
-        sessionStorage.setItem("userLogin", this.username);
+const loadingBar = useLoadingBar();
+const message = useMessage();
+const router = useRouter();
 
-        // Lưu thông tin đăng nhập vào session storage
-        this.$router.push("/fields");
-      } else {
-        alert("Sai thông tin đăng nhập!");
-      }
-    },
-  },
-  computed: {
-    getUsernameFromSession() {
-      return sessionStorage.getItem("isLoggedIn") === "true" ? "Admin" : "";
-      // Trả về tên người dùng từ session storage nếu đã đăng nhập, nếu không trả về chuỗi rỗng.
-    },
-  },
-  created() {
-    this.isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
-    // Kiểm tra xem người dùng đã đăng nhập hay chưa khi tải trang.
-  },
-};
+const loginData = ref({
+  email: '',
+  password: ''
+});
+
+async function login() {
+  sessionStorage.removeItem('userData');
+  sessionStorage.removeItem('userToken');
+
+  loadingBar.start();
+  try {
+    const response = await axios.post('http://localhost:5000/api/login/admin', loginData.value);
+    message.success('Đăng nhập admin thành công');
+    sessionStorage.setItem('userToken', response.data.token); // Lưu token trong sessionStorage
+    sessionStorage.setItem('userData', JSON.stringify(response.data.user)); // Lưu thông tin người dùng trong sessionStorage
+    router.push('/fields');
+  } catch (error) {
+    message.error(error?.response?.data?.message || 'Đăng nhập thất bại');
+  } finally {
+    loadingBar.finish();
+  }
+}
+const adminLoggedIn = computed(() => {
+  if (!sessionStorage.getItem('userData')) return false;
+  const userData = JSON.parse(sessionStorage.getItem('userData'));
+  return userData?.role === 'admin';
+});
+
+const getUsernameFromSession = computed(() => (adminLoggedIn.value ? 'Admin' : ''));
 </script>
 
 <style>
 .login-container {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  margin-top: 100px;
-  margin-bottom: 100px;
+  min-height: 400px;
+  margin: auto;
+}
+.login-container h2 {
+  margin-bottom: 10px;
+  padding: 10px;
+  font-size: 20px;
+  font-weight: bold;
 }
 .login-container input {
   margin-bottom: 20px;
