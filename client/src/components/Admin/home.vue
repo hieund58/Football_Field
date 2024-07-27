@@ -1,68 +1,59 @@
 <template>
   <div class="flex">
-    <div class="w-1/5 bg-gray-800 h-screen">
+    <div class="hidden md:block w-1/5 bg-gray-800 min-h-[600px]">
       <div class="text-white p-4">
         <h2 class="text-xl font-bold">Trang chủ Admin</h2>
-        <div class="user-info">
-          <p>User: {{ getUsernameFromSession }}</p>
-          <router-link to="/admin">Logout{{ logout }} </router-link>
+        <div class="mt-2">
+          <button @click="logout">Logout</button>
         </div>
       </div>
       <div class="my-4">
-        <router-link
-          to="/fields"
-          class="block text-gray-300 hover:bg-gray-700 py-2 px-4"
+        <p
+          :class="`block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4 ${activeTab === 'fields' ? 'bg-gray-700' : ''}`"
+          @click="activeTab = 'fields'"
         >
           Thống kê các sân bóng
-        </router-link>
-        <router-link
-          to="/bookingDetail"
-          class="block text-gray-300 hover:bg-gray-700 py-2 px-4"
+        </p>
+        <p
+          :class="`block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4 ${activeTab === 'fieldsInUse' ? 'bg-gray-700' : ''}`"
+          @click="activeTab = 'fieldsInUse'"
         >
           Sân đang được đặt
-        </router-link>
-        <router-link
-          to="/UserManager"
-          class="block text-gray-300 hover:bg-gray-700 py-2 px-4"
-        >
-          Trạng thái người dùng
-        </router-link>
-        <router-link
-          to="/revenue"
-          class="block text-gray-300 hover:bg-gray-700 py-2 px-4"
-        >
-          Doanh Thu
-        </router-link>
+        </p>
+        <p class="block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4">Trạng thái người dùng</p>
+        <p class="block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4">Doanh Thu</p>
       </div>
     </div>
-    <div class="w-4/5 bg-white p-4">
-      <!-- Nội dung trang chính -->
-
-      <router-view></router-view>
+    <div class="sm:w-full md:w-4/5 bg-white p-4">
+      <fields v-if="activeTab === 'fields'" />
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  computed: {
-    getUsernameFromSession() {
-      return sessionStorage.getItem("isLoggedIn") === "true"
-        ? sessionStorage.getItem("userLogin")
-        : "Chưa đăng nhập";
-      // Trả về tên người dùng từ session storage nếu đã đăng nhập, nếu không trả về chuỗi rỗng.
-    },
-    logout() {
-      sessionStorage.removeItem("isLoggedIn");
-      sessionStorage.removeItem("userLogin");
-    },
-  },
+<script setup>
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useMessage } from 'naive-ui';
+
+import Fields from './Fields.vue';
+
+const router = useRouter();
+const message = useMessage();
+const activeTab = ref('fields');
+
+const adminLoggedIn = computed(() => {
+  if (!sessionStorage.getItem('userData')) return false;
+  const userData = JSON.parse(sessionStorage.getItem('userData'));
+  return userData?.role === 'admin';
+});
+
+const getUsernameFromSession = computed(() => (adminLoggedIn.value ? 'Admin' : ''));
+
+const logout = () => {
+  sessionStorage.removeItem('userData');
+  message.success('Đăng xuất thành công');
+  router.push('/admin');
 };
 </script>
 
-<style>
-/* Để kích hoạt Tailwind CSS */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-</style>
+<style></style>

@@ -1,10 +1,10 @@
 <template>
   <div>
     <div v-if="!adminLoggedIn" class="login-container">
-        <h2>Đăng nhập admin</h2>
-        <input type="text" v-model="loginData.email" placeholder="Username" />
-        <input type="password" v-model="loginData.password" placeholder="Password" />
-        <button @click="login">Đăng nhập</button>
+      <h2>Đăng nhập admin</h2>
+      <input type="text" v-model="loginData.email" placeholder="Username" />
+      <input type="password" v-model="loginData.password" placeholder="Password" />
+      <button @click="login">Đăng nhập</button>
     </div>
     <div v-else class="login-container">
       <h2>Bạn đã đăng nhập!</h2>
@@ -17,7 +17,7 @@
 
 <script setup>
 import axios from 'axios';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLoadingBar, useMessage } from 'naive-ui';
 import { useRouter } from 'vue-router';
 
@@ -40,7 +40,7 @@ async function login() {
     message.success('Đăng nhập admin thành công');
     sessionStorage.setItem('userToken', response.data.token); // Lưu token trong sessionStorage
     sessionStorage.setItem('userData', JSON.stringify(response.data.user)); // Lưu thông tin người dùng trong sessionStorage
-    router.push('/fields');
+    router.push('/admin/home');
   } catch (error) {
     message.error(error?.response?.data?.message || 'Đăng nhập thất bại');
   } finally {
@@ -54,6 +54,20 @@ const adminLoggedIn = computed(() => {
 });
 
 const getUsernameFromSession = computed(() => (adminLoggedIn.value ? 'Admin' : ''));
+
+function onKeyUpEnter(event) {
+  if (event?.keyCode === 13) {
+    login();
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keyup', onKeyUpEnter, true);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keyup', onKeyUpEnter, true);
+});
 </script>
 
 <style>

@@ -1,130 +1,224 @@
 <template>
-  <div class="flex">
-    <div class="w-1/5 bg-gray-800 h-screen">
-      <div class="text-white p-4">
-        <h2 class="text-xl font-bold">Trang chủ Admin</h2>
-        <div class="user-info">
-          <p>User: {{ getUsernameFromSession }}</p>
-          <button @click="logout">Logout</button>
+  <div class="field-management">
+    <Transition name="fade" :duration="300" mode="out-in">
+      <div v-if="!drawerOpen">
+        <h1>Quản lý sân</h1>
+        <div class="flex justify-between mb-2">
+          <n-input-group>
+            <n-input v-model:value="searchInput" placeholder="Tìm theo tên sân" class="!w-[200px]" />
+            <n-button ghost @click="handleSearch">
+              <template #icon>
+                <n-icon><SearchOutline /></n-icon>
+              </template>
+            </n-button>
+            <n-button ghost @click="() => fetchProductData()">
+              <template #icon>
+                <n-icon><ReloadOutline /></n-icon>
+              </template>
+            </n-button>
+          </n-input-group>
+          <n-button type="success" @click="openDrawer('create')">
+            <template #icon>
+              <n-icon><AddOutline /></n-icon>
+            </template>
+            Thêm mới
+          </n-button>
         </div>
+        <n-data-table :columns="columns" :data="tableData" :pagination="pagination" />
+
       </div>
-      <div class="my-4">
-        <router-link
-          to="/fields"
-          class="block text-gray-300 hover:bg-gray-700 py-2 px-4"
-        >
-          Thống kê các sân bóng
-        </router-link>
-        <router-link
-          to="/bookingDetail"
-          class="block text-gray-300 hover.bg-gray-700 py-2 px-4"
-        >
-          Sân đang được đặt
-        </router-link>
-        <router-link
-          to="/revenue"
-          class="block text-gray-300 hover.bg-gray-700 py-2 px-4"
-        >
-          Doanh Thu
-        </router-link>
-      </div>
-    </div>
-    <div class="w-4/5 bg-white p-4">
-      <div class="fields-container">
-        <h2>Bảng thống kê các sân bóng</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Tên sân</th>
-              <th>Số người</th>
-              <th>Mô tả</th>
-              <th>Giá sân</th>
-              <th>Hình ảnh sân</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="field in fields" :key="field._id">
-              <td>{{ field.name }}</td>
-              <td>{{ field.people }}</td>
-              <td>{{ field.description && field.description.facilities }}</td>
-              <td>{{ field.price }}</td>
-              <td>
-                <img
-                  :src="field.imageSrc"
-                  alt="Hình ảnh sân"
-                  style="max-width: 100px"
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <router-view></router-view>
-    </div>
+
+      <field-detail
+        v-else-if="drawerOpen"
+        :mode="drawerMode"
+        :detail-data="rowData"
+        @success="() => fetchProductData()"
+        @close="drawerOpen = false"
+      />
+    </Transition>
   </div>
 </template>
 
-<script>
-import axios from "axios";
+<script setup>
+import { h, ref, onMounted } from 'vue';
+import axios from 'axios';
+import { NButton, NIcon, NPopconfirm, useMessage, useLoadingBar } from 'naive-ui';
+import { Eye, CreateOutline, TrashOutline, AddOutline, SearchOutline, ReloadOutline } from '@vicons/ionicons5';
 
-export default {
-  computed: {
-    getUsernameFromSession() {
-      return sessionStorage.getItem("isLoggedIn") === "true"
-        ? sessionStorage.getItem("userLogin")
-        : "Chưa đăng nhập";
-    },
+import FieldDetail from './FieldDetail.vue';
+
+const message = useMessage();
+const loadingBar = useLoadingBar();
+
+const userData = JSON.parse(sessionStorage.getItem('userData'));
+const tableData = ref([]);
+
+const drawerOpen = ref(false);
+const drawerMode = ref('');
+const rowData = ref();
+const searchInput = ref('');
+
+function openDrawer(mode, data) {
+  drawerOpen.value = true;
+  drawerMode.value = mode;
+  rowData.value = data;
+}
+
+function renderIcon(icon) {
+  return h(NIcon, null, {
+    default: () => h(icon)
+  });
+}
+
+const columns = [
+  {
+    title: 'Tên sân',
+    key: 'name'
   },
-  data() {
-    return {
-      fields: [],
-    };
+  {
+    title: 'Địa Chỉ',
+    key: 'address'
   },
-  created() {
-    this.fetchFields();
+  {
+    title: 'Khu vực',
+    key: 'area'
   },
-  methods: {
-    async fetchFields() {
-      try {
-        const response = await axios.get("http://localhost:5000/api/products");
-        this.fields = response.data;
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    logout() {
-      sessionStorage.removeItem("isLoggedIn");
-      sessionStorage.removeItem("userLogin");
-      this.$router.push("/admin");
-    },
+  {
+    title: 'Giá',
+    key: 'price'
   },
+  {
+    title: 'Số người',
+    key: 'playerNum'
+  },
+  {
+    title: 'Thao tác',
+    fixed: 'right',
+    width: '100',
+    key: 'actions',
+    render(row) {
+      return h(
+        'div',
+        {
+          style: { display: 'flex', justifyContent: 'space-between' }
+        },
+        [
+          h(
+            NButton,
+            {
+              type: 'info',
+              ghost: true,
+              circle: true,
+              size: 'small',
+              title: 'Chi tiết',
+              style: { marginRight: '2px' },
+              renderIcon: () => renderIcon(Eye),
+              onClick: () => openDrawer('detail', row)
+            },
+            null
+          ),
+          h(
+            NButton,
+            {
+              type: 'info',
+              circle: true,
+              ghost: true,
+              size: 'small',
+              title: 'Sửa',
+              style: { marginRight: '2px' },
+              renderIcon: () => renderIcon(CreateOutline),
+              onClick: () => openDrawer('edit', row)
+            },
+            null
+          ),
+          h(
+            NPopconfirm,
+            {
+              positiveText: 'Có',
+              negativeText: 'Không',
+              onPositiveClick: () => deleteField(row),
+              onNegativeClick: () => {}
+            },
+            {
+              default: () => 'Bạn có chắc chắn xóa sân?',
+              trigger: () =>
+                h(
+                  NButton,
+                  {
+                    type: 'error',
+                    circle: true,
+                    ghost: true,
+                    size: 'small',
+                    title: 'Xóa',
+                    renderIcon: () => renderIcon(TrashOutline)
+                  },
+                  null
+                )
+            }
+          )
+        ]
+      );
+    }
+  }
+];
+
+const pagination = {
+  pageSize: 10
 };
+
+const deleteField = async row => {
+  try {
+    await axios.delete(`http://localhost:5000/api/field/${row._id}`);
+    message.success('Xóa sân thành công');
+    await fetchProductData();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const fetchProductData = async () => {
+  try {
+    loadingBar.start();
+    const response = await axios.get('http://localhost:5000/api/field');
+    tableData.value = response.data;
+    console.log('Email từ sessionStorage:', userData.email);
+  } catch (error) {
+    console.error(error);
+    message.error(error?.response?.data?.message);
+  } finally {
+    loadingBar.finish();
+  }
+};
+
+const handleSearch = () => {
+  if (!searchInput.value || !tableData.value?.length) return;
+  tableData.value = tableData.value.filter(row => row?.name?.toLowerCase()?.includes(searchInput.value.toLowerCase()));
+};
+
+onMounted(async () => {
+  await fetchProductData();
+});
 </script>
 
-<style>
-.fields-container {
-  margin-top: 50px;
-  margin-bottom: 100px;
+<style lang="scss" scoped>
+.field-management {
+  padding: 10px;
+  font-family: Arial, sans-serif;
+
+  h1 {
+    font-size: 20px;
+    font-weight: 500;
+    padding-bottom: 10px;
+  }
 }
 
-.fields-container h2 {
-  margin-bottom: 20px;
-  font-size: 30px;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
 }
 
-.fields-container table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.fields-container th,
-.fields-container td {
-  border: 1px solid #dddddd;
-  padding: 8px;
-  text-align: left;
-}
-
-.fields-container tr:nth-child(even) {
-  background-color: #f2f2f2;
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
