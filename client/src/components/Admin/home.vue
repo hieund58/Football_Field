@@ -47,13 +47,9 @@ const adminLoggedIn = computed(() => {
   return userData?.role === 'admin';
 });
 
-const getUsernameFromSession = computed(() => (adminLoggedIn.value ? 'Admin' : ''));
-
 const logout = () => {
   sessionStorage.removeItem('userData');
   message.success('Đăng xuất thành công');
   router.push('/admin');
 };
 </script>
-
-<style></style>

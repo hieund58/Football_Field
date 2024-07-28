@@ -4,10 +4,10 @@ const fieldSchema = new mongoose.Schema({
   name: String,
   address: String,
   area: String,
-  imageSrc: String,
   price: Number,
   playerNum: Number,
-  ownedBy: String,  
+  avatarSrc: String,
+  detailImgSrc: String,
   description: {
     facilities: String,
     transportation: String,

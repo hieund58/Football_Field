@@ -32,22 +32,24 @@ const storage = multer.diskStorage({
     cb(null, 'uploads/'); // Thay đổi thư mục đích để lưu trữ hình ảnh
   },
   filename: (req, file, cb) => {
-    console.log(file)
     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
   }
 });
 
 const upload = multer({ storage });
 
-router.post('/', upload.single('image'), async (req, res) => {
-    console.log(req.body)
-    console.log(req.file)
+router.post('/', upload.array('images'), async (req, res) => {
+    // console.log(req.body)
+    // console.log(req.files)
+    const detailImgNames = req.files?.map(file => file.filename)?.slice(1)
   try {
     const fieldData = JSON.parse(req.body.fieldData || '') || {}
     const field = new Field({
       ...fieldData,
-      imageSrc: req.file.filename
+      avatarSrc: req.files[0].filename,
+      detailImgSrc: JSON.stringify(detailImgNames)
     });
+    console.log(field)
 
     await field.save();
     res.status(201).json(field);
@@ -59,7 +61,7 @@ router.post('/', upload.single('image'), async (req, res) => {
 
 
 // Cập nhật sản phẩm kèm theo cập nhật hình ảnh
-router.put('/:id', upload.single('image'), async (req, res) => {
+router.put('/:id', upload.array('images'), async (req, res) => {
   try {
     const updateData = JSON.parse(req.body.fieldData || '') || {};
     const fieldId = req.params.id;
@@ -70,9 +72,11 @@ router.put('/:id', upload.single('image'), async (req, res) => {
       return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
     }
 
-    if (req.file) {
+    if (req.files) {
       // Nếu có hình ảnh mới được tải lên, cập nhật đường dẫn hình ảnh
-      updateData.imageSrc = req.file.filename;
+      updateData.avatarSrc = req.files[0].filename;
+      const detailImgNames = req.files?.slice(1)?.map(file => file.filename);
+      updateData.detailImgSrc = JSON.stringify(detailImgNames);
     }
 
     const updatedField = await Field.findByIdAndUpdate(fieldId, updateData, { new: true });

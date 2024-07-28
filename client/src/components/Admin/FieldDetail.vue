@@ -39,30 +39,14 @@
           <span v-else>{{ formModel.area }}</span>
         </n-form-item-gi>
         <n-form-item-gi :span="1" path="price" label="Giá">
-          <n-input v-if="!detailMode" v-model:value="formModel.price" placeholder="Giá" />
-          <span v-else>{{ formModel.price }}</span>
+          <n-input-number v-if="!detailMode" v-model:value="formModel.price" :show-button="false" placeholder="Giá">
+            <template #suffix>VNĐ</template>
+          </n-input-number>
+          <span v-else>{{ formatMoney(formModel.price) }}</span>
         </n-form-item-gi>
         <n-form-item-gi :span="1" path="playerNum" label="Số người">
           <n-input v-if="!detailMode" v-model:value="formModel.playerNum" placeholder="Số người" />
           <span v-else>{{ formModel.playerNum }}</span>
-        </n-form-item-gi>
-        <n-form-item-gi :span="1" path="image" label="Ảnh sân">
-          <n-space vertical :wrap="false">
-            <n-upload
-              v-if="!detailMode"
-              v-model:file-list="fileList"
-              :default-upload="false"
-              @preview="showModalPreview = true"
-              :on-update:file-list="handleUpload"
-            >
-              <n-button size="small">Chọn ảnh</n-button>
-            </n-upload>
-            <img
-              v-if="detailMode || (mode === 'edit' && fileList.length === 0)"
-              :src="`http://localhost:5000/${formModel.imageSrc}`"
-              style="width: 100%"
-            />
-          </n-space>
         </n-form-item-gi>
         <n-form-item-gi :span="2" path="description.facilities" label="Cơ sở vật chất">
           <n-input
@@ -84,11 +68,53 @@
           />
           <span v-else>{{ formModel.description.transportation }}</span>
         </n-form-item-gi>
+
+        <n-form-item-gi :span="2" path="avatar" label="Ảnh đại diện sân (1 ảnh)">
+          <n-space vertical :wrap="false">
+            <n-upload
+              v-if="!detailMode"
+              v-model:file-list="formModel.avatar"
+              :default-upload="false"
+              :on-update:file-list="handleUploadAvatar"
+              list-type="image-card"
+              file-list-class="!flex flex-row"
+              :max="1"
+            >
+              <n-button size="small">Chọn ảnh</n-button>
+            </n-upload>
+            <img
+              v-if="detailMode || (mode === 'edit' && formModel.avatar?.length === 0)"
+              :src="getImgUrl(formModel.avatarSrc)"
+              style="max-width: 200px; object-fit: contain"
+            />
+          </n-space>
+        </n-form-item-gi>
+
+        <n-form-item-gi :span="2" path="image" label="Ảnh chi tiết sân (max 3 ảnh)">
+          <n-space vertical :wrap="false">
+            <n-upload
+              v-if="!detailMode"
+              v-model:file-list="detailImages"
+              :default-upload="false"
+              list-type="image-card"
+              file-list-class="!flex flex-row"
+              multiple
+              :max="3"
+              :on-update:file-list="handleUploadDetailImg"
+            >
+              <n-button size="small">Chọn ảnh</n-button>
+            </n-upload>
+            <div v-if="detailMode || (mode === 'edit' && detailImages.length === 0)" class="flex flex-row">
+              <img
+                v-for="imageSrc in detailImagesSrc"
+                :src="getImgUrl(imageSrc)"
+                style="max-width: 200px; margin: 2px; object-fit: contain"
+              />
+            </div>
+          </n-space>
+        </n-form-item-gi>
       </n-grid>
     </n-form>
-    <n-modal v-model:show="showModalPreview" preset="card" style="width: 600px" title="Xem ảnh vừa tải">
-      <img :src="previewImageUrl" style="width: 100%" />
-    </n-modal>
   </div>
 </template>
 
@@ -96,10 +122,11 @@
 import { computed, ref, watch } from 'vue';
 import { useMessage } from 'naive-ui';
 import axios from 'axios';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, last, omit } from 'lodash';
 import { SaveOutline, CloseOutline } from '@vicons/ionicons5';
 
-import { areaList } from '../../utils/constant';
+import { areaList } from '@/utils/constant';
+import { formatMoney, getImgUrl } from '@/utils/common';
 
 const props = defineProps({
   mode: { type: String, default: 'create' },
@@ -108,29 +135,29 @@ const props = defineProps({
 const emits = defineEmits(['success', 'close']);
 
 const message = useMessage();
-const userData = JSON.parse(sessionStorage.getItem('userData'));
 const formInit = {
   name: '',
   address: '',
   area: undefined,
-  imageSrc: '',
   price: '',
   playerNum: '',
   description: {
     facilities: '',
     transportation: ''
-  }
+  },
+  avatar: [],
+  avatarSrc: '',
+  detailImgSrc: []
 };
 
 const formRef = ref(null);
 const formModel = ref(cloneDeep(formInit));
-const showModalPreview = ref(false);
-const previewImageUrl = ref();
-const fileList = ref([]);
+const detailImages = ref([]);
 const loading = ref(false);
 
 const rules = {
-  name: [{ required: true, message: 'Thông tin bắt buộc', trigger: ['change', 'blur'] }]
+  name: [{ required: true, message: 'Thông tin bắt buộc', trigger: ['change', 'blur'] }],
+  avatar: [{ required: true, message: 'Thông tin bắt buộc', type: 'array', trigger: ['change', 'blur'] }]
 };
 
 const title = computed(() => {
@@ -139,26 +166,38 @@ const title = computed(() => {
 
 const detailMode = computed(() => props.mode === 'detail');
 
-const handleUpload = fileListData => {
-  const file = fileListData[0].file;
+const detailImagesSrc = computed(() => {
+  if (!formModel.value.detailImgSrc) return [];
+  return JSON.parse(formModel.value.detailImgSrc.replaceAll('\\', ''));
+});
+
+const handleUploadAvatar = fileListData => {
+  const file = fileListData[0]?.file;
   if (file) {
-    // Kiểm tra xem kích thước tệp có vượt quá giới hạn không (ví dụ: 5MB)
     const maxFileSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxFileSize) {
-      // Hiển thị thông báo lỗi nếu kích thước vượt quá giới hạn
       message.error('Kích thước tệp quá lớn. Vui lòng chọn một tệp nhỏ hơn 5MB.');
-      // Xoá tệp đang chọn (tùy chọn)
-      fileList.value = [];
+      formModel.value.avatar = [];
       return;
     }
+    formModel.value.avatar = fileListData;
+  } else {
+    formModel.value.avatar = [];
+  }
+};
 
-    // Tiếp tục xử lý tải lên hình ảnh
-    fileList.value = fileListData;
-    const reader = new FileReader();
-    reader.onload = () => {
-      previewImageUrl.value = reader.result;
-    };
-    reader.readAsDataURL(file);
+const handleUploadDetailImg = fileListData => {
+  console.log('🚀 ~ handleUploadDetailImg ~ fileListData:', fileListData);
+  const file = last(fileListData)?.file;
+  if (file) {
+    const maxFileSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxFileSize) {
+      message.error('Kích thước tệp quá lớn. Vui lòng chọn một tệp nhỏ hơn 5MB.');
+      return;
+    }
+    detailImages.value = fileListData;
+  } else {
+    detailImages.value = [];
   }
 };
 
@@ -170,22 +209,12 @@ const handleSave = () => {
 
       try {
         const formData = new FormData();
-        let fieldData;
-        if (props.mode === 'create') {
-          fieldData = {
-            ...formModel.value,
-            ownedBy: userData.email
-          };
-        } // case edit
-        else {
-          fieldData = {
-            ...formModel.value,
-            ownedBy: props.detailData?.ownedBy
-          };
-        }
-
-        formData.append('fieldData', JSON.stringify(fieldData));
-        if (fileList.value?.[0]) formData.append('image', fileList.value[0].file);
+        const formValues = omit(formModel.value, ['avatar', 'avatarSrc', 'detailImgSrc']);
+        formData.append('fieldData', JSON.stringify(formModel.value));
+        if (formModel.value.avatar?.[0]) formData.append('images', formModel.value.avatar[0].file);
+        detailImages.value.forEach(image => {
+          formData.append('images', image?.file);
+        });
 
         if (props.mode === 'create') {
           await axios.post('http://localhost:5000/api/field', formData, {
@@ -213,7 +242,7 @@ const handleSave = () => {
 
 const handleClose = () => {
   formModel.value = formInit;
-  fileList.value = [];
+  detailImages.value = [];
   emits('close');
 };
 
@@ -226,13 +255,15 @@ watch(
         name: val?.name,
         address: val?.address,
         area: val?.area,
-        imageSrc: val?.imageSrc,
         price: val?.price?.toString(),
         playerNum: val?.playerNum?.toString(),
         description: {
           facilities: val?.description?.facilities,
           transportation: val?.description?.transportation
-        }
+        },
+        avatar: [],
+        avatarSrc: val?.avatarSrc,
+        detailImgSrc: val?.detailImgSrc
       };
   },
   {

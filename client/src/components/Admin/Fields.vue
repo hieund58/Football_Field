@@ -45,6 +45,8 @@ import axios from 'axios';
 import { NButton, NIcon, NPopconfirm, useMessage, useLoadingBar } from 'naive-ui';
 import { Eye, CreateOutline, TrashOutline, AddOutline, SearchOutline, ReloadOutline } from '@vicons/ionicons5';
 
+import { formatMoney } from '@/utils/common'
+
 import FieldDetail from './FieldDetail.vue';
 
 const message = useMessage();
@@ -85,7 +87,10 @@ const columns = [
   },
   {
     title: 'Giá',
-    key: 'price'
+    key: 'price',
+    render(row) {
+      return h('div', null, [formatMoney(row?.price)])
+    }
   },
   {
     title: 'Số người',
