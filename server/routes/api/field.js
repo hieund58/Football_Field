@@ -60,7 +60,7 @@ router.post('/', upload.array('images'), async (req, res) => {
 });
 
 
-// Cập nhật sản phẩm kèm theo cập nhật hình ảnh
+// Cập nhật sân kèm theo cập nhật hình ảnh
 router.put('/:id', upload.array('images'), async (req, res) => {
   try {
     const updateData = JSON.parse(req.body.fieldData || '') || {};
@@ -69,7 +69,7 @@ router.put('/:id', upload.array('images'), async (req, res) => {
     const field = await Field.findById(fieldId);
 
     if (!field) {
-      return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
+      return res.status(404).json({ message: 'Không tìm thấy sân' });
     }
 
     if (req.files) {

@@ -1,28 +1,54 @@
 <template>
-  <div class="waraper">
-    <div class="header">
+  <div class="wrapper">
+    <div class="hover:cursor-pointer flex items-center my-1 text-gray-500 text-[13px]" @click="backToList">
+      <n-icon class="mr-1"><ArrowBackOutline /></n-icon>
+      Quay lại danh sách sân
+    </div>
+    <div>
       <h1>{{ detail.name }}</h1>
-      <h2><font-awesome-icon icon="location-dot" /> {{ detail.area }}</h2>
-      <n-carousel
-        effect="card"
-        prev-slide-style="transform: translateX(-150%) translateZ(-800px);"
-        next-slide-style="transform: translateX(50%) translateZ(-800px);"
-        style="height: 500px"
-        :show-dots="false"
-      >
-        <n-carousel-item :style="{ width: '60%' }">
-          <img class="carousel-img" :src="detail.imageSrc" />
-        </n-carousel-item>
-        <n-carousel-item :style="{ width: '60%' }">
-          <img class="carousel-img" :src="detail.imageSrc" />
-        </n-carousel-item>
-        <n-carousel-item :style="{ width: '60%' }">
-          <img class="carousel-img" :src="detail.imageSrc" />
-        </n-carousel-item>
-        <n-carousel-item :style="{ width: '60%' }">
-          <img class="carousel-img" :src="detail.imageSrc" />
-        </n-carousel-item>
-      </n-carousel>
+      <h2>
+        <font-awesome-icon icon="location-dot" />
+        {{ detail.address }}
+      </h2>
+      <n-grid cols="1 m:3" responsive="screen" :x-gap="10">
+        <n-gi :span="2">
+          <n-carousel effect="fade" style="min-height: 400px" autoplay :interval="3000">
+            <n-carousel-item v-for="imgSrc in detail.detailImgSrc" :style="{ width: '100%' }">
+              <img class="carousel-img" :src="getImgUrl(imgSrc)" />
+            </n-carousel-item>
+          </n-carousel>
+        </n-gi>
+
+        <n-gi :span="1">
+          <div class="bg-slate-100 h-full p-2 flex flex-col justify-between rounded-[10px]">
+            <div class="field-info">
+              <h2>Thông tin sân</h2>
+              <div class="field-info__item">
+                <span class="field-info__item--label">Giá sân</span>
+                <span class="field-info__item--bold">{{ formatMoney(detail.price) }}</span>
+              </div>
+              <div class="field-info__item">
+                <span class="field-info__item--label">Cơ sở vật chất</span>
+                <span class="field-info__item--bold">{{ detail.description.facilities }}</span>
+              </div>
+              <div class="field-info__item">
+                <span class="field-info__item--label">Cách thức di chuyển</span>
+                <span class="field-info__item--bold">{{ detail.description.transportation }}</span>
+              </div>
+            </div>
+            <div class="field-map">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3725.7500875440132!2d105.748617!3d20.962549!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313452efff394ce3%3A0x391a39d4325be464!2zVHLGsOG7nW5nIMSQ4bqhaSBI4buNYyBQaGVuaWthYQ!5e0!3m2!1svi!2sus!4v1695110174331!5m2!1svi!2sus"
+                width="100%"
+                height="200"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+          </div>
+        </n-gi>
+      </n-grid>
     </div>
 
     <div class="content-detail">
@@ -34,9 +60,7 @@
           <div class="detail">
             <div class="detail-2">
               <ul>
-                <span class="detail-header"
-                  >Cơ Sở Vật Chất Và Tiện Ích Tại Sân</span
-                >
+                <span class="detail-header">Cơ Sở Vật Chất Và Tiện Ích Tại Sân</span>
                 <li class="detail-content">
                   {{ detail.description.facilities }}
                 </li>
@@ -87,11 +111,7 @@
                 @update:value="onDateChange"
                 format="yyyy-MM-dd"
               ></n-date-picker>
-              <select
-                v-model="selectedTime"
-                class="date-time"
-                @change="handleTimeChange"
-              >
+              <select v-model="selectedTime" class="date-time" @change="handleTimeChange">
                 <option value="">Chọn giờ</option>
                 <option v-for="hour in hoursList" :key="hour" :value="hour">
                   {{ hour }}
@@ -107,10 +127,7 @@
                 </button>
               </router-link>
             </div>
-            <p
-              v-if="!isFormValid && (!selectedDate || !selectedTime)"
-              style="color: red; padding-left: 140px"
-            >
+            <p v-if="!isFormValid && (!selectedDate || !selectedTime)" style="color: red; padding-left: 140px">
               {{ formErrorMessage }}
             </p>
           </div>
@@ -121,153 +138,166 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
-import axios from "axios";
-import { useRoute, useRouter } from "vue-router";
+import { ref, onMounted, computed } from 'vue';
+import axios from 'axios';
+import { useRoute, useRouter } from 'vue-router';
+import { ArrowBackOutline } from '@vicons/ionicons5';
+
+import { getImgUrl, formatMoney } from '@/utils/common';
+
 const router = useRouter();
 const route = useRoute();
 const _id = computed(() => route.params.id);
+
 const detail = ref({
-  name: "",
-  area: "",
-  address: "",
-  people: "",
+  name: '',
+  area: '',
+  address: '',
+  playerNum: '',
+  price: '',
+  detailImgSrc: '',
   description: {
-    facilities: "",
-    prices: "",
-    transportation: "",
+    facilities: '',
+    transportation: ''
   },
   schedules: {
-    time: "",
-    status: "",
+    time: '',
+    status: '',
     totalCourts: 0,
-    bookedCourts: 0,
-  },
+    bookedCourts: 0
+  }
 });
+
+const backToList = () => {
+  router.push('/bookingball')
+}
+
+
 const productInfo = ref({
-  name: "",
-  area: "",
+  name: '',
+  area: '',
   description: {
-    facilities: "",
-    prices: "",
-    transportation: "",
-  },
+    facilities: '',
+    prices: '',
+    transportation: ''
+  }
 });
 const selectedInfo = ref([
   {
-    date: "",
-    sanId: "",
+    date: '',
+    sanId: '',
     slots: [
       {
-        hour: "",
-        status: "",
-        court: "",
-        price: "", // Thêm trường giá tiền
-      },
-    ],
-  },
+        hour: '',
+        status: '',
+        court: '',
+        price: '' // Thêm trường giá tiền
+      }
+    ]
+  }
 ]);
 const hoursList = ref([
-  "05:00 AM",
-  "06:00 AM",
-  "07:00 AM",
-  "08:00 AM",
-  "09:00 AM",
-  "10:00 AM",
-  "11:00 AM",
-  "12:00 AM",
-  "13:00 AM",
-  "14:00 AM",
-  "15:00 AM",
-  "16:00 AM",
-  "17:00 AM",
-  "18:00 AM",
-  "19:00 AM",
-  "20:00 AM",
-  "21:00 AM",
-  "22:00 AM",
-  "23:00 AM",
+  '05:00 AM',
+  '06:00 AM',
+  '07:00 AM',
+  '08:00 AM',
+  '09:00 AM',
+  '10:00 AM',
+  '11:00 AM',
+  '12:00 AM',
+  '13:00 AM',
+  '14:00 AM',
+  '15:00 AM',
+  '16:00 AM',
+  '17:00 AM',
+  '18:00 AM',
+  '19:00 AM',
+  '20:00 AM',
+  '21:00 AM',
+  '22:00 AM',
+  '23:00 AM'
 ]);
 const selectedDate = ref(DateTime.now()); // Sử dụng ngày mặc định tại đây
 const selectedTime = ref({});
 const totalPrice = ref(0); // Khởi tạo biến price
 const isFormValid = ref(true);
-const formErrorMessage = ref("");
-import { DateTime } from "luxon";
+const formErrorMessage = ref('');
+
+import { DateTime } from 'luxon';
+
 const fetchDetail = async () => {
   try {
-    const response = await axios.get(
-      `http://localhost:5000/api/field/${_id.value}`,
-    );
+    const response = await axios.get(`http://localhost:5000/api/field/${_id.value}`);
     detail.value = response.data;
+    if (detail.value?.detailImgSrc)
+      detail.value.detailImgSrc = JSON.parse(detail.value.detailImgSrc.replaceAll('\\', ''));
 
     // Kiểm tra xem detail đã được tải thành công và detail._id không rỗng
     if (detail.value && detail.value._id) {
       // In ra detail theo _id hiện tại
-      console.log("Detail cho _id hiện tại:", detail.value);
+      console.log('Detail cho _id hiện tại:', detail.value);
 
       // Gọi hàm fetchScheduleByDate ở đây
       fetchScheduleByDate(selectedDate.value);
     } else {
-      console.error("Chi tiết sản phẩm không hợp lệ.");
+      console.error('Chi tiết sản phẩm không hợp lệ.');
     }
   } catch (error) {
-    console.error("Lỗi khi lấy dữ liệu chi tiết sân:", error);
+    console.error('Lỗi khi lấy dữ liệu chi tiết sân:', error);
   }
 };
 
 const fetchScheduleByDate = async (selectedDateValue, sanId) => {
   try {
     if (!selectedDateValue || !sanId) {
-      console.error("Vui lòng chọn sản phẩm và ngày trước khi lấy lịch sân.");
+      console.error('Vui lòng chọn sản phẩm và ngày trước khi lấy lịch sân.');
       return;
     }
 
     const isoDateString = selectedDateValue.toISODate();
     const axiosInstance = axios.create({
-      baseURL: "http://localhost:5000/api/schedule/",
+      baseURL: 'http://localhost:5000/api/schedule/'
     });
 
     const params = {
-      selectedDateValue: isoDateString,
+      selectedDateValue: isoDateString
     };
 
     // Truyền `sanId` như một tham số trong URL
-    const response = await axiosInstance.get(
-      `get-schedule-by-date/${isoDateString}/${sanId}`,
-      { params: { selectedDateValue: isoDateString } },
-    );
+    const response = await axiosInstance.get(`get-schedule-by-date/${isoDateString}/${sanId}`, {
+      params: { selectedDateValue: isoDateString }
+    });
 
     if (response.data.schedule) {
       selectedInfo.value = response.data.schedule.slots;
     } else {
-      console.error("Không tìm thấy lịch sân cho sản phẩm này.");
+      console.error('Không tìm thấy lịch sân cho sản phẩm này.');
     }
   } catch (error) {
-    console.error("Lỗi khi lấy lịch sân:", error);
+    console.error('Lỗi khi lấy lịch sân:', error);
   }
 };
 
 // Hàm xử lý sự kiện khi ngày thay đổi
-const onDateChange = (date) => {
+const onDateChange = date => {
   if (date instanceof Date) {
     selectedDate.value = DateTime.fromJSDate(date); // Chuyển đổi sang đối tượng DateTime của Luxon
     // Truyền sanId từ sản phẩm hiện tại và selectedDate.value từ date picker
     fetchScheduleByDate(selectedDate.value, detail.value._id);
     // Xóa thông báo lỗi nếu có
     isFormValid.value = true;
-    formErrorMessage.value = "";
-  } else if (typeof date === "number") {
+    formErrorMessage.value = '';
+  } else if (typeof date === 'number') {
     const dateInMilliseconds = DateTime.fromMillis(date); // Chuyển đổi sang đối tượng DateTime của Luxon
     selectedDate.value = dateInMilliseconds;
     // Truyền sanId từ sản phẩm hiện tại và dateInMilliseconds từ date picker
     fetchScheduleByDate(dateInMilliseconds, detail.value._id);
     // Xóa thông báo lỗi nếu có
     isFormValid.value = true;
-    formErrorMessage.value = "";
+    formErrorMessage.value = '';
     updateTotalPrice();
   } else {
-    console.error("Ngày không hợp lệ:", date);
+    console.error('Ngày không hợp lệ:', date);
   }
 };
 
@@ -281,52 +311,46 @@ const handleTimeChange = () => {
 const updateTotalPrice = () => {
   if (selectedDate.value && selectedTime.value && selectedInfo.value) {
     const selectedDateISO = selectedDate.value.toISODate();
-    console.log("Selected Date:", selectedDateISO);
-    console.log("Selected Time:", selectedTime.value);
+    console.log('Selected Date:', selectedDateISO);
+    console.log('Selected Time:', selectedTime.value);
     console.log(selectedInfo);
     // Tìm lịch sân phù hợp
-    const matchingSlot = selectedInfo.value.find(
-      (slots) => slots.hour === selectedTime.value,
-    );
+    const matchingSlot = selectedInfo.value.find(slots => slots.hour === selectedTime.value);
 
     if (matchingSlot) {
       totalPrice.value = matchingSlot.price;
     }
   }
 
-  console.log("Total Price:", totalPrice.value);
+  console.log('Total Price:', totalPrice.value);
 };
 
 const submitDateTime = () => {
   if (!selectedDate.value || !selectedTime.value) {
     isFormValid.value = false;
-    formErrorMessage.value = "Vui lòng chọn ngày và giờ trước khi đặt sân.";
+    formErrorMessage.value = 'Vui lòng chọn ngày và giờ trước khi đặt sân.';
   } else {
     const userData = getUserDataFromSessionStorage();
     if (userData && userData.email) {
       isFormValid.value = true;
       router.push(getThanhToanBallLink.value);
     } else {
-      formErrorMessage.value =
-        "Bạn phải đăng nhập và cung cấp địa chỉ email trước khi đặt sân.";
+      formErrorMessage.value = 'Bạn phải đăng nhập và cung cấp địa chỉ email trước khi đặt sân.';
     }
   }
 };
 
 const getUserDataFromSessionStorage = () => {
   // Kiểm tra xem có dữ liệu userData trong sessionStorage không
-  const userDataString = sessionStorage.getItem("userData");
+  const userDataString = sessionStorage.getItem('userData');
   if (userDataString) {
     try {
       // Parse dữ liệu userData từ JSON
       const userData = JSON.parse(userDataString);
-      console.log("Dữ liệu userData:", userData); // In dữ liệu userData vào console
+      console.log('Dữ liệu userData:', userData); // In dữ liệu userData vào console
       return userData;
     } catch (error) {
-      console.error(
-        "Lỗi khi phân tích dữ liệu userData từ sessionStorage:",
-        error,
-      );
+      console.error('Lỗi khi phân tích dữ liệu userData từ sessionStorage:', error);
     }
   }
   return null;
@@ -334,21 +358,21 @@ const getUserDataFromSessionStorage = () => {
 
 const getThanhToanBallLink = computed(() => {
   return {
-    name: "thanhtoanball",
+    name: 'thanhtoanball',
     params: {
       id: _id.value,
       detailData: detail,
       selectTime: selectedTime.value,
       selectDate: selectedDate.value.toISODate(),
-      sanId: _id.value,
+      sanId: _id.value
     },
     query: {
-      price: totalPrice.value, // Truyền giá tiền qua query
-    },
+      price: totalPrice.value // Truyền giá tiền qua query
+    }
   };
 });
 // Hàm để lấy sanId từ mảng selectedInfo
-const getSanIdFromSelectedInfo = (selectedInfo) => {
+const getSanIdFromSelectedInfo = selectedInfo => {
   let sanId = _id.value;
 
   if (selectedInfo && selectedInfo.length > 0) {
@@ -361,38 +385,47 @@ const getSanIdFromSelectedInfo = (selectedInfo) => {
   return sanId;
 };
 onMounted(() => {
-  console.log("_id:", _id.value);
-  console.log("detail:", detail.value);
+  console.log('_id:', _id.value);
+  console.log('detail:', detail.value);
   // Lấy sanId từ mảng selectedInfo
   const sanId = getSanIdFromSelectedInfo(selectedInfo.value);
-  console.log("sanId:", sanId);
+  console.log('sanId:', sanId);
   fetchDetail();
   const selectTime = handleTimeChange(selectedTime.value);
-  console.log("time:", selectTime);
+  console.log('time:', selectTime);
   // Gọi onDateChange với giá trị ban đầu của selectedDate
   updateTotalPrice;
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .carousel-img {
   margin: 0 auto;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  padding: 40px 0;
+  border-radius: 10px;
 }
 
-.waraper {
+.wrapper {
   height: auto;
   max-width: 1500px;
   width: 100%;
-  margin: 0 auto;
-}
+  display: flex;
+  padding-left: 40px;
+  padding-right: 40px;
+  flex-direction: column;
 
-.waraper h1 {
-  font-size: 30px;
-  font-weight: 600;
+  h1 {
+    font-size: 25px;
+    font-weight: 600;
+  }
+
+  h2 {
+    font-size: 15px;
+    font-weight: 400;
+    padding-bottom: 5px;
+  }
 }
 
 .content-detail {
@@ -400,8 +433,32 @@ onMounted(() => {
   box-shadow: 0 1px 8px 3px #ccc;
 }
 
-.header {
-  padding-top: 50px;
+.field-info {
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  &__item {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__item--label {
+    margin-right: 10px;
+    font-weight: 400;
+  }
+
+  &__item--bold {
+    max-width: 200px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+}
+
+.field-map {
+  border: 1px solid rgb(181, 179, 179);
+  margin-top: 5px
 }
 
 .content-time {
