@@ -9,7 +9,7 @@
     <div v-else class="login-container">
       <h2>Bạn đã đăng nhập!</h2>
       <p>Xin chào, {{ getUsernameFromSession }}</p>
-      <router-link to="/fields" class="block py-2 px-4 text-blue-500 underline">Truy cập trang chủ admin</router-link>
+      <router-link to="/admin/home" class="block py-2 px-4 text-blue-500 underline">Truy cập trang chủ admin</router-link>
       <!-- Nút logout -->
     </div>
   </div>
