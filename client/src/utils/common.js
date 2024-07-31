@@ -15,6 +15,12 @@ export const formatDateVn = date => {
   return date?.setLocale('vi-VI')?.toLocaleString();
 };
 
+
+export const formatQueryDate = date => {
+  const luxonDate = typeof date === 'string' ? DateTime.fromISO(date) : date;
+  return luxonDate?.toFormat('yyyy-MM-dd');
+};
+
 export const getWeekDay = date => {
   const luxonDate = DateTime.fromFormat(date, 'yyyy-MM-dd');
   return luxonDate.setLocale('vi-VI')?.toLocaleString({ weekday: 'short' });

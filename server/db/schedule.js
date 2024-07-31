@@ -1,64 +1,83 @@
-const mongoose = require('mongoose');
-const moment = require('moment-timezone'); 
+const mongoose = require("mongoose");
+const timeZone = require('mongoose-timezone');
+
 const scheduleSchema = new mongoose.Schema({
-  date: String,
-  sanId: String, 
-  // Hoặc kiểu dữ liệu phù hợp với `sanId` của bạn
-  slots: [{
-    hour: String,
-    status: String,
-    court: Number,
-    price: Number, // Thêm trường giá tiền
-  }],
+  date: Date,
+  fieldId: String,
+  // Hoặc kiểu dữ liệu phù hợp với `fieldId` của bạn
+  slots: [
+    {
+      hour: String,
+      status: String,
+      court: Number,
+      price: Number, // Thêm trường giá tiền
+    },
+  ],
 });
 
-const Schedule = mongoose.model('Schedule', scheduleSchema);
+scheduleSchema.plugin(timeZone);
 
-Schedule.createInitialSchedule = async () => {
+const Schedule = mongoose.model("Schedule", scheduleSchema);
+
+Schedule.createInitialSchedule = async (fieldId, date) => {
   try {
     const hoursOfDay = [
-      '05:00 AM', '06:00 AM', '07:00 AM', '08:00 AM', '09:00 AM',
-      '10:00 AM', '11:00 AM', '12:00 AM', '13:00 AM', '14:00 AM',
-      '15:00 AM', '16:00 AM', '17:00 AM', '18:00 AM', '19:00 AM',
-      '20:00 AM', '21:00 AM', '22:00 AM', '23:00 AM',
+      "5:00",
+      "6:00",
+      "7:00",
+      "8:00",
+      "9:00",
+      "10:00",
+      "11:00",
+      "12:00",
+      "13:00",
+      "14:00",
+      "15:00",
+      "16:00",
+      "17:00",
+      "18:00",
+      "19:00",
+      "20:00",
+      "21:00",
+      "22:00",
+      "23:00",
     ];
 
-    const currentDate = moment(); // Sử dụng moment() để tạo ngày giờ hiện tại
-    const formattedDate = currentDate.format(); // Lấy ngày giờ theo định dạng ISO
-
-    const existingSchedule = await Schedule.findOne({ date: formattedDate });
+    const existingSchedule = await Schedule.findOne({ fieldId: fieldId, date: date });
 
     if (!existingSchedule) {
       const initialSlots = hoursOfDay.map((hour) => ({
         hour,
-        status: 'available',
-        court: '', // Số sân ban đầu
-        price: '', // Giá tiền ban đầuz
+        status: "available",
+        court: "", // Số sân ban đầu
+        price: "", // Giá tiền ban đầuz
       }));
 
       const initialSchedule = new Schedule({
         date: formattedDate, // Lưu trữ ngày giờ dưới định dạng ISO
-        sanId,
+        fieldId,
         slots: initialSlots,
       });
 
       await initialSchedule.save();
-      console.log('Tạo lịch cố định ban đầu thành công');
+      console.log("Tạo lịch cố định ban đầu thành công");
     } else {
-      console.log('Lịch cho ngày hiện tại đã tồn tại.');
+      console.log("Lịch cho ngày hiện tại đã tồn tại.");
     }
   } catch (error) {
-    console.error('Lỗi khi tạo lịch cố định: ' + error);
+    console.error("Lỗi khi tạo lịch cố định: " + error);
   }
 };
 
 // Định nghĩa hàm để cập nhật thông tin của một giờ trên lịch sân
-Schedule.updateSlotInfo = async (date, hour, court, price, status,sanId) => {
+Schedule.updateSlotInfo = async (fieldId, date, hour, status, court, price) => {
   try {
-    const existingSchedule = await Schedule.findOne({ date,sanId });
+    const existingSchedule = await Schedule.findOne({ date, fieldId });
 
     if (existingSchedule) {
-      const slotIndex = existingSchedule.slots.findIndex((slot) => slot.hour === hour);
+      const slotIndex = existingSchedule.slots.findIndex(
+        (slot) => slot.hour === hour
+      );
 
       if (slotIndex !== -1) {
         existingSchedule.slots[slotIndex].court = court;
@@ -66,15 +85,15 @@ Schedule.updateSlotInfo = async (date, hour, court, price, status,sanId) => {
         existingSchedule.slots[slotIndex].status = status;
 
         await existingSchedule.save();
-        console.log('Cập nhật thông tin lịch sân thành công');
+        console.log("Cập nhật thông tin lịch sân thành công");
       } else {
-        console.log('Không tìm thấy giờ trên lịch sân.');
+        console.log("Không tìm thấy giờ trên lịch sân.");
       }
     } else {
-      console.log('Không tìm thấy lịch cho ngày đã cho.');
+      console.log("Không tìm thấy lịch cho ngày đã cho.");
     }
   } catch (error) {
-    console.error('Lỗi khi cập nhật thông tin lịch sân: ' + error);
+    console.error("Lỗi khi cập nhật thông tin lịch sân: " + error);
   }
 };
 

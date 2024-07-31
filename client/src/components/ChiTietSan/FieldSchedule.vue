@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper bg-slate-100">
     <div class="top-buttons">
-        <h2>Lịch đặt sân</h2>
+      <h2>Lịch đặt sân</h2>
       <div class="top-buttons__week-nav">
         <n-icon
           v-if="showPrevWeekArrow"
@@ -48,7 +48,9 @@
         <div
           v-for="slot in schedule.slots"
           :class="`hover:cursor-pointer ${slotDisabled(schedule.date, slot.hour) ? 'time-slot--disabled' : slot.status === 'available' ? 'time-slot--available' : 'time-slot--booked'}`"
-          @click="slotDisabled(schedule.date, slot.hour) ? () => {} : openModalPayment(schedule.date, slot.hour)"
+          @click="
+            slotDisabled(schedule.date, slot.hour) ? () => {} : openModalPayment(schedule.date, slot.hour, slot.status)
+          "
         >
           <div>{{ slot.name }}</div>
           <div>
@@ -59,29 +61,41 @@
         </div>
       </div>
     </div>
-    <modal-field-payment v-model:show="showModalPayment" :data="paymentData" @success="onPaymentSuccess" @close="showModalPayment = false" />
+    <modal-field-payment
+      v-model:show="showModalPayment"
+      :data="paymentData"
+      @success="onPaymentSuccess"
+      @close="showModalPayment = false"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import axios from 'axios';
+import { ref, computed, onMounted } from 'vue';
 import { DateTime } from 'luxon';
 import { ChevronBackOutline, ChevronForwardOutline } from '@vicons/ionicons5';
+import { useLoadingBar, useMessage } from 'naive-ui';
 
-import { formatDateVn, getWeekDay, getMonthDay, isToday } from '@/utils/common'
+import { formatDateVn, formatQueryDate, getWeekDay, getMonthDay, isToday } from '@/utils/common';
 
-import ModalFieldPayment from './ModalFieldPayment.vue'
+import ModalFieldPayment from './ModalFieldPayment.vue';
 
 const props = defineProps({
-    fieldId: String
-})
+  fieldId: String
+});
+
+const loadingBar = useLoadingBar();
+const message = useMessage();
 
 const dayPeriod = ref('morning'); // morning or afternoon
 const startDate = ref(DateTime.now());
 const endDate = computed(() => startDate.value?.plus({ weeks: 1 }));
 
-const showModalPayment= ref(false)
-const paymentData = ref({})
+const schedulesFromApi = ref([]);
+
+const showModalPayment = ref(false);
+const paymentData = ref({});
 
 const showPrevWeekArrow = computed(() => !isToday(startDate.value));
 const showNextWeekArrow = computed(() => endDate.value.diffNow('weeks').get('week') < 2);
@@ -89,6 +103,7 @@ const showNextWeekArrow = computed(() => endDate.value.diffNow('weeks').get('wee
 const changeWeek = type => {
   if (type === 'prev') startDate.value = startDate.value.minus({ weeks: 1 });
   else startDate.value = startDate.value.plus({ weeks: 1 });
+  fetchSchedules();
 };
 
 const toggleDayPeriod = period => {
@@ -135,21 +150,62 @@ const filteredSchedules = computed(() => {
     schedule.slots = schedule.slots.filter(
       slot => (dayPeriod.value === 'morning' && slot.isMorning) || (dayPeriod.value === 'afternoon' && !slot.isMorning)
     );
+    console.log(schedulesFromApi.value);
+    if (!schedulesFromApi.value?.length) return;
+    schedulesFromApi.value?.forEach(scheduleFromApi => {
+      if (formatQueryDate(scheduleFromApi?.date) === schedule.date) {
+        console.log(scheduleFromApi);
+        const bookedHours = [];
+        scheduleFromApi.slots.forEach(slotFromApi => {
+          if (slotFromApi.status === 'booked') {
+            // schedule.slots[slotIndex].status = 'booked';
+            bookedHours.push(slotFromApi.hour);
+          }
+        });
+        schedule.slots.forEach(slot => {
+          if (bookedHours.includes(slot.hour)) slot.status = 'booked';
+        });
+      }
+    });
   });
   return schedules;
 });
 
-const openModalPayment = (scheduleDate, slotHour) => {
-    paymentData.value = {
-        fieldId: props.fieldId,
-        scheduleDate: scheduleDate,
-        slotHour: slotHour
-    }
-    showModalPayment.value = true
-}
+const openModalPayment = (scheduleDate, slotHour, slotStatus) => {
+  paymentData.value = {
+    fieldId: props.fieldId,
+    scheduleDate,
+    slotHour,
+    slotStatus
+  };
+  showModalPayment.value = true;
+};
 
-const onPaymentSuccess = () => {}
+const onPaymentSuccess = () => {
+  showModalPayment.value = false;
+  fetchSchedules();
+};
 
+const fetchSchedules = async () => {
+  const params = {
+    fieldId: props.fieldId,
+    dateFrom: formatQueryDate(startDate.value),
+    dateTo: formatQueryDate(endDate.value)
+  };
+  try {
+    loadingBar.start();
+    const res = await axios.get(`http://localhost:5000/api/schedule/get-schedules-by-field/`, { params });
+    schedulesFromApi.value = res.data;
+  } catch (error) {
+    message.error(error?.response?.data?.message || 'Tìm lịch sân thất bại');
+  } finally {
+    loadingBar.finish();
+  }
+};
+
+onMounted(() => {
+  fetchSchedules();
+});
 </script>
 
 <style lang="scss" scoped>
@@ -213,13 +269,13 @@ const onPaymentSuccess = () => {}
   overflow-x: scroll;
   scrollbar {
     width: 10px;
-}
-::-webkit-scrollbar-track {
+  }
+  ::-webkit-scrollbar-track {
     background-color: darkgrey;
-}
-::-webkit-scrollbar-thumb {
+  }
+  ::-webkit-scrollbar-thumb {
     box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-}
+  }
 
   &__weekday {
     display: flex;
@@ -259,7 +315,7 @@ const onPaymentSuccess = () => {}
   }
 
   &--booked {
-    background: red;
+    background: rgb(255, 79, 79);
     border: 1px solid #93b4fd;
     margin: 5px;
     padding: 10px;
