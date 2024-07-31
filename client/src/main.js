@@ -61,7 +61,8 @@ library.add(
 );
 import { createRouter, createWebHistory } from "vue-router";
 import BookingBallLayout from "./components/DatSanBong/BookingBallLayout.vue";
-import DetailBall from "./components/ChiTietSan/DetailBall.vue";
+// import DetailBall from "./components/ChiTietSan/DetailBall.vue";
+import FieldBooking from "./components/ChiTietSan/FieldBooking.vue";
 import Home from "./views/index.vue";
 import AboutUsVue from "./components/AboutUs.vue";
 import ThanhToanBall from "./components/ThanhToan/ThanhToanBall.vue";
@@ -89,7 +90,7 @@ const router = createRouter({
       alias: "/home",
     },
     { path: "/bookingball", component: BookingBallLayout },
-    { path: "/detailball/:id", component: DetailBall },
+    { path: "/detailball/:id", component: FieldBooking },
     {
       path: "/detailball/:id/thanhtoanball/:sanId/:selectDate/:selectTime",
       component: ThanhToanBall,

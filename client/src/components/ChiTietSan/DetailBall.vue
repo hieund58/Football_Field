@@ -51,6 +51,8 @@
       </n-grid>
     </div>
 
+    <field-schedule class="mt-4" :field-id="_id" />
+
     <div class="content-detail">
       <n-grid cols="5">
         <n-gi span="3">
@@ -145,6 +147,8 @@ import { ArrowBackOutline } from '@vicons/ionicons5';
 
 import { getImgUrl, formatMoney } from '@/utils/common';
 
+import FieldSchedule from './FieldSchedule.vue'
+
 const router = useRouter();
 const route = useRoute();
 const _id = computed(() => route.params.id);
@@ -173,15 +177,6 @@ const backToList = () => {
 }
 
 
-const productInfo = ref({
-  name: '',
-  area: '',
-  description: {
-    facilities: '',
-    prices: '',
-    transportation: ''
-  }
-});
 const selectedInfo = ref([
   {
     date: '',
