@@ -49,6 +49,8 @@ const adminLoggedIn = computed(() => {
 
 const logout = () => {
   sessionStorage.removeItem('userData');
+  const userChangeEvent = new Event('user-data-change');
+  window.dispatchEvent(userChangeEvent);
   message.success('Đăng xuất thành công');
   router.push('/admin');
 };

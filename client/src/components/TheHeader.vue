@@ -122,10 +122,11 @@
           Liên Hệ
         </router-link>
         <router-link to="/contact" class="header-btn text-sm font-semibold leading-6 text-gray-900">Hỗ trợ</router-link>
+        <router-link v-if="user?.role === 'admin'" to="/admin/home" class="header-btn text-sm font-semibold leading-6 text-gray-900">Admin</router-link>
       </div>
       
       <div class="hidden md:flex flex-1 justify-end">
-        <div v-if="user?.role !== 'admin'">
+        <div v-if="!isLoggedIn || user?.role === 'user'">
           <button v-if="!isLoggedIn" @click="redirectToLogin">Đăng nhập</button>
           <div class="dropdown" v-else>
             <div class="avatar" @click="toggleDropdown">
@@ -192,14 +193,17 @@ const isLoggedIn = ref(false);
 const user = ref(null); // Thay thế bằng null ban đầu
 onMounted(() => {
   const loginSuccessHandler = () => {
-    isLoggedIn.value = true;
     // Đoạn code khôi phục thông tin người dùng từ sessionStorage
     const userData = sessionStorage.getItem('userData');
     if (userData) {
       user.value = JSON.parse(userData);
+      isLoggedIn.value = true;
+    } else {
+      user.value = {}
+      isLoggedIn.value = false;
     }
   };
-  window.addEventListener('login-success', loginSuccessHandler);
+  window.addEventListener('user-data-change', loginSuccessHandler);
 
   // Kiểm tra xem có thông tin người dùng trong sessionStorage khi trang được tải lại
   const userData = sessionStorage.getItem('userData');

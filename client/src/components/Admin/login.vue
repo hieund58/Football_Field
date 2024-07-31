@@ -40,6 +40,8 @@ async function login() {
     message.success('Đăng nhập admin thành công');
     sessionStorage.setItem('userToken', response.data.token); // Lưu token trong sessionStorage
     sessionStorage.setItem('userData', JSON.stringify(response.data.user)); // Lưu thông tin người dùng trong sessionStorage
+    const userChangeEvent = new Event('user-data-change');
+    window.dispatchEvent(userChangeEvent);
     router.push('/admin/home');
   } catch (error) {
     message.error(error?.response?.data?.message || 'Đăng nhập thất bại');

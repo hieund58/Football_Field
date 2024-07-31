@@ -40,9 +40,6 @@
             @keydown.enter.prevent
           />
         </n-form-item>
-        <n-form-item path="role" label="Vai trò">
-          <n-select v-model:value="user.role" :options="roleOptions" />
-        </n-form-item>
         <n-button type="info" block @click="registerUser"> Đăng ký </n-button>
       </n-form>
 
@@ -76,11 +73,6 @@ const user = ref({
   passwordConfirm: "",
   role: "user", // Mặc định là người dùng
 });
-
-const roleOptions = [
-  { label: "Người dùng", value: "user" },
-  { label: "Người quản lý", value: "admin" },
-];
 
 const rules = {
   email: [
