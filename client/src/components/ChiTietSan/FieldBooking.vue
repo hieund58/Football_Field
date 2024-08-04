@@ -51,12 +51,12 @@
       </n-grid>
     </div>
 
-    <field-schedule class="my-4" :field-id="_id" />
+    <field-schedule class="my-4" :field-data="fieldData" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import axios from 'axios';
 import { useRoute, useRouter } from 'vue-router';
 import { ArrowBackOutline } from '@vicons/ionicons5';
@@ -67,7 +67,6 @@ import FieldSchedule from './FieldSchedule.vue';
 
 const router = useRouter();
 const route = useRoute();
-const _id = computed(() => route.params.id);
 
 const detail = ref({
   name: '',
@@ -88,6 +87,13 @@ const detail = ref({
   }
 });
 
+const _id = computed(() => route.params.id);
+
+const fieldData = computed(() => ({
+  id: _id.value,
+  price: detail.value.price
+}))
+
 const backToList = () => {
   router.push('/bookingball');
 };
@@ -98,24 +104,13 @@ const fetchDetail = async () => {
     detail.value = response.data;
     if (detail.value?.detailImgSrc)
       detail.value.detailImgSrc = JSON.parse(detail.value.detailImgSrc.replaceAll('\\', ''));
-
-    // Kiểm tra xem detail đã được tải thành công và detail._id không rỗng
-    if (detail.value && detail.value._id) {
-      // In ra detail theo _id hiện tại
-      console.log('Detail cho _id hiện tại:', detail.value);
-
-      // Gọi hàm fetchScheduleByDate ở đây
-      fetchScheduleByDate(selectedDate.value);
-    } else {
-      console.error('Chi tiết sản phẩm không hợp lệ.');
-    }
   } catch (error) {
     console.error('Lỗi khi lấy dữ liệu chi tiết sân:', error);
   }
 };
 
-onMounted(() => {
-  fetchDetail();
+onMounted(async () => {
+  await fetchDetail();
 });
 </script>
 

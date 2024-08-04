@@ -1,32 +1,48 @@
-const express = require("express")
+const express = require("express");
 const moment = require("moment-timezone");
 
 const Schedule = require("../../db/schedule"); // Import your MongoDB model
 
 const router = express.Router();
 
-router.get(
-  "/get-schedules-by-field/",
-  async (req, res) => {
-    const { fieldId, dateFrom, dateTo } = req.query
-    try {
-      const schedules = await Schedule.find({
-        fieldId: fieldId,
-        date: {
-          $gte: dateFrom,
-          $lte: dateTo,
-        },
-      });
-      schedules?.forEach(item => item.date = moment(item.date))
-      res.json(schedules);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Lỗi khi lấy lịch sân" });
-    }
+router.get("/get-schedules-by-field/", async (req, res) => {
+  const { fieldId, dateFrom, dateTo } = req.query;
+  try {
+    const schedules = await Schedule.find({
+      fieldId: fieldId,
+      date: {
+        $gte: dateFrom,
+        $lte: dateTo,
+      },
+    });
+    schedules?.forEach((item) => (item.date = moment(item.date)));
+    res.json(schedules);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Lỗi khi lấy lịch sân" });
   }
-);
+});
 
 router.post("/", async (req, res) => {
+  try {
+    const { fieldId, date } = req.body;
+    const schedule = await Schedule.findOne({
+      fieldId: fieldId,
+      date: date,
+    });
+    if (!schedule) {
+      await Schedule.createInitialSchedule(fieldId, date);
+    }
+    res.status(201).json({
+      message: `Tạo lịch sân mặc định thành công ngày ${date}`,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Lỗi khi tạo lịch sân" });
+  }
+});
+
+router.put("/", async (req, res) => {
   try {
     const { fieldId, date, slotHour, slotStatus } = req.body;
     const schedule = await Schedule.findOne({
@@ -34,13 +50,19 @@ router.post("/", async (req, res) => {
       date: date,
     });
     if (!schedule) {
-      await Schedule.createInitialSchedule(fieldId, date)
+      res.status(500).json({ message: "Lỗi khi sửa lịch sân" });
+      return;
     }
-    await Schedule.updateSlotInfo(fieldId, date, slotHour, slotStatus)
-    res.status(201).json({ message: `${slotStatus === 'booked' ? 'Đặt' : 'Hủy'} lịch sân thành công ngày ${date} giờ ${slotHour}`});
+    await Schedule.updateSlotInfo(fieldId, date, slotHour, slotStatus);
+
+    res.status(201).json({
+      message: `${
+        slotStatus === "booked" ? "Đặt" : "Hủy"
+      } lịch sân thành công ngày ${date} giờ ${slotHour}`,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Lỗi khi lấy lịch sân" });
+    res.status(500).json({ message: "Lỗi khi sửa lịch sân" });
   }
 });
 

@@ -49,7 +49,7 @@
           v-for="slot in schedule.slots"
           :class="`hover:cursor-pointer ${slotDisabled(schedule.date, slot.hour) ? 'time-slot--disabled' : slot.status === 'available' ? 'time-slot--available' : 'time-slot--booked'}`"
           @click="
-            slotDisabled(schedule.date, slot.hour) ? () => {} : openModalPayment(schedule.date, slot.hour, slot.status)
+            slotDisabled(schedule.date, slot.hour) ? () => {} : openModalPayment(schedule.date, slot.hour, slot.name, slot.status)
           "
         >
           <div>{{ slot.name }}</div>
@@ -64,7 +64,7 @@
     <modal-field-payment
       v-model:show="showModalPayment"
       :data="paymentData"
-      @success="onPaymentSuccess"
+      @cancel-success="onCancelSuccess"
       @close="showModalPayment = false"
     />
   </div>
@@ -76,17 +76,20 @@ import { ref, computed, onMounted } from 'vue';
 import { DateTime } from 'luxon';
 import { ChevronBackOutline, ChevronForwardOutline } from '@vicons/ionicons5';
 import { useLoadingBar, useMessage } from 'naive-ui';
+import { useRoute, useRouter } from 'vue-router';
 
 import { formatDateVn, formatQueryDate, getWeekDay, getMonthDay, isToday } from '@/utils/common';
 
 import ModalFieldPayment from './ModalFieldPayment.vue';
 
 const props = defineProps({
-  fieldId: String
+  fieldData: Object
 });
 
 const loadingBar = useLoadingBar();
 const message = useMessage();
+const route = useRoute();
+const router = useRouter();
 
 const dayPeriod = ref('morning'); // morning or afternoon
 const startDate = ref(DateTime.now());
@@ -150,7 +153,6 @@ const filteredSchedules = computed(() => {
     schedule.slots = schedule.slots.filter(
       slot => (dayPeriod.value === 'morning' && slot.isMorning) || (dayPeriod.value === 'afternoon' && !slot.isMorning)
     );
-    console.log(schedulesFromApi.value);
     if (!schedulesFromApi.value?.length) return;
     schedulesFromApi.value?.forEach(scheduleFromApi => {
       if (formatQueryDate(scheduleFromApi?.date) === schedule.date) {
@@ -171,40 +173,58 @@ const filteredSchedules = computed(() => {
   return schedules;
 });
 
-const openModalPayment = (scheduleDate, slotHour, slotStatus) => {
+const openModalPayment = (scheduleDate, slotHour, slotName, slotStatus) => {
   paymentData.value = {
-    fieldId: props.fieldId,
+    fieldId: props.fieldData?.id,
+    fieldPrice: props.fieldData?.price,
     scheduleDate,
     slotHour,
+    slotName,
     slotStatus
   };
   showModalPayment.value = true;
 };
 
-const onPaymentSuccess = () => {
+const onCancelSuccess = async () => {
   showModalPayment.value = false;
-  fetchSchedules();
+  loadingBar.start();
+  await fetchSchedules();
+  loadingBar.finish();
 };
 
 const fetchSchedules = async () => {
   const params = {
-    fieldId: props.fieldId,
+    fieldId: props.fieldData?.id,
     dateFrom: formatQueryDate(startDate.value),
     dateTo: formatQueryDate(endDate.value)
   };
   try {
-    loadingBar.start();
     const res = await axios.get(`http://localhost:5000/api/schedule/get-schedules-by-field/`, { params });
     schedulesFromApi.value = res.data;
   } catch (error) {
     message.error(error?.response?.data?.message || 'Tìm lịch sân thất bại');
-  } finally {
-    loadingBar.finish();
   }
 };
 
-onMounted(() => {
-  fetchSchedules();
+const executePayment = async () => {
+  if (!route.query.token) return;
+  const paymentId = route.query.token;
+  try {
+    const res = await axios.post('http://localhost:5000/api/paypal/execute', { paymentId });
+    console.log('🚀 ~ excutePayment ~ res:', res);
+    message.success('Đặt sân thành công');
+    router.replace({ query: {} });
+  } catch (error) {
+    console.log('🚀 ~ excutePayment ~ error:', error);
+    router.replace({ query: {} });
+  }
+};
+
+onMounted(async () => {
+  loadingBar.start();
+  await executePayment();
+  await fetchSchedules();
+  loadingBar.finish();
 });
 </script>
 

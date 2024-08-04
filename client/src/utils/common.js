@@ -12,9 +12,9 @@ export const formatMoney = (moneyNum, separator = ',', suffix = ' VNĐ') => {
 };
 
 export const formatDateVn = date => {
-  return date?.setLocale('vi-VI')?.toLocaleString();
+  const luxonDate = typeof date === 'string' ?  DateTime.fromFormat(date, 'yyyy-MM-dd') : date;
+  return luxonDate?.setLocale('vi-VI')?.toLocaleString();
 };
-
 
 export const formatQueryDate = date => {
   const luxonDate = typeof date === 'string' ? DateTime.fromISO(date) : date;
@@ -34,4 +34,14 @@ export const getMonthDay = date => {
 export const isToday = date => {
   const dateToCompare = typeof date === 'string' ? DateTime.fromFormat(date, 'yyyy-MM-dd') : date;
   return dateToCompare.hasSame(DateTime.now(), 'days');
+};
+
+export const getUserData = () => {
+  const userDataString = sessionStorage.getItem('userData');
+  return userDataString ? JSON.parse(userDataString) : null;
+};
+
+export const vndToUsd = vnd => {
+  if (isNaN(parseFloat(vnd))) return null;
+  return String((Number(vnd) / 25217.5).toFixed(2));
 };

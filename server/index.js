@@ -33,7 +33,7 @@ const urlpay = require('../server/routes/api/urlpay');
 const ipnurl = require('../server/routes/api/ipnurl');
 const returnurl = require('../server/routes/api/returnurl');
 const users = require('../server/routes/api/users');
-const paypal = require('../server/routes/api/paypal');
+const paypal = require('../server/routes/api/paypalv2');
 const field = require('../server/routes/api/field')
 
 app.use('/api/vnpay_ipn', ipnurl);

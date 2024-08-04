@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const timeZone = require('mongoose-timezone');
+const timeZone = require("mongoose-timezone");
 
 const scheduleSchema = new mongoose.Schema({
   date: Date,
@@ -15,11 +15,12 @@ const scheduleSchema = new mongoose.Schema({
   ],
 });
 
-scheduleSchema.plugin(timeZone);
+// scheduleSchema.plugin(timeZone, { paths: ['date'] });
 
 const Schedule = mongoose.model("Schedule", scheduleSchema);
 
 Schedule.createInitialSchedule = async (fieldId, date) => {
+  console.log("🚀 ~ Schedule.createInitialSchedule= ~ date:", date)
   try {
     const hoursOfDay = [
       "5:00",
@@ -43,7 +44,7 @@ Schedule.createInitialSchedule = async (fieldId, date) => {
       "23:00",
     ];
 
-    const existingSchedule = await Schedule.findOne({ fieldId: fieldId, date: date });
+    const existingSchedule = await Schedule.findOne({ fieldId, date });
 
     if (!existingSchedule) {
       const initialSlots = hoursOfDay.map((hour) => ({
@@ -54,7 +55,7 @@ Schedule.createInitialSchedule = async (fieldId, date) => {
       }));
 
       const initialSchedule = new Schedule({
-        date: formattedDate, // Lưu trữ ngày giờ dưới định dạng ISO
+        date, // Lưu trữ ngày giờ dưới định dạng ISO
         fieldId,
         slots: initialSlots,
       });
@@ -72,7 +73,10 @@ Schedule.createInitialSchedule = async (fieldId, date) => {
 // Định nghĩa hàm để cập nhật thông tin của một giờ trên lịch sân
 Schedule.updateSlotInfo = async (fieldId, date, hour, status, court, price) => {
   try {
-    const existingSchedule = await Schedule.findOne({ date, fieldId });
+    const existingSchedule = await Schedule.findOne({
+      date: new Date(date),
+      fieldId: fieldId,
+    });
 
     if (existingSchedule) {
       const slotIndex = existingSchedule.slots.findIndex(
