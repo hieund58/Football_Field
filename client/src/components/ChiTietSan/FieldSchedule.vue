@@ -49,7 +49,7 @@
           v-for="slot in schedule.slots"
           :class="`hover:cursor-pointer ${slotDisabled(schedule.date, slot.hour) ? 'time-slot--disabled' : slot.status === 'available' ? 'time-slot--available' : 'time-slot--booked'}`"
           @click="
-            slotDisabled(schedule.date, slot.hour) ? () => {} : openModalPayment(schedule.date, slot.hour, slot.name, slot.status)
+            slotDisabled(schedule.date, slot.hour) ? () => {} : openModalPayment(schedule.date, slot)
           "
         >
           <div>{{ slot.name }}</div>
@@ -173,14 +173,12 @@ const filteredSchedules = computed(() => {
   return schedules;
 });
 
-const openModalPayment = (scheduleDate, slotHour, slotName, slotStatus) => {
+const openModalPayment = (scheduleDate, slot) => {
   paymentData.value = {
     fieldId: props.fieldData?.id,
     fieldPrice: props.fieldData?.price,
     scheduleDate,
-    slotHour,
-    slotName,
-    slotStatus
+    slot
   };
   showModalPayment.value = true;
 };

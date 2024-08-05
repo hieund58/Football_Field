@@ -85,18 +85,17 @@ router.post("/execute", async (req, res) => {
 
     await Payment.findOneAndUpdate({ paymentId }, { status: "paid" });
     const paidPayment = await Payment.findOne({ paymentId });
-    console.log("🚀 ~ router.post ~ paidPayment:", paidPayment);
 
     if (paidPayment && paidPayment?.type === "booking") {
       const formattedDate = DateTime.fromJSDate(
         paidPayment.bookingData?.scheduleDate
       ).toFormat("yyyy-MM-dd");
-      console.log("🚀 ~ router.post ~ formattedDate:", formattedDate);
       await Schedule.updateSlotInfo(
         paidPayment.bookingData?.fieldId,
         formattedDate,
         paidPayment.bookingData?.scheduleSlotHour,
-        "booked"
+        "booked",
+        paidPayment.fromUser
       );
     }
     res.json({ message: "Thanh toán thành công" });

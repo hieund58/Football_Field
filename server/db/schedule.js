@@ -10,7 +10,8 @@ const scheduleSchema = new mongoose.Schema({
       hour: String,
       status: String,
       court: Number,
-      price: Number, // Thêm trường giá tiền
+      price: Number,
+      bookedBy: String,
     },
   ],
 });
@@ -52,6 +53,7 @@ Schedule.createInitialSchedule = async (fieldId, date) => {
         status: "available",
         court: "", // Số sân ban đầu
         price: "", // Giá tiền ban đầuz
+        bookedBy: null,
       }));
 
       const initialSchedule = new Schedule({
@@ -71,7 +73,7 @@ Schedule.createInitialSchedule = async (fieldId, date) => {
 };
 
 // Định nghĩa hàm để cập nhật thông tin của một giờ trên lịch sân
-Schedule.updateSlotInfo = async (fieldId, date, hour, status, court, price) => {
+Schedule.updateSlotInfo = async (fieldId, date, hour, status, court, price, bookedBy) => {
   try {
     const existingSchedule = await Schedule.findOne({
       date: new Date(date),
@@ -87,6 +89,7 @@ Schedule.updateSlotInfo = async (fieldId, date, hour, status, court, price) => {
         existingSchedule.slots[slotIndex].court = court;
         existingSchedule.slots[slotIndex].price = price;
         existingSchedule.slots[slotIndex].status = status;
+        existingSchedule.slots[slotIndex].bookedBy = bookedBy;
 
         await existingSchedule.save();
         console.log("Cập nhật thông tin lịch sân thành công");

@@ -1,46 +1,39 @@
 <template>
   <n-modal v-model:show="show">
-    <n-card
-      style="width: 400px"
-      :title="modalTitle"
-      :bordered="false"
-      size="huge"
-      role="dialog"
-      aria-modal="true"
-    >
-    <div v-if="!isCancel">
-      <div class="w-full h-[60px] mb-2">
-        <img
-          src="https://irp.cdn-website.com/621d057d/dms3rep/multi/Paypal.png"
-          alt=""
-          style="width: 100%; height: 100%; object-fit: cover"
-        />
-      </div>
+    <n-card style="width: 400px" :title="modalTitle" :bordered="false" size="huge" role="dialog" aria-modal="true">
+      <div v-if="!isCancel">
+        <div class="w-full h-[60px] mb-2">
+          <img
+            src="https://irp.cdn-website.com/621d057d/dms3rep/multi/Paypal.png"
+            alt=""
+            style="width: 100%; height: 100%; object-fit: cover"
+          />
+        </div>
 
-      <span class="block font-[600] mb-2">Bạn có chắc chắn đặt sân?</span>
-      <div class="flex flex-col w-full">
-        <div class="flex flex-row justify-between">
-          <span class="font-[600]">Giá tiền</span>
-          <span class="font-[700] text-[#f03131]">{{ formatMoney(data?.fieldPrice) }}</span>
-        </div>
-        <div class="flex flex-row justify-between">
-          <span class="font-[600]">Giá tiền tương ứng USD</span>
-          <span class="font-[700] text-[#f03131]">{{ vndToUsd(data?.fieldPrice) }}</span>
-        </div>
-        <div class="flex flex-row justify-between">
-          <span class="font-[600]">Vào ngày</span>
-          <span class="font-[700] text-[#f03131]">{{ formatDateVn(data?.scheduleDate) }}</span>
-        </div>
-        <div class="flex flex-row justify-between">
-          <span class="font-[600]">Khung giờ</span>
-          <span class="font-[700] text-[#f03131]">{{ data?.slotName }}</span>
+        <span class="block font-[600] mb-2">Bạn có chắc chắn đặt sân?</span>
+        <div class="flex flex-col w-full">
+          <div class="flex flex-row justify-between">
+            <span class="font-[600]">Giá tiền</span>
+            <span class="font-[700] text-[#f03131]">{{ formatMoney(data?.fieldPrice) }}</span>
+          </div>
+          <div class="flex flex-row justify-between">
+            <span class="font-[600]">Giá tiền tương ứng USD</span>
+            <span class="font-[700] text-[#f03131]">{{ vndToUsd(data?.fieldPrice) }}</span>
+          </div>
+          <div class="flex flex-row justify-between">
+            <span class="font-[600]">Vào ngày</span>
+            <span class="font-[700] text-[#f03131]">{{ formatDateVn(data?.scheduleDate) }}</span>
+          </div>
+          <div class="flex flex-row justify-between">
+            <span class="font-[600]">Khung giờ</span>
+            <span class="font-[700] text-[#f03131]">{{ data?.slotName }}</span>
+          </div>
         </div>
       </div>
-    </div>
-    <div v-else>
-      <span class="block font-[600] mb-2">Sân đã được đặt bởi</span>
-      <span class="block font-[600] mb-2">Bạn có chắc chắn hủy sân?</span>
-    </div>
+      <div v-else>
+        <span class="block font-[600] mb-2">Sân đã được đặt bởi</span>
+        <span class="block font-[600] mb-2">Bạn có chắc chắn hủy sân?</span>
+      </div>
       <template #footer>
         <n-button v-if="!isCancel" :loading="loading" type="info" @click="handlePayment">
           <template #icon>
@@ -52,7 +45,8 @@
           <template #icon>
             <n-icon><CloseCircleOutline /></n-icon>
           </template>
-          Hủy sân</n-button>
+          Hủy sân
+        </n-button>
         <n-button class="ml-2" @click="emits('close')">
           <template #icon>
             <n-icon><CloseOutline /></n-icon>
@@ -69,6 +63,7 @@ import { computed, ref } from 'vue';
 import axios from 'axios';
 import { useMessage } from 'naive-ui';
 import { LogoPaypal, CloseOutline, CloseCircleOutline } from '@vicons/ionicons5';
+import { useRouter } from 'vue-router';
 
 import { getUserData, vndToUsd, formatMoney, formatDateVn } from '@/utils/common';
 
@@ -80,12 +75,29 @@ const props = defineProps({
 });
 
 const message = useMessage();
+const router = useRouter();
 
 const loading = ref(false);
 
 const show = computed(() => props.show);
-const isCancel = computed(() => props.data?.slotStatus === 'booked');
-const modalTitle = computed(() => isCancel.value ? 'Xác nhận hủy sân' : 'Xác nhận thanh toán')
+const isCancel = computed(() => props.data?.slot?.status === 'booked');
+const modalTitle = computed(() => (isCancel.value ? 'Xác nhận hủy sân' : 'Xác nhận thanh toán'));
+
+function checkPermission() {
+  const userData = getUserData();
+  if (!userData) {
+    const cancelText = `Vui lòng đăng nhập trước khi ${isCancel.value ? 'hủy' : ''} thanh toán`;
+    message.warning(cancelText);
+    router.push('/login');
+    return false;
+  }
+  // case hủy sân cần xem có cùng người đặt không
+  if (isCancel.value && props.data?.slot?.bookedBy !== userData?.email) {
+    message.warning('User đăng nhập khác user đặt sân, không có quyền hủy');
+    return false;
+  }
+  return true;
+}
 
 const createDefaultSchedule = async () => {
   const payload = {
@@ -100,15 +112,14 @@ const createDefaultSchedule = async () => {
 };
 
 const handlePayment = async () => {
-  const userData = getUserData();
-  console.log('🚀 ~ handlePayment ~ userData:', userData);
+  if (!checkPermission()) return;
   const requestBody = {
     type: 'booking',
-    fromUser: userData?.email,
+    fromUser: getUserData()?.email,
     bookingData: {
       fieldId: props.data?.fieldId,
       scheduleDate: props.data?.scheduleDate,
-      scheduleSlotHour: props.data?.slotHour
+      scheduleSlotHour: props.data?.slot?.hour
     },
     price: vndToUsd(props.data?.fieldPrice)
   };
@@ -129,7 +140,7 @@ const cancelBooking = async () => {
   const payload = {
     fieldId: props.data?.fieldId,
     date: props.data?.scheduleDate,
-    slotHour: props.data?.slotHour,
+    slotHour: props.data?.slot?.hour,
     slotStatus: 'available'
   };
   try {
