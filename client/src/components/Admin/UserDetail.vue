@@ -1,5 +1,5 @@
 <template>
-<div>
+  <div>
     <div class="flex justify-between b">
       <p class="text-[20px] font-medium">{{ title }}</p>
       <div>
@@ -21,62 +21,35 @@
 
     <n-form ref="formRef" size="small" :model="formModel" :rules="!detailMode ? rules : {}" class="w-full">
       <n-grid cols="2 md:1" responsive="screen" :x-gap="10">
-        <n-form-item-gi :span="1" path="name" label="Tên sân">
-          <n-input v-if="!detailMode" v-model:value="formModel.name" placeholder="Tên sân" />
-          <span v-else>{{ formModel.name }}</span>
+        <n-form-item-gi :span="1" path="email" label="Email">
+          <n-input v-if="!detailMode" v-model:value="formModel.email" :disabled="editMode" placeholder="Email" />
+          <span v-else>{{ formModel.email }}</span>
         </n-form-item-gi>
-        <n-form-item-gi :span="1" path="address" label="Địa chỉ">
-          <n-input v-if="!detailMode" v-model:value="formModel.address" placeholder="Địa chỉ" />
-          <span v-else>{{ formModel.address }}</span>
-        </n-form-item-gi>
-        <n-form-item-gi :span="1" path="area" label="Thuộc khu vực">
+        <n-form-item-gi :span="1" path="role" label="Vai trò">
           <n-select
             v-if="!detailMode"
-            v-model:value="formModel.area"
-            placeholder="Thuộc khu vực"
-            :options="areaList"
-            clearable
+            v-model:value="formModel.role"
+            :disabled="editMode"
+            :options="roleList"
+            placeholder="Vai trò"
           />
-          <span v-else>{{ formModel.area }}</span>
+          <span v-else>{{ formModel.role }}</span>
         </n-form-item-gi>
-        <n-form-item-gi :span="1" path="price" label="Giá">
-          <n-input-number v-if="!detailMode" v-model:value="formModel.price" :show-button="false" placeholder="Giá">
-            <template #suffix>VNĐ</template>
-          </n-input-number>
-          <span v-else>{{ formatMoney(formModel.price) }}</span>
+        <n-form-item-gi :span="1" path="phone" label="Số điện thoại">
+          <n-input v-if="!detailMode" v-model:value="formModel.phone" placeholder="Số điện thoại" />
+          <span v-else>{{ formModel.phone }}</span>
         </n-form-item-gi>
-        <n-form-item-gi :span="1" path="playerNum" label="Số người">
-          <n-input v-if="!detailMode" v-model:value="formModel.playerNum" placeholder="Số người" />
-          <span v-else>{{ formModel.playerNum }}</span>
+        <n-form-item-gi :span="1" path="fullName" label="Họ và tên">
+          <n-input v-if="!detailMode" v-model:value="formModel.fullName" placeholder="Họ và tên" />
+          <span v-else>{{ formModel.fullName }}</span>
         </n-form-item-gi>
-        <n-form-item-gi :span="2" path="description.facilities" label="Cơ sở vật chất">
-          <n-input
-            v-if="!detailMode"
-            v-model:value="formModel.description.facilities"
-            placeholder="Cơ sở vật chất"
-            type="textarea"
-            :rows="2"
-          />
-          <span v-else>{{ formModel.description.facilities }}</span>
-        </n-form-item-gi>
-        <n-form-item-gi :span="2" path="description.transportation" label="Phương tiện di chuyển">
-          <n-input
-            v-if="!detailMode"
-            v-model:value="formModel.description.transportation"
-            placeholder="Phương tiện di chuyển"
-            type="textarea"
-            :rows="2"
-          />
-          <span v-else>{{ formModel.description.transportation }}</span>
-        </n-form-item-gi>
-
       </n-grid>
     </n-form>
-</div>
+  </div>
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onMounted } from 'vue';
 import { useMessage } from 'naive-ui';
 import axios from 'axios';
 import { cloneDeep, last, omit } from 'lodash';
@@ -84,20 +57,98 @@ import { SaveOutline, CloseOutline } from '@vicons/ionicons5';
 
 const props = defineProps({
   mode: { type: String, default: 'create' },
-  detailData: Object
+  userId: String
 });
 const emits = defineEmits(['success', 'close']);
 
+const roleList = [
+  {
+    label: 'Admin',
+    value: 'admin'
+  },
+  {
+    label: 'User',
+    value: 'user'
+  }
+];
+
 const message = useMessage();
 const formInit = {
-    email: '',
-    role: '',
-    phone: '',
-    fullName: ''
+  email: '',
+  role: undefined,
+  phone: '',
+  fullName: ''
 };
 
 const formRef = ref(null);
 const formModel = ref(cloneDeep(formInit));
 const loading = ref(false);
 
+const rules = {
+  email: [{ required: true, message: 'Thông tin bắt buộc', trigger: ['change', 'blur'] }],
+  role: [{ required: true, message: 'Thông tin bắt buộc', trigger: ['change', 'blur'] }]
+};
+
+const title = computed(() => {
+  return props.mode === 'detail'
+    ? 'Chi tiết người dùng'
+    : props.mode === 'create'
+      ? 'Thêm mới người dùng (mật khẩu mặc định 123456)'
+      : 'Sửa thông tin người dùng';
+});
+
+const detailMode = computed(() => props.mode === 'detail');
+const editMode = computed(() => props.mode === 'edit');
+
+const handleSave = () => {
+  formRef.value
+    ?.validate(async errors => {
+      if (errors) return;
+      loading.value = true;
+
+      try {
+        if (props.mode === 'create') {
+          await axios.post('http://localhost:5000/api/users', formModel.value);
+          message.success('Thêm mới người dùng thành công');
+        } else {
+          await axios.put(`http://localhost:5000/api/users/${props.userId}`, formModel.value);
+          message.success('Sửa thông tin người dùng thành công');
+        }
+        emits('success');
+        handleClose();
+      } catch (error) {
+        const errMess = props.mode === 'create' ? 'Lỗi khi lưu người dùng mới' : 'Lỗi khi sửa người dùng';
+        console.error(errMess, error);
+        message.error(error?.response?.data?.message || errMess);
+      } finally {
+        loading.value = false;
+      }
+    })
+    .catch(() => {});
+};
+
+const handleClose = () => {
+  formModel.value = formInit;
+  emits('close');
+};
+
+watch(
+  () => props.userId,
+  async val => {
+    if (val && props.mode !== 'create') {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/users/${val}`);
+        formModel.value = {
+          email: res?.data?.email,
+          role: res?.data?.role,
+          phone: res?.data?.phone,
+          fullName: res?.data?.fullName
+        };
+      } catch (error) {}
+    }
+  },
+  {
+    immediate: true
+  }
+);
 </script>

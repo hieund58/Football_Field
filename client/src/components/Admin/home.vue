@@ -12,7 +12,7 @@
           :class="`block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4 ${activeTab === 'fields' ? 'bg-gray-700' : ''}`"
           @click="activeTab = 'fields'"
         >
-          Thống kê các sân bóng
+          Quản lý sân bóng
         </p>
         <p
           :class="`block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4 ${activeTab === 'fieldsInUse' ? 'bg-gray-700' : ''}`"
@@ -21,7 +21,7 @@
           Sân đang được đặt
         </p>
         <p :class="`block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4 ${activeTab === 'users' ? 'bg-gray-700' : ''}`"
-        @click="activeTab = 'users'">Trạng thái người dùng</p>
+        @click="activeTab = 'users'">Quản lý người dùng</p>
         <p class="block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4">Doanh Thu</p>
       </div>
     </div>

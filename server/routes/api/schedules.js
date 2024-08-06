@@ -44,7 +44,7 @@ router.post("/", async (req, res) => {
 
 router.put("/", async (req, res) => {
   try {
-    const { fieldId, date, slotHour, slotStatus } = req.body;
+    const { fieldId, date, slotHour, slotStatus, bookedBy } = req.body;
     const schedule = await Schedule.findOne({
       fieldId: fieldId,
       date: date,
@@ -54,7 +54,7 @@ router.put("/", async (req, res) => {
       return;
     }
     
-    await Schedule.updateSlotInfo(fieldId, date, slotHour, slotStatus);
+    await Schedule.updateSlotInfo(fieldId, date, slotHour, slotStatus, bookedBy);
 
     res.status(201).json({
       message: `${

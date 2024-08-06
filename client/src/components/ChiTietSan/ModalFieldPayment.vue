@@ -142,7 +142,8 @@ const cancelBooking = async () => {
     fieldId: props.data?.fieldId,
     date: props.data?.scheduleDate,
     slotHour: props.data?.slot?.hour,
-    slotStatus: 'available'
+    slotStatus: 'available',
+    bookedBy: null
   };
   try {
     loading.value = true;
