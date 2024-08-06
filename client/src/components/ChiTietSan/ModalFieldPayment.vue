@@ -26,12 +26,12 @@
           </div>
           <div class="flex flex-row justify-between">
             <span class="font-[600]">Khung giờ</span>
-            <span class="font-[700] text-[#f03131]">{{ data?.slotName }}</span>
+            <span class="font-[700] text-[#f03131]">{{ data?.slot?.name }}</span>
           </div>
         </div>
       </div>
       <div v-else>
-        <span class="block font-[600] mb-2">Sân đã được đặt bởi</span>
+        <span class="block font-[600] mb-2">Sân đã được đặt bởi {{ data?.slot?.bookedBy }}</span>
         <span class="block font-[600] mb-2">Bạn có chắc chắn hủy sân?</span>
       </div>
       <template #footer>
@@ -137,6 +137,7 @@ const handlePayment = async () => {
 };
 
 const cancelBooking = async () => {
+  if (!checkPermission()) return;
   const payload = {
     fieldId: props.data?.fieldId,
     date: props.data?.scheduleDate,

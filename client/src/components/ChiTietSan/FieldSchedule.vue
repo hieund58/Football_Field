@@ -120,7 +120,8 @@ const createTimeSlots = () => {
       hour: `${i}:00`,
       name: `${i}:00 - ${i + 1}:00`,
       isMorning: i <= 12,
-      status: 'available'
+      status: 'available',
+      bookedBy: ''
     });
   }
   return arr;
@@ -157,15 +158,24 @@ const filteredSchedules = computed(() => {
     schedulesFromApi.value?.forEach(scheduleFromApi => {
       if (formatQueryDate(scheduleFromApi?.date) === schedule.date) {
         console.log(scheduleFromApi);
-        const bookedHours = [];
+        const bookedSlots = [];
         scheduleFromApi.slots.forEach(slotFromApi => {
           if (slotFromApi.status === 'booked') {
             // schedule.slots[slotIndex].status = 'booked';
-            bookedHours.push(slotFromApi.hour);
+            bookedSlots.push({
+              hour: slotFromApi.hour,
+              bookedBy: slotFromApi.bookedBy
+            });
           }
         });
         schedule.slots.forEach(slot => {
-          if (bookedHours.includes(slot.hour)) slot.status = 'booked';
+          bookedSlots.forEach(booked => {
+            if (booked.hour === slot.hour) {
+              slot.status = 'booked';
+              slot.bookedBy = booked.bookedBy
+            }
+          })
+          // if (bookedSlots.includes(slot.hour)) slot.status = 'booked';
         });
       }
     });

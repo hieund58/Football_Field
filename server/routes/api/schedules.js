@@ -53,6 +53,7 @@ router.put("/", async (req, res) => {
       res.status(500).json({ message: "Lỗi khi sửa lịch sân" });
       return;
     }
+    
     await Schedule.updateSlotInfo(fieldId, date, slotHour, slotStatus);
 
     res.status(201).json({

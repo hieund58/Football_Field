@@ -53,7 +53,7 @@ Schedule.createInitialSchedule = async (fieldId, date) => {
         status: "available",
         court: "", // Số sân ban đầu
         price: "", // Giá tiền ban đầuz
-        bookedBy: null,
+        bookedBy: "",
       }));
 
       const initialSchedule = new Schedule({
@@ -73,7 +73,7 @@ Schedule.createInitialSchedule = async (fieldId, date) => {
 };
 
 // Định nghĩa hàm để cập nhật thông tin của một giờ trên lịch sân
-Schedule.updateSlotInfo = async (fieldId, date, hour, status, court, price, bookedBy) => {
+Schedule.updateSlotInfo = async (fieldId, date, hour, status, bookedBy, court, price) => {
   try {
     const existingSchedule = await Schedule.findOne({
       date: new Date(date),

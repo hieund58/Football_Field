@@ -20,12 +20,14 @@
         >
           Sân đang được đặt
         </p>
-        <p class="block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4">Trạng thái người dùng</p>
+        <p :class="`block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4 ${activeTab === 'users' ? 'bg-gray-700' : ''}`"
+        @click="activeTab = 'users'">Trạng thái người dùng</p>
         <p class="block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4">Doanh Thu</p>
       </div>
     </div>
     <div class="sm:w-full md:w-4/5 bg-white p-4">
       <fields v-if="activeTab === 'fields'" />
+      <user-management v-else-if="activeTab === 'users' " />
     </div>
   </div>
 </template>
@@ -36,6 +38,7 @@ import { useRouter } from 'vue-router';
 import { useMessage } from 'naive-ui';
 
 import Fields from './Fields.vue';
+import UserManagement from './UserManagement.vue';
 
 const router = useRouter();
 const message = useMessage();
