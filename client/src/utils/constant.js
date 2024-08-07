@@ -17,6 +17,17 @@ export const areaList = [
     }
 ]
 
+export const productTypes = [
+    {
+        label: 'Dụng cụ',
+        value: 'equipment'
+    },
+    {
+        label: 'Quần áo',
+        value: 'clothes'
+    }
+]
+
 export const priceRange = [
     {
         value: '0,200000',

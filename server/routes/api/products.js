@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../../db/product');
 const multer = require('multer');
-const mongoose = require('mongoose');
-
+const path = require('path');
 
 // Lấy danh sách sản phẩm
 router.get('/', async (req, res) => {
@@ -37,11 +36,17 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-router.post('/', async (req, res) => {
+
+router.post('/', upload.single('image'), async (req, res) => {
   try {
+    const productData = JSON.parse(req.body.productData || '') || {}
     const newProduct = new Product({
-      ...req.body,
+      ...productData,
     });
+
+    if (req.file) {
+      newProduct.imageSrc = req.file.filename;
+    }
 
     await newProduct.save();
     res.status(201).json(newProduct);
@@ -66,7 +71,7 @@ router.put('/:id', upload.single('image'), async (req, res) => {
 
     if (req.file) {
       // Nếu có hình ảnh mới được tải lên, cập nhật đường dẫn hình ảnh
-      updatedProductData.imageSrc = '/uploads/' + req.file.filename;
+      updatedProductData.imageSrc = req.file.filename;
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(productId, updatedProductData, { new: true });

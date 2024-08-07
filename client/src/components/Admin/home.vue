@@ -20,14 +20,25 @@
         >
           Sân đang được đặt
         </p>
-        <p :class="`block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4 ${activeTab === 'users' ? 'bg-gray-700' : ''}`"
-        @click="activeTab = 'users'">Quản lý người dùng</p>
+        <p
+          :class="`block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4 ${activeTab === 'users' ? 'bg-gray-700' : ''}`"
+          @click="activeTab = 'users'"
+        >
+          Quản lý người dùng
+        </p>
+        <p
+          :class="`block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4 ${activeTab === 'products' ? 'bg-gray-700' : ''}`"
+          @click="activeTab = 'products'"
+        >
+          Quản lý sản phẩm
+        </p>
         <p class="block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4">Doanh Thu</p>
       </div>
     </div>
     <div class="sm:w-full md:w-4/5 bg-white p-4">
       <fields v-if="activeTab === 'fields'" />
-      <user-management v-else-if="activeTab === 'users' " />
+      <user-management v-else-if="activeTab === 'users'" />
+      <product-management v-else-if="activeTab === 'products'" />
     </div>
   </div>
 </template>
@@ -39,16 +50,11 @@ import { useMessage } from 'naive-ui';
 
 import Fields from './Fields.vue';
 import UserManagement from './UserManagement.vue';
+import ProductManagement from './Product/ProductManagement.vue';
 
 const router = useRouter();
 const message = useMessage();
 const activeTab = ref('fields');
-
-const adminLoggedIn = computed(() => {
-  if (!sessionStorage.getItem('userData')) return false;
-  const userData = JSON.parse(sessionStorage.getItem('userData'));
-  return userData?.role === 'admin';
-});
 
 const logout = () => {
   sessionStorage.removeItem('userData');
