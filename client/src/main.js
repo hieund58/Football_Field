@@ -130,6 +130,10 @@ const app = createApp(App);
 const isLoggedIn = ref(false);
 app.config.globalProperties.$isLoggedIn = isLoggedIn;
 
+const meta = document.createElement('meta')
+meta.name = 'naive-ui-style'
+document.head.appendChild(meta)
+
 app.component("font-awesome-icon", FontAwesomeIcon);
 app.use(naive);
 app.use(create());

@@ -9,30 +9,16 @@
         </div>
       </div>
       <div class="my-4">
-        <router-link
-          to="/fields"
-          class="block text-gray-300 hover:bg-gray-700 py-2 px-4"
-        >
+        <router-link to="/fields" class="block text-gray-300 hover:bg-gray-700 py-2 px-4">
           Thống kê các sân bóng
         </router-link>
-        <router-link
-          to="/bookingDetail"
-          class="block text-gray-300 hover:bg-gray-700 py-2 px-4"
-        >
+        <router-link to="/bookingDetail" class="block text-gray-300 hover:bg-gray-700 py-2 px-4">
           Sân đang được đặt
         </router-link>
-        <router-link
-          to="/UserManager"
-          class="block text-gray-300 hover-bg-gray-700 py-2 px-4"
-        >
+        <router-link to="/UserManager" class="block text-gray-300 hover-bg-gray-700 py-2 px-4">
           Trạng thái người dùng
         </router-link>
-        <router-link
-          to="/revenue"
-          class="block text-gray-300 hover:bg-gray-700 py-2 px-4"
-        >
-          Doanh Thu
-        </router-link>
+        <router-link to="/revenue" class="block text-gray-300 hover:bg-gray-700 py-2 px-4">Doanh Thu</router-link>
       </div>
     </div>
     <div class="w-4/5 bg-white p-4">
@@ -61,9 +47,7 @@
               <td>{{ detail.price }}</td>
               <td>{{ detail.status }}</td>
               <td>
-                <button @click="confirmPayment(detail)">
-                  Xác nhận thanh toán
-                </button>
+                <button @click="confirmPayment(detail)">Xác nhận thanh toán</button>
               </td>
             </tr>
           </tbody>
@@ -74,9 +58,7 @@
     </div>
 
     <div class="confirmation-dialog" v-if="showConfirmationDialog">
-      <div
-        class="confirmation-content mx-auto p-4 bg-white shadow-lg rounded-lg"
-      >
+      <div class="confirmation-content mx-auto p-4 bg-white shadow-lg rounded-lg">
         <!-- Hiển thị thông tin của this.confirmationDetail -->
         <h2>Xác nhận thanh toán</h2>
         <p>Tên sân: {{ confirmationDetail.name }}</p>
@@ -92,7 +74,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios';
 
 export default {
   data() {
@@ -100,7 +82,7 @@ export default {
       details: [],
       showConfirmationDialog: false,
       confirmationDetail: null,
-      confirmationSanId: null, // Thêm biến confirmationSanId
+      confirmationSanId: null // Thêm biến confirmationSanId
     };
   },
   created() {
@@ -108,30 +90,26 @@ export default {
   },
   computed: {
     getUsernameFromSession() {
-      return sessionStorage.getItem("isLoggedIn") === "true"
-        ? sessionStorage.getItem("userLogin")
-        : "Chưa đăng nhập";
-    },
+      return sessionStorage.getItem('isLoggedIn') === 'true' ? sessionStorage.getItem('userLogin') : 'Chưa đăng nhập';
+    }
   },
   methods: {
     logout() {
-      sessionStorage.removeItem("isLoggedIn");
-      sessionStorage.removeItem("userLogin");
-      this.$router.push("/admin");
+      sessionStorage.removeItem('isLoggedIn');
+      sessionStorage.removeItem('userLogin');
+      this.$router.push('/admin');
     },
     async bookedFields() {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/process-payment",
-        );
+        const response = await axios.get('http://localhost:5000/api/process-payment');
         this.details = response.data;
       } catch (error) {
-        console.error("Lỗi khi lấy thông tin các sân đã được đặt:", error);
+        console.error('Lỗi khi lấy thông tin các sân đã được đặt:', error);
         return [];
       }
     },
     confirmPayment(detail) {
-      console.log("Clicked item _id:", detail._id);
+      console.log('Clicked item _id:', detail._id);
       console.log(detail.sanId);
       this.showConfirmationDialog = true;
       this.confirmationDetail = detail;
@@ -141,58 +119,45 @@ export default {
       try {
         const _id = this.confirmationDetail._id;
         const sanId = this.confirmationSanId; // Sử dụng confirmationSanId
-        const response = await axios.put(
-          `http://localhost:5000/api/process-payment/${_id}`,
-          {
-            status: "Đã thanh toán",
-          },
-        );
+        const response = await axios.put(`http://localhost:5000/api/process-payment/${_id}`, {
+          status: 'Đã thanh toán'
+        });
 
-        if (
-          response.data.message === "Cập nhật trạng thái thanh toán thành công"
-        ) {
-          const updatedDetails = this.details.map((detail) => {
+        if (response.data.message === 'Cập nhật trạng thái thanh toán thành công') {
+          const updatedDetails = this.details.map(detail => {
             if (detail._id === _id) {
-              return { ...detail, status: "Đã thanh toán" };
+              return { ...detail, status: 'Đã thanh toán' };
             }
             return detail;
           });
           this.details = updatedDetails;
 
           this.showConfirmationDialog = false;
-          await this.updateSchedule(
-            this.confirmationDetail.selectDate,
-            this.confirmationDetail.selectTime,
-            sanId,
-          ); // Truyền sanId ở đây
+          await this.updateSchedule(this.confirmationDetail.selectDate, this.confirmationDetail.selectTime, sanId); // Truyền sanId ở đây
         } else {
-          console.error("Lỗi khi cập nhật trạng thái.");
+          console.error('Lỗi khi cập nhật trạng thái.');
         }
       } catch (error) {
-        console.error("Lỗi khi gọi API:", error);
+        console.error('Lỗi khi gọi API:', error);
       }
     },
 
     async updateSchedule(formattedDate, selectTime, sanId) {
       try {
         // Gọi API để cập nhật lịch
-        const updateResponse = await this.updateScheduleApi(
-          formattedDate,
-          selectTime,
-          sanId,
-        );
+        const updateResponse = await this.updateScheduleApi(formattedDate, selectTime, sanId);
 
-        if (updateResponse.message === "Cập nhật số sân thành công") {
+        if (updateResponse.message === 'Cập nhật số sân thành công') {
           // Nếu cập nhật thành công, cập nhật local data
           this.updateLocalSchedule(formattedDate, selectTime);
         } else {
-          console.error("Lỗi khi cập nhật số sân.");
+          console.error('Lỗi khi cập nhật số sân.');
         }
 
         // Đóng hộp thoại xác nhận
         this.showConfirmationDialog = false;
       } catch (error) {
-        console.error("Lỗi khi gọi API:", error);
+        console.error('Lỗi khi gọi API:', error);
       }
     },
 
@@ -202,38 +167,33 @@ export default {
           `http://localhost:5000/api/schedule/update-court/${formattedDate}/${sanId}/delete`,
           {
             selectTime,
-            sanId: sanId,
-          },
+            sanId: sanId
+          }
         );
         return response.data;
       } catch (error) {
-        throw new Error("Lỗi khi gọi API để cập nhật lịch: " + error);
+        throw new Error('Lỗi khi gọi API để cập nhật lịch: ' + error);
       }
     },
 
     updateLocalSchedule(formattedDate, selectTime) {
       // Tìm và cập nhật local data dựa trên API response
-      const updatedDetails = this.details.map((detail) => {
-        if (
-          detail.selectDate === formattedDate &&
-          detail.selectTime === selectTime
-        ) {
-          return { ...detail, status: "Đã thanh toán" };
+      const updatedDetails = this.details.map(detail => {
+        if (detail.selectDate === formattedDate && detail.selectTime === selectTime) {
+          return { ...detail, status: 'Đã thanh toán' };
         }
         return detail;
       });
 
       // Cập nhật local data
       this.details = updatedDetails;
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style>
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
 .bookings-container {
   margin-top: 50px;
   margin-bottom: 100px;

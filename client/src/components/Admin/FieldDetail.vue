@@ -3,7 +3,7 @@
     <div class="flex justify-between b">
       <p class="text-[20px] font-medium">{{ title }}</p>
       <div>
-        <n-button v-if="!detailMode" type="success" :disabled="loading" class="mr-2" @click="handleSave">
+        <n-button v-if="!detailMode" type="success" :disabled="loading" class="!mr-2" @click="handleSave">
           <template #icon>
             <n-icon><SaveOutline /></n-icon>
           </template>
