@@ -29,7 +29,13 @@
           <span v-else>{{ formModel.remaining }}</span>
         </n-form-item-gi>
         <n-form-item-gi :span="1" path="price" label="Giá">
-          <n-input-number v-if="!detailMode" v-model:value="formModel.price" :show-button="false" placeholder="Giá" class="w-full">
+          <n-input-number
+            v-if="!detailMode"
+            v-model:value="formModel.price"
+            :show-button="false"
+            placeholder="Giá"
+            class="w-full"
+          >
             <template #suffix>VNĐ</template>
           </n-input-number>
           <span v-else>{{ formatMoney(formModel.price) }}</span>
@@ -64,13 +70,13 @@
               :default-upload="false"
               :on-update:file-list="handleUploadAvatar"
               list-type="image-card"
-              file-list-class="!flex flex-row"
+              file-list-class="!flex flex-row !h-[200px]"
               :max="1"
             >
               <n-button size="small">Chọn ảnh</n-button>
             </n-upload>
             <img
-              v-if="detailMode || (mode === 'edit' && formModel.avatar?.length === 0)"
+              v-if="detailMode"
               :src="getImgUrl(formModel.avatarSrc)"
               style="max-width: 500px; object-fit: contain"
             />
@@ -102,10 +108,10 @@ const formInit = {
   name: '',
   remaining: '',
   type: undefined,
-  price: '',
+  price: undefined,
   description: '',
   avatar: [],
-  avatarSrc: '',
+  avatarSrc: ''
 };
 
 const formRef = ref(null);
@@ -143,6 +149,7 @@ const handleUploadAvatar = fileListData => {
   } else {
     formModel.value.avatar = [];
   }
+  formRef.value?.validate().catch(() => {});
 };
 
 const handleSave = () => {
@@ -156,7 +163,7 @@ const handleSave = () => {
         const formValues = omit(formModel.value, ['avatar', 'avatarSrc']);
         formData.append('productData', JSON.stringify(formValues));
         if (formModel.value.avatar?.[0]) formData.append('image', formModel.value.avatar[0].file);
-
+        
         if (props.mode === 'create') {
           await axios.post('http://localhost:5000/api/products', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -197,8 +204,15 @@ watch(
         remaining: val?.remaining?.toString(),
         description: val?.description,
         avatar: [],
-        avatarSrc: val?.imageSrc,
+        avatarSrc: val?.imageSrc
       };
+    if (val?.imageSrc) {
+      formModel.value.avatar.push({
+        id: 'image',
+        status: 'finished',
+        url: getImgUrl(val?.imageSrc)
+      });
+    }
   },
   {
     immediate: true,
@@ -206,3 +220,14 @@ watch(
   }
 );
 </script>
+
+<style scoped lang="scss">
+:deep(.n-upload-file-list .n-upload-file.n-upload-file--image-card-type) {
+  width: 200px;
+  height: 200px
+}
+:deep(.n-upload-trigger.n-upload-trigger--image-card) {
+  width: 200px;
+  height: 200px
+}
+</style>

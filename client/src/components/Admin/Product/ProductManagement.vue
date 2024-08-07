@@ -73,16 +73,16 @@
   
   const columns = [
     {
-      title: 'Tên sân',
+      title: 'Tên sản phẩm',
       key: 'name'
     },
     {
-      title: 'Địa Chỉ',
-      key: 'address'
+      title: 'Thuộc loại',
+      key: 'type'
     },
     {
-      title: 'Khu vực',
-      key: 'area'
+      title: 'Số lượng',
+      key: 'remaining'
     },
     {
       title: 'Giá',
@@ -90,10 +90,6 @@
       render(row) {
         return h('div', null, [formatMoney(row?.price)])
       }
-    },
-    {
-      title: 'Số người',
-      key: 'playerNum'
     },
     {
       title: 'Thao tác',
@@ -144,7 +140,7 @@
                 onNegativeClick: () => {}
               },
               {
-                default: () => 'Bạn có chắc chắn xóa sân?',
+                default: () => 'Bạn có chắc chắn xóa sản phẩm?',
                 trigger: () =>
                   h(
                     NButton,
@@ -173,7 +169,7 @@
   const deleteField = async row => {
     try {
       await axios.delete(`http://localhost:5000/api/products/${row._id}`);
-      message.success('Xóa sân thành công');
+      message.success('Xóa sản phẩm thành công');
       await fetchProductData();
     } catch (error) {
       console.error(error);

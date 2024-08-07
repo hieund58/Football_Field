@@ -61,7 +61,10 @@ router.post('/', upload.array('images'), async (req, res) => {
 
 
 // Cập nhật sân kèm theo cập nhật hình ảnh
-router.put('/:id', upload.array('images'), async (req, res) => {
+router.put('/:id', upload.fields([
+  { name: 'avatar', maxCount: 1},
+  { name: 'detailImg', maxCount: 3}
+]), async (req, res) => {
   try {
     const updateData = JSON.parse(req.body.fieldData || '') || {};
     const fieldId = req.params.id;
@@ -74,9 +77,10 @@ router.put('/:id', upload.array('images'), async (req, res) => {
 
     if (req.files) {
       // Nếu có hình ảnh mới được tải lên, cập nhật đường dẫn hình ảnh
-      updateData.avatarSrc = req.files[0].filename;
-      const detailImgNames = req.files?.slice(1)?.map(file => file.filename);
-      updateData.detailImgSrc = JSON.stringify(detailImgNames);
+      if (req.files?.avatar) updateData.avatarSrc = req.files.avatar.filename;
+      const newDetailImgs = req.files?.detailImg?.map(file => file.filename) || [];
+      const detailImgsToKeep = updateData?.detailImgKeep || []
+      updateData.detailImgSrc = JSON.stringify(detailImgsToKeep.concat(newDetailImgs));
     }
 
     const updatedField = await Field.findByIdAndUpdate(fieldId, updateData, { new: true });

@@ -83,7 +83,7 @@
               <n-button size="small">Chọn ảnh</n-button>
             </n-upload>
             <img
-              v-if="detailMode || (mode === 'edit' && formModel.avatar?.length === 0)"
+              v-if="detailMode"
               :src="getImgUrl(formModel.avatarSrc)"
               style="max-width: 200px; object-fit: contain"
             />
@@ -104,7 +104,7 @@
             >
               <n-button size="small">Chọn ảnh</n-button>
             </n-upload>
-            <div v-if="detailMode || (mode === 'edit' && detailImages.length === 0)" class="flex flex-row">
+            <div v-if="detailMode" class="flex flex-row">
               <img
                 v-for="imageSrc in detailImagesSrc"
                 :src="getImgUrl(imageSrc)"
@@ -187,7 +187,6 @@ const handleUploadAvatar = fileListData => {
 };
 
 const handleUploadDetailImg = fileListData => {
-  console.log('🚀 ~ handleUploadDetailImg ~ fileListData:', fileListData);
   const file = last(fileListData)?.file;
   if (file) {
     const maxFileSize = 5 * 1024 * 1024; // 5MB
@@ -195,10 +194,8 @@ const handleUploadDetailImg = fileListData => {
       message.error('Kích thước tệp quá lớn. Vui lòng chọn một tệp nhỏ hơn 5MB.');
       return;
     }
-    detailImages.value = fileListData;
-  } else {
-    detailImages.value = [];
-  }
+  } 
+  detailImages.value = fileListData;
 };
 
 const handleSave = () => {
@@ -210,10 +207,13 @@ const handleSave = () => {
       try {
         const formData = new FormData();
         const formValues = omit(formModel.value, ['avatar', 'avatarSrc', 'detailImgSrc']);
-        formData.append('fieldData', JSON.stringify(formModel.value));
-        if (formModel.value.avatar?.[0]) formData.append('images', formModel.value.avatar[0].file);
+        const detailImgKeep = detailImages.value.filter(img => !!img.url).map(img => last(img.url.split('/')))
+        formValues.detailImgKeep = detailImgKeep
+
+        formData.append('fieldData', JSON.stringify(formValues));
+        if (formModel.value.avatar?.[0]) formData.append('avatar', formModel.value.avatar[0].file);
         detailImages.value.forEach(image => {
-          formData.append('images', image?.file);
+          formData.append('detailImg', image?.file);
         });
 
         if (props.mode === 'create') {
@@ -249,13 +249,12 @@ const handleClose = () => {
 watch(
   () => props.detailData,
   val => {
-    console.log('🚀 ~ props.detailData:', props.detailData);
-    if (val && props.mode !== 'create')
+    if (val && props.mode !== 'create') {
       formModel.value = {
         name: val?.name,
         address: val?.address,
         area: val?.area,
-        price: val?.price?.toString(),
+        price: val?.price,
         playerNum: val?.playerNum?.toString(),
         description: {
           facilities: val?.description?.facilities,
@@ -265,6 +264,18 @@ watch(
         avatarSrc: val?.avatarSrc,
         detailImgSrc: val?.detailImgSrc
       };
+      if (val?.avatarSrc) formModel.value.avatar.push({
+        id: 'image',
+        status: 'finished',
+        url: getImgUrl(val.avatarSrc)
+      })
+      if (val?.detailImgSrc) detailImages.value = detailImagesSrc.value?.map((src, index) => ({
+        id: index,
+        status: 'finished',
+        url: getImgUrl(src)
+      }))
+    }
+
   },
   {
     immediate: true,
