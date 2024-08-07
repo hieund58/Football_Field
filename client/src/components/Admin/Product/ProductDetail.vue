@@ -24,11 +24,8 @@
           <n-input v-if="!detailMode" v-model:value="formModel.name" placeholder="Tên sản phẩm" />
           <span v-else>{{ formModel.name }}</span>
         </n-form-item-gi>
-        <n-form-item-gi :span="1" path="remaining" label="Số lượng">
-          <n-input v-if="!detailMode" v-model:value="formModel.remaining" placeholder="Số lượng" />
-          <span v-else>{{ formModel.remaining }}</span>
-        </n-form-item-gi>
-        <n-form-item-gi :span="1" path="price" label="Giá">
+
+        <n-form-item-gi :span="2" path="price" label="Giá">
           <n-input-number
             v-if="!detailMode"
             v-model:value="formModel.price"
@@ -40,6 +37,31 @@
           </n-input-number>
           <span v-else>{{ formatMoney(formModel.price) }}</span>
         </n-form-item-gi>
+
+        <n-form-item-gi :span="2" path="sizes" label="Kích cỡ">
+          <n-select
+            v-if="!detailMode"
+            v-model:value="formModel.sizes"
+            placeholder="Kích cỡ"
+            multiple
+            :options="productSizes"
+            clearable
+          />
+          <span v-else>{{ arrayToText(formModel.sizes) }}</span>
+        </n-form-item-gi>
+
+        <n-form-item-gi :span="2" path="colors" label="Màu sắc">
+          <n-select
+            v-if="!detailMode"
+            v-model:value="formModel.colors"
+            placeholder="Màu sắc"
+            multiple
+            :options="productColors"
+            clearable
+          />
+          <span v-else>{{ arrayToText(formModel.colors) }}</span>
+        </n-form-item-gi>
+
         <n-form-item-gi :span="2" path="type" label="Thuộc loại">
           <n-select
             v-if="!detailMode"
@@ -91,10 +113,10 @@
 import { computed, ref, watch } from 'vue';
 import { useMessage } from 'naive-ui';
 import axios from 'axios';
-import { cloneDeep, last, omit } from 'lodash';
+import { cloneDeep, omit } from 'lodash';
 import { SaveOutline, CloseOutline } from '@vicons/ionicons5';
 
-import { productTypes } from '@/utils/constant';
+import { productTypes, productColors, productSizes } from '@/utils/constant';
 import { formatMoney, getImgUrl } from '@/utils/common';
 
 const props = defineProps({
@@ -106,9 +128,10 @@ const emits = defineEmits(['success', 'close']);
 const message = useMessage();
 const formInit = {
   name: '',
-  remaining: '',
   type: undefined,
   price: undefined,
+  colors: undefined,
+  sizes: undefined,
   description: '',
   avatar: [],
   avatarSrc: ''
@@ -122,7 +145,8 @@ const rules = {
   name: [{ required: true, message: 'Thông tin bắt buộc', trigger: ['change', 'blur'] }],
   type: [{ required: true, message: 'Thông tin bắt buộc', trigger: ['change', 'blur'] }],
   price: [{ required: true, message: 'Thông tin bắt buộc', type: 'number', trigger: ['change', 'blur'] }],
-  remaining: [{ required: true, message: 'Thông tin bắt buộc', trigger: ['change', 'blur'] }],
+  sizes: [{ required: true, message: 'Thông tin bắt buộc', type: 'array', trigger: ['change', 'blur'] }],
+  colors: [{ required: true, message: 'Thông tin bắt buộc', type: 'array', trigger: ['change', 'blur'] }],
   avatar: [{ required: true, message: 'Thông tin bắt buộc', type: 'array', trigger: ['change', 'blur'] }]
 };
 
@@ -161,9 +185,11 @@ const handleSave = () => {
       try {
         const formData = new FormData();
         const formValues = omit(formModel.value, ['avatar', 'avatarSrc']);
+        formValues.colors = JSON.stringify(formValues.colors);
+        formValues.sizes = JSON.stringify(formValues.sizes);
         formData.append('productData', JSON.stringify(formValues));
         if (formModel.value.avatar?.[0]) formData.append('image', formModel.value.avatar[0].file);
-        
+
         if (props.mode === 'create') {
           await axios.post('http://localhost:5000/api/products', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -193,6 +219,16 @@ const handleClose = () => {
   emits('close');
 };
 
+const parseArray = JSONstring => {
+  if (!JSONstring) return '';
+  return JSON.parse(JSONstring.replaceAll('\\', ''));
+};
+
+const arrayToText = array => {
+  if (!array || !Array.isArray(array)) return ''
+  return array.join(', ')
+}
+
 watch(
   () => props.detailData,
   val => {
@@ -201,7 +237,8 @@ watch(
         name: val?.name,
         type: val?.type,
         price: val?.price,
-        remaining: val?.remaining?.toString(),
+        sizes: parseArray(val?.sizes),
+        colors: parseArray(val?.colors),
         description: val?.description,
         avatar: [],
         avatarSrc: val?.imageSrc
@@ -224,10 +261,10 @@ watch(
 <style scoped lang="scss">
 :deep(.n-upload-file-list .n-upload-file.n-upload-file--image-card-type) {
   width: 200px;
-  height: 200px
+  height: 200px;
 }
 :deep(.n-upload-trigger.n-upload-trigger--image-card) {
   width: 200px;
-  height: 200px
+  height: 200px;
 }
 </style>

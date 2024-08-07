@@ -283,3 +283,14 @@ watch(
   }
 );
 </script>
+
+<style scoped lang="scss">
+:deep(.n-upload-file-list .n-upload-file.n-upload-file--image-card-type) {
+  width: 200px;
+  height: 200px
+}
+:deep(.n-upload-trigger.n-upload-trigger--image-card) {
+  width: 200px;
+  height: 200px
+}
+</style>

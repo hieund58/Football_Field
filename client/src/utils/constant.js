@@ -65,3 +65,23 @@ export const playerNumRange = [
         label: '> 15 người'
     }
 ]
+
+export const productSizes = [
+    { label: 'XXS', value: 'XXS' },
+    { label: 'XS', value: 'XS' },
+    { label: 'S', value: 'S' },
+    { label: 'M', value: 'M' },
+    { label: 'L', value: 'L' },
+    { label: 'XL', value: 'XL' },
+    { label: 'XXL', value: 'XXL' },
+    { label: 'XXXL', value: 'XXXL' }
+]
+
+export const productColors = [
+    { label: 'Trắng', value: 'white' },
+    { label: 'Xám', value: 'gray' },
+    { label: 'Đen', value: 'black' },
+    { label: 'Đỏ', value: 'red' },
+    { label: 'Vàng', value: 'yellow' },
+    { label: 'Xanh', value: 'blue' }
+]

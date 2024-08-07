@@ -40,8 +40,9 @@ const upload = multer({ storage });
 router.post('/', upload.single('image'), async (req, res) => {
   try {
     const productData = JSON.parse(req.body.productData || '') || {}
+    console.log("🚀 ~ router.post ~ productData:", productData)
     const newProduct = new Product({
-      ...productData,
+      ...productData
     });
 
     if (req.file) {
@@ -60,7 +61,7 @@ router.post('/', upload.single('image'), async (req, res) => {
 // Cập nhật sản phẩm kèm theo cập nhật hình ảnh
 router.put('/:id', upload.single('image'), async (req, res) => {
   try {
-    const updatedProductData = req.body;
+    const updatedProductData = JSON.parse(req.body.productData || '') || {}
     const productId = req.params.id;
 
     const product = await Product.findById(productId);

@@ -4,7 +4,8 @@ const productSchema = new mongoose.Schema({
   imageSrc: String,
   type: String, // equipment or clothes
   price: Number,
-  remaining: Number,  
+  sizes: String,
+  colors: String,  
   description: String,
 });
 
