@@ -79,7 +79,7 @@ import FieldRevenue from "./components/Admin/FieldRevenue.vue";
 import ConTact from "./components/ConTact.vue";
 import userManager from "./components/Admin/userManager.vue";
 import DetailNew from "./components/FootBallNews/DetailNew.vue";
-import CategoryVue from "./components/QuanAo/Category.vue";
+import Store from "./components/QuanAo/Store.vue";
 import { create } from "naive-ui";
 const router = createRouter({
   history: createWebHistory(),
@@ -111,7 +111,7 @@ const router = createRouter({
     { path: "/userManager", component: userManager },
     { path: "/Revenue/:name", name: "FieldRevenue", component: FieldRevenue },
     { path: "/tintuc", component: DetailNew },
-    { path: "/quanao", component: CategoryVue },
+    { path: "/store", component: Store },
   ],
 });
 

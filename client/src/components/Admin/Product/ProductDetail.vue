@@ -38,10 +38,34 @@
           <span v-else>{{ formatMoney(formModel.price) }}</span>
         </n-form-item-gi>
 
+        <n-form-item-gi :span="2" path="remaining" label="Số lượng">
+          <n-input-number
+            v-if="!detailMode"
+            v-model:value="formModel.remaining"
+            :show-button="false"
+            placeholder="Số lượng"
+            class="w-full"
+          ></n-input-number>
+          <span v-else>{{ formatMoney(formModel.remaining, ',', '') }}</span>
+        </n-form-item-gi>
+
+        
+        <n-form-item-gi :span="2" path="type" label="Thuộc loại">
+          <n-select
+            v-if="!detailMode"
+            v-model:value="formModel.type"
+            placeholder="Thuộc loại"
+            :options="productTypes"
+            clearable
+          />
+          <span v-else>{{ formModel.type }}</span>
+        </n-form-item-gi>
+
         <n-form-item-gi :span="2" path="sizes" label="Kích cỡ">
           <n-select
             v-if="!detailMode"
             v-model:value="formModel.sizes"
+            :disabled="disableSizeAndColor"
             placeholder="Kích cỡ"
             multiple
             :options="productSizes"
@@ -54,6 +78,7 @@
           <n-select
             v-if="!detailMode"
             v-model:value="formModel.colors"
+            :disabled="disableSizeAndColor"
             placeholder="Màu sắc"
             multiple
             :options="productColors"
@@ -62,18 +87,8 @@
           <span v-else>{{ arrayToText(formModel.colors) }}</span>
         </n-form-item-gi>
 
-        <n-form-item-gi :span="2" path="type" label="Thuộc loại">
-          <n-select
-            v-if="!detailMode"
-            v-model:value="formModel.type"
-            placeholder="Thuộc loại"
-            :options="productTypes"
-            clearable
-          />
-          <span v-else>{{ formModel.type }}</span>
-        </n-form-item-gi>
 
-        <n-form-item-gi :span="2" path="description" label="Mô tả">
+        <n-form-item-gi :span="4" path="description" label="Mô tả">
           <n-input
             v-if="!detailMode"
             v-model:value="formModel.description"
@@ -84,7 +99,7 @@
           <span v-else>{{ formModel.description }}</span>
         </n-form-item-gi>
 
-        <n-form-item-gi :span="2" path="avatar" label="Ảnh đại diện (1 ảnh)">
+        <n-form-item-gi :span="4" path="avatar" label="Ảnh đại diện (1 ảnh)">
           <n-space vertical :wrap="false">
             <n-upload
               v-if="!detailMode"
@@ -116,7 +131,7 @@ import axios from 'axios';
 import { cloneDeep, omit } from 'lodash';
 import { SaveOutline, CloseOutline } from '@vicons/ionicons5';
 
-import { productTypes, productColors, productSizes } from '@/utils/constant';
+import { productTypes, productColors, productClothesSizes, productShoeSizes } from '@/utils/constant';
 import { formatMoney, getImgUrl } from '@/utils/common';
 
 const props = defineProps({
@@ -132,6 +147,7 @@ const formInit = {
   price: undefined,
   colors: undefined,
   sizes: undefined,
+  remaining: undefined,
   description: '',
   avatar: [],
   avatarSrc: ''
@@ -144,9 +160,8 @@ const loading = ref(false);
 const rules = {
   name: [{ required: true, message: 'Thông tin bắt buộc', trigger: ['change', 'blur'] }],
   type: [{ required: true, message: 'Thông tin bắt buộc', trigger: ['change', 'blur'] }],
+  remaining: [{ required: true, message: 'Thông tin bắt buộc', type: 'number', trigger: ['change', 'blur'] }],
   price: [{ required: true, message: 'Thông tin bắt buộc', type: 'number', trigger: ['change', 'blur'] }],
-  sizes: [{ required: true, message: 'Thông tin bắt buộc', type: 'array', trigger: ['change', 'blur'] }],
-  colors: [{ required: true, message: 'Thông tin bắt buộc', type: 'array', trigger: ['change', 'blur'] }],
   avatar: [{ required: true, message: 'Thông tin bắt buộc', type: 'array', trigger: ['change', 'blur'] }]
 };
 
@@ -157,6 +172,9 @@ const title = computed(() => {
       ? 'Thêm mới sản phẩm'
       : 'Sửa thông tin sản phẩm';
 });
+
+const productSizes = computed(() => formModel.value.type === 'clothes' ? productClothesSizes : productShoeSizes)
+const disableSizeAndColor = computed(() => formModel.value.type !== 'clothes' &&  formModel.value.type !== 'shoe')
 
 const detailMode = computed(() => props.mode === 'detail');
 
@@ -185,8 +203,8 @@ const handleSave = () => {
       try {
         const formData = new FormData();
         const formValues = omit(formModel.value, ['avatar', 'avatarSrc']);
-        formValues.colors = JSON.stringify(formValues.colors);
-        formValues.sizes = JSON.stringify(formValues.sizes);
+        formValues.colors = formValues.colors?.length ? JSON.stringify(formValues.colors) : undefined;
+        formValues.sizes = formValues.sizes?.length ?  JSON.stringify(formValues.sizes) : undefined;
         formData.append('productData', JSON.stringify(formValues));
         if (formModel.value.avatar?.[0]) formData.append('image', formModel.value.avatar[0].file);
 
@@ -225,9 +243,9 @@ const parseArray = JSONstring => {
 };
 
 const arrayToText = array => {
-  if (!array || !Array.isArray(array)) return ''
-  return array.join(', ')
-}
+  if (!array || !Array.isArray(array)) return '';
+  return array.join(', ');
+};
 
 watch(
   () => props.detailData,
@@ -237,6 +255,7 @@ watch(
         name: val?.name,
         type: val?.type,
         price: val?.price,
+        remaining: val?.remaining,
         sizes: parseArray(val?.sizes),
         colors: parseArray(val?.colors),
         description: val?.description,
@@ -256,6 +275,14 @@ watch(
     deep: true
   }
 );
+
+watch(() => disableSizeAndColor.value, val => {
+  console.log("🚀 ~ watch ~ val:", val)
+  if (val) {
+    formModel.value.sizes = [];
+    formModel.value.colors = [];
+  }
+})
 </script>
 
 <style scoped lang="scss">

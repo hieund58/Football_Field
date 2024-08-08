@@ -118,13 +118,20 @@
         <router-link to="/bookingball" class="header-btn text-sm font-semibold leading -6 text-gray-900">
           Đặt Sân
         </router-link>
+        <router-link to="/store" class="header-btn text-sm font-semibold leading-6 text-gray-900">Cửa hàng</router-link>
         <router-link to="/aboutus" class="header-btn text-sm font-semibold leading-6 text-gray-900">
           Liên Hệ
         </router-link>
         <router-link to="/contact" class="header-btn text-sm font-semibold leading-6 text-gray-900">Hỗ trợ</router-link>
-        <router-link v-if="user?.role === 'admin'" to="/admin/home" class="header-btn text-sm font-semibold leading-6 text-gray-900">Admin</router-link>
+        <router-link
+          v-if="user?.role === 'admin'"
+          to="/admin/home"
+          class="header-btn text-sm font-semibold leading-6 text-gray-900"
+        >
+          Admin
+        </router-link>
       </div>
-      
+
       <div class="hidden md:flex flex-1 justify-end">
         <div v-if="!isLoggedIn || user?.role === 'user'">
           <button v-if="!isLoggedIn" @click="redirectToLogin">Đăng nhập</button>
@@ -199,7 +206,7 @@ onMounted(() => {
       user.value = JSON.parse(userData);
       isLoggedIn.value = true;
     } else {
-      user.value = {}
+      user.value = {};
       isLoggedIn.value = false;
     }
   };
@@ -225,11 +232,6 @@ const logout = () => {
   redirectToLogin();
 };
 
-const products = [
-  { name: 'Đặt Sân Bóng', href: '#' },
-  { name: 'Thuê Dụng Cụ', href: '#' },
-  { name: 'Nước Uống', href: '#' }
-];
 </script>
 <style scoped>
 .header-content {

@@ -50,7 +50,7 @@ const products = [
   {
     id: 2,
     name: "Dụng Cụ Thể Thao",
-    href: "#",
+    href: "/store",
     imageSrc:
       "https://www.thethaothientruong.vn/uploads/2020/phu-kien-bong-da.jpg",
     title: "Các dụng cụ không thể thiếu khi tham gia.",
@@ -58,7 +58,7 @@ const products = [
   {
     id: 3,
     name: "Áo Đá ",
-    href: "/quanao",
+    href: "/store",
     imageSrc:
       "https://rozaco.vn/wp-content/uploads/2022/08/AoKhongLogo-Ro-BG000088.jpg",
     title: 'Khoác lên những "Chiến Bào" giúp mọi người tự tin chiến thắng.',
