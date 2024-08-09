@@ -90,31 +90,31 @@
       </div>
 
       <div class="hidden md:flex gap-x-12 items-center">
-        <router-link to="/home" class="header-btn text-sm font-semibold leading -6 text-gray-900">
+        <router-link to="/home" class="header-btn text-lg font-semibold leading -6 text-gray-900">
           Trang chủ
         </router-link>
-        <router-link to="/bookingball" class="header-btn text-sm font-semibold leading -6 text-gray-900">
+        <router-link to="/bookingball" class="header-btn text-lg font-semibold leading -6 text-gray-900">
           Đặt Sân
         </router-link>
-        <router-link to="/store" class="header-btn text-sm font-semibold leading-6 text-gray-900">Cửa hàng</router-link>
-        <router-link to="/aboutus" class="header-btn text-sm font-semibold leading-6 text-gray-900">
+        <router-link to="/store" class="header-btn text-lg font-semibold leading-6 text-gray-900">Cửa hàng</router-link>
+        <router-link to="/aboutus" class="header-btn text-lg font-semibold leading-6 text-gray-900">
           Liên Hệ
         </router-link>
-        <router-link to="/contact" class="header-btn text-sm font-semibold leading-6 text-gray-900">Hỗ trợ</router-link>
+        <router-link to="/contact" class="header-btn text-lg font-semibold leading-6 text-gray-900">Hỗ trợ</router-link>
         <router-link
           v-if="user?.role === 'admin'"
           to="/admin/home"
-          class="header-btn text-sm font-semibold leading-6 text-gray-900"
+          class="header-btn text-lg font-semibold leading-6 text-gray-900"
         >
           Admin
         </router-link>
       </div>
 
       <div class="hidden md:flex flex-1 justify-end">
-        <div v-if="!isLoggedIn || user?.role === 'user'">
+        <div v-if="!isLoggedIn || user?.role === 'user'" class="flex items-center">
           <button
             v-if="!isLoggedIn"
-            class="text-sm font-semibold leading-6 text-gray-900 hover:cursor-pointer mr-10"
+            class="text-lg font-semibold leading-6 text-gray-900 hover:cursor-pointer mr-10"
             @click="redirectToLogin"
           >
             Đăng nhập
@@ -227,6 +227,9 @@ onMounted(() => {
   box-shadow: 0 1px 8px 3px #ccc;
 }
 
+.header-content {
+  font-size: 30px !important;
+}
 .header-btn:hover {
   color: rgb(235, 25, 25);
   border-bottom: 1px solid #000;
@@ -240,11 +243,6 @@ onMounted(() => {
   box-shadow: 0 1px 6px 1px #ccc;
   background-color: #fff;
   z-index: 50;
-}
-
-.header-btn:hover {
-  color: rgb(235, 25, 25);
-  border-bottom: 1px solid #000;
 }
 
 .user-profile {

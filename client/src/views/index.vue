@@ -4,8 +4,8 @@
     <ServiceBall />
     <BannerBall />
     <BallNews />
-    <AboutUs />
     <BlogSections />
+    <AboutUs />
   </div>
 </template>
 

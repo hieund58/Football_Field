@@ -38,15 +38,18 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.post('/', upload.array('images'), async (req, res) => {
+router.post('/', upload.fields([
+  { name: 'avatar', maxCount: 1},
+  { name: 'detailImg', maxCount: 3}
+]), async (req, res) => {
     // console.log(req.body)
-    // console.log(req.files)
-    const detailImgNames = req.files?.map(file => file.filename)?.slice(1)
+    console.log(req.files)
+    const detailImgNames = req.files?.detailImg?.map(file => file.filename) || [];
   try {
     const fieldData = JSON.parse(req.body.fieldData || '') || {}
     const field = new Field({
       ...fieldData,
-      avatarSrc: req.files[0].filename,
+      avatarSrc: req.files?.avatar?.[0]?.filename,
       detailImgSrc: JSON.stringify(detailImgNames)
     });
     console.log(field)
@@ -77,7 +80,7 @@ router.put('/:id', upload.fields([
 
     if (req.files) {
       // Nếu có hình ảnh mới được tải lên, cập nhật đường dẫn hình ảnh
-      if (req.files?.avatar) updateData.avatarSrc = req.files.avatar.filename;
+      if (req.files?.avatar?.[0]) updateData.avatarSrc = req.files.avatar[0].filename;
       const newDetailImgs = req.files?.detailImg?.map(file => file.filename) || [];
       const detailImgsToKeep = updateData?.detailImgKeep || []
       updateData.detailImgSrc = JSON.stringify(detailImgsToKeep.concat(newDetailImgs));

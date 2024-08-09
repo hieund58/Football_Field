@@ -39,7 +39,7 @@
           <span v-else>{{ formModel.area }}</span>
         </n-form-item-gi>
         <n-form-item-gi :span="1" path="price" label="Giá">
-          <n-input-number v-if="!detailMode" v-model:value="formModel.price" :show-button="false" placeholder="Giá">
+          <n-input-number v-if="!detailMode" v-model:value="formModel.price" :show-button="false" placeholder="Giá" class="w-full">
             <template #suffix>VNĐ</template>
           </n-input-number>
           <span v-else>{{ formatMoney(formModel.price) }}</span>

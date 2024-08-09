@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper px-4">
     <h1 class="text-2xl font-bold tracking-tight text-gray-900 text-center">
       Tin Tức Bóng Đá
     </h1>
@@ -143,7 +143,6 @@ onMounted(() => {
 .wrapper {
   width: 100%;
   margin: auto;
-  padding: 10px;
   margin-top: 20px;
   margin-bottom: 20px;
   /* box-shadow: 1px 1px 8px 3px #ccc; */
@@ -205,10 +204,6 @@ onMounted(() => {
   width: 100%;
   height: 150px;
   object-fit: cover;
-}
-
-.content-1 {
-  border-bottom: 1px solid #000;
 }
 
 .content-2 {

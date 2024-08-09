@@ -4,7 +4,7 @@
       <div class="mx-auto max-w-[90%] px-4 py-8 sm:px-6 sm:py-6 lg:px-8">
         <h2 class="text-2xl font-bold tracking-tight text-gray-900 bg-slate-100 rounded-lg px-2 py-1">Quần Áo Đá</h2>
 
-        <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 xl:gap-x-8">
+        <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:gap-x-8">
           <div
             v-for="product in currentPageProducts"
             :key="product._id"

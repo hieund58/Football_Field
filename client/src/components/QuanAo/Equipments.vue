@@ -6,7 +6,7 @@
           Dụng cụ thể thao
         </h2>
 
-        <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 xl:gap-x-8">
+        <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:gap-x-8">
           <div
             v-for="product in currentPageProducts"
             :key="product._id"
@@ -261,8 +261,7 @@ const dialogOpen = ref(false);
 const selectedColor = ref(null);
 const selectedSize = ref(null);
 const page = ref(1);
-const pageSize = 4;
-const filteredProducts = ref([]);
+const pageSize = 6;
 const products = ref([]);
 
 const openProductDialog = product => {
