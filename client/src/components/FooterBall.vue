@@ -61,7 +61,7 @@ const currentYear = ref(new Date().getFullYear());
 
 <style scoped>
 .footer-content {
-  box-shadow: 0 1px 8px 3px #ccc;
+  box-shadow: 1px 1px 8px 3px #ccc;
   width: 100%;
   bottom: 0;
 }

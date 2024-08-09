@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <div class="hover:cursor-pointer flex items-center my-1 text-gray-500 text-[13px]" @click="backToList">
+    <div class="hover:cursor-pointer flex items-center my-1 text-gray-500 text-[13px] pt-2" @click="backToList">
       <n-icon class="mr-1"><ArrowBackOutline /></n-icon>
       Quay lại danh sách sân
     </div>

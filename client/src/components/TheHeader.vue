@@ -1,6 +1,6 @@
 <template>
   <header class="header-content fixed top-0 left-0 w-full bg-white z-50">
-    <nav class="mx-auto flex max-w-7xl items-center justify-between p-1 lg:px-3" aria-label="Global">
+    <nav class="mx-auto flex items-center justify-between p-1 lg:px-3" aria-label="Global">
       <div class="flex md:flex-1 items-center">
         <a href="#" class="flex items-center -m-1.5 p-1.5">
           <img class="h-[60px] w-auto" src="../assets/images/Logo.jpg" alt="" />
@@ -34,28 +34,6 @@
             <PopoverPanel
               class="absolute right-0 top-full z-10 mt-3 w-screen max-w-[120px] overflow-hidden rounded-2xl p-4 bg-white shadow-lg ring-1 ring-gray-900/5"
             >
-              <!-- <div class="p-4">
-                <div v-for="item in products" :key="item.name"
-                  class="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-gray-50">
-                  <div
-                    class="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                    <component :is="item.icon" class="h-6 w-6 text-gray-600 group-hover:text-indigo-600"
-                                                            aria-hidden="true" />
-                  </div>
-                  <div class="flex-auto">
-                    <a :href="item.href" class="block font-semibold text-gray-900">
-                      {{ item.name }}
-                    </a>
-                    <p class="mt-1 text-gray-600">{{ item.description }}</p>
-                  </div>
-                </div>
-              </div>
-              <div class="grid grid-cols-2 divide-x divide-gray-900/5 bg-gray-50">
-                <a v-for="item in callsToAction" :key="item.name" :href="item.href"
-                  class="flex items-center justify-center gap-x-2.5 p-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-100">
-                  {{ item.name }}
-                </a>
-              </div> -->
               <n-space vertical>
                 <router-link to="/home" class="header-btn text-sm font-semibold leading -6 text-gray-900">
                   Trang chủ
@@ -134,7 +112,7 @@
 
       <div class="hidden md:flex flex-1 justify-end">
         <div v-if="!isLoggedIn || user?.role === 'user'">
-          <button v-if="!isLoggedIn" @click="redirectToLogin">Đăng nhập</button>
+          <button v-if="!isLoggedIn" class="text-sm font-semibold leading-6 text-gray-900 hover:cursor-pointer mr-10" @click="redirectToLogin">Đăng nhập</button>
           <div class="dropdown" v-else>
             <div class="avatar" @click="toggleDropdown">
               <img
@@ -248,7 +226,7 @@ const logout = () => {
   top: 0;
   left: 0;
   width: 100%;
-  box-shadow: 0 1px 8px 3px #ccc;
+  box-shadow: 0 1px 6px 1px #ccc;
   background-color: #fff;
   z-index: 50;
 }

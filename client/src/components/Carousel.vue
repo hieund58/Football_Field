@@ -1,5 +1,5 @@
 <template>
-  <n-carousel show-arrow autoplay>
+  <n-carousel show-arrow autoplay class="max-h-[500px]">
     <img
       class="carousel-img"
       src="https://thuthuatnhanh.com/wp-content/uploads/2022/06/Anh-bong-da-sieu-dep.jpg"
@@ -55,7 +55,7 @@ export default defineComponent({
 <style scoped>
 .carousel-img {
   width: 100%;
-  height: 800px;
+  max-height: 500px;
   object-fit: cover;
 }
 

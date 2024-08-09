@@ -1,9 +1,9 @@
 <template>
   <div>
     <Carousel />
-    <BallNews />
     <ServiceBall />
     <BannerBall />
+    <BallNews />
     <AboutUs />
     <BlogSections />
   </div>

@@ -1,11 +1,11 @@
 <template>
   <div class="bg-white">
-    <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
-      <h2 class="text-2xl font-bold tracking-tight text-gray-900">
+    <div class="mx-auto px-4 py-8 sm:px-6 sm:py-12">
+      <h2 class="text-2xl font-bold tracking-tight text-gray-900 text-center">
         Các Dịch Vụ
       </h2>
       <div
-        class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3"
+        class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3"
       >
         <div
           v-for="product in products"
@@ -22,7 +22,7 @@
                 class="h-full w-full object-cover object-center lg:h-full lg:w-full"
               />
             </div>
-            <div class="mt-4 flex justify-between">
+            <div class="mt-4 flex justify-center">
               <div>
                 <h3 class="text-sm text-gray-1000 text-lg font-semibold">
                   {{ product.name }}

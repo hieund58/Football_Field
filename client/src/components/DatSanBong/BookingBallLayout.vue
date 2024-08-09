@@ -1,24 +1,7 @@
 <template>
   <div class="warraper">
-    <!-- <div class="search-content shadow-xl bg-white rounded-lg p-4 sm:p-1 lg:p-2">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div class="filter">
-          <h1 class="content-btn">Khu Vực</h1>
-          <n-select v-model:value="searchForm.area" :options="areaList" multiple clearable placeholder="Chọn khu vực" />
-        </div>
-        <div class="filter">
-          <h1 class="content-btn">Giá</h1>
-          <n-select v-model:value="searchForm.priceRange" :options="priceRange" multiple clearable placeholder="Chọn khoảng giá" />
-        </div>
-        <div class="filter">
-          <h1 class="content-btn">Loại Sân</h1>
-          <n-select v-model:value="searchForm.playerNumRange" :options="playerNumRange" multiple clearable placeholder="Chọn loại sân" />
-        </div>
-      </div>
-    </div> -->
-
-    <div class="search-content shadow-xl bg-white rounded-lg p-4 sm:p-1 lg:p-2">
-      <n-grid cols="4 md:1" responsive="screen" :x-gap="10">
+    <div class="search-content bg-slate-100 rounded-lg px-4 sm:p-1 lg:p-2">
+      <n-grid cols="1 l:4" responsive="screen" :x-gap="10">
         <n-gi :span="1">
           <n-select v-model:value="searchForm.area" :options="areaList" multiple clearable placeholder="Chọn khu vực" />
         </n-gi>
@@ -40,26 +23,26 @@
         </n-gi>
         <n-gi :span="1">
           <n-space>
-            <n-button ghost @click="handleSearch">
+            <n-button type="info" ghost @click="handleSearch">
               <template #icon>
                 <n-icon><SearchOutline /></n-icon>
               </template>
-              Tìm kiếm
+              Tìm kiếm sân
             </n-button>
-            <n-button ghost @click="handleReset">
+            <n-button type="error" ghost @click="handleReset">
               <template #icon>
                 <n-icon><ReloadOutline /></n-icon>
               </template>
-              Tải lại
+              Tìm lại
             </n-button>
           </n-space>
         </n-gi>
       </n-grid>
     </div>
 
-    <div class="bg-white">
-      <div class="mx-auto max-w-full px-4 py-6 sm:px-6 sm:py-6 lg:max-w-7xl lg:px-8">
-        <div class="mt-6 grid gap-4 sm:gap-5 lg:grid-cols-2 xl:grid-cols-4">
+    <!-- <div class="bg-white"> -->
+      <div class="mx-auto max-w-[90%] py-2">
+        <div class="mt-6 grid gap-4 sm:gap-5 lg:grid-cols-3 xl:grid-cols-5">
           <div v-for="field in currentPageFields" :key="field.id" class="group relative">
             <div
               class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80"
@@ -85,8 +68,8 @@
           </div>
         </div>
       </div>
-    </div>
-    <div v-if="currentPageFields.length" class="pagination flex justify-center items-center p-4 lg:p-8">
+    <!-- </div> -->
+    <div v-if="currentPageFields.length" class="pagination flex justify-center items-center">
       <button @click="prevPage" :disabled="page === 1">
         <font-awesome-icon class="icon-pagination" :icon="['fas', 'arrow-left']" />
       </button>
@@ -197,10 +180,8 @@ onMounted(async () => {
 
 <style scoped>
 .warraper {
-  height: auto;
-  max-width: 1500px;
+  height: 100%;
   width: 100%;
-  min-height: 400px;
   margin: 0 auto;
 }
 
@@ -217,14 +198,14 @@ onMounted(async () => {
 }
 
 .pagination {
-  padding-bottom: 100px;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .search-content {
-  max-width: 1200px;
-  width: 100%;
+  width: 90%;
   height: auto;
-  margin: 15px auto;
+  margin: 20px auto 0 auto;
 }
 
 * {

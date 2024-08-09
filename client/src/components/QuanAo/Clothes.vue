@@ -1,10 +1,10 @@
 <template>
   <div class="wrapper">
     <div class="bg-white">
-      <div class="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-6 lg:max-w-7xl lg:px-8">
-        <h2 class="text-2xl font-bold tracking-tight text-gray-900">Quần Áo Đá</h2>
+      <div class="mx-auto max-w-[90%] px-4 py-8 sm:px-6 sm:py-6 lg:px-8">
+        <h2 class="text-2xl font-bold tracking-tight text-gray-900 bg-slate-100 rounded-lg px-2 py-1">Quần Áo Đá</h2>
 
-        <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+        <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 xl:gap-x-8">
           <div
             v-for="product in currentPageProducts"
             :key="product._id"
@@ -20,21 +20,21 @@
                 class="h-full w-full object-cover object-center lg:h-full lg:w-full"
               />
             </div>
-            <div class="mt-4 flex justify-between">
-              <p class="text-sm font-medium text-gray-700">
-                {{ product.name }}
-              </p>
-              <p class="text-sm font-medium text-gray-900">
-                {{ formatMoney(product.price) }}
-              </p>
-            </div>
-            <div class="mt-2 flex justify-between">
-              <p class="text-sm font-medium text-gray-700">
-                Số lượng
-              </p>
-              <p class="text-sm font-medium text-gray-900">
-                {{ formatMoney(product.remaining, ',', '') }}
-              </p>
+            <div class="px-2 pb-2">
+              <div class="mt-4 flex justify-between">
+                <p class="text-sm font-medium text-gray-700">
+                  {{ product.name }}
+                </p>
+                <p class="text-sm font-medium text-gray-900">
+                  {{ formatMoney(product.price) }}
+                </p>
+              </div>
+              <div class="mt-2 flex justify-between">
+                <p class="text-sm font-medium text-gray-700">Số lượng</p>
+                <p class="text-sm font-medium text-gray-900">
+                  {{ formatMoney(product.remaining, ',', '') }}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -351,6 +351,11 @@ watch(
   margin-top: 10px;
 }
 
+.group {
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 8px 3px #ccc;
+}
+
 .pagination {
   padding-bottom: 10px;
 }
@@ -361,6 +366,7 @@ watch(
 
 .icon-pagination:hover {
   /* font-size: 17px; */
+  cursor: pointer;
   color: rgb(250, 69, 22);
 }
 </style>

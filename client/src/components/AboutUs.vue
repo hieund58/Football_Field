@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="w-full">
     <div class="relative isolate overflow-hidden bg-gray-900 py-24 sm:py-32">
       <img
         src="https://www.sapo.pt/assets/img/bg-placard-01.jpg"
@@ -62,7 +62,7 @@
           "
         />
       </div>
-      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+      <div class="mx-auto px-6 lg:px-8">
         <div class="mx-auto max-w-2xl lg:mx-0">
           <h2 class="text-4xl font-bold tracking-tight text-white sm:text-6xl">
             Về Chúng Tôi
@@ -116,9 +116,3 @@ const stats = [
   { name: "Chất Lượng hàng đầu", value: "Uy Tín" },
 ];
 </script>
-<style scoped>
-.wrapper {
-  margin: auto;
-  padding: 100px 0 3px 0;
-}
-</style>

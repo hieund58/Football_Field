@@ -10,7 +10,7 @@
             <n-gi>
               <div class="left-1">
                 <img
-                  class="h-full w-full object-cover object-center lg:h-full lg:w-full"
+                  class="h-full w-full object-cover object-center lg:h-full lg:w-full rounded-md"
                   :src="footballItems[0] ? footballItems[0].imgFootBall : ''"
                   alt=""
                 />
@@ -22,7 +22,7 @@
             <n-gi>
               <div class="left-2">
                 <img
-                  class="h-full w-full object-cover object-center lg:h-full lg:w-full"
+                  class="h-full w-full object-cover object-center lg:h-full lg:w-full rounded-md"
                   :src="footballItems[1] ? footballItems[1].imgFootBall : ''"
                   alt=""
                 />
@@ -37,11 +37,11 @@
         <n-gi span="3" class="lg:span-4 xl:span-3">
           <router-link to="/tintuc" class="mid"
             ><img
-              class="lg:h-full lg:w-full"
+              class="lg:h-full lg:w-full rounded-md"
               :src="footballItems[2] ? footballItems[2].imgFootBall : ''"
               alt=""
             />
-            <a>{{
+            <a class="chu-tin">{{
               footballItems[2] ? footballItems[2].name : ""
             }}</a></router-link
           >
@@ -52,7 +52,7 @@
             <n-gi>
               <div class="right-1">
                 <img
-                  class="h-full w-full object-cover object-center lg:h-full lg:w-full"
+                  class="h-full w-full object-cover object-center lg:h-full lg:w-full rounded-md"
                   :src="footballItems[3] ? footballItems[3].imgFootBall : ''"
                   alt=""
                 />
@@ -64,7 +64,7 @@
             <n-gi>
               <div class="right-2">
                 <img
-                  class="h-full w-full object-cover object-center lg:h-full lg:w-full"
+                  class="h-full w-full object-cover object-center lg:h-full lg:w-full rounded-md"
                   :src="footballItems[4] ? footballItems[4].imgFootBall : ''"
                   alt=""
                 />
@@ -91,7 +91,7 @@
           <n-grid :x-gap="12" :y-gap="8" :cols="1">
             <n-gi>
               <div class="news-item">
-                <img :src="item.imgFootBall" alt="" class="image-item" />
+                <img :src="item.imgFootBall" alt="" class="image-item rounded-md" />
                 <a class="chu-tin">{{ item.name }}</a>
               </div>
             </n-gi>
@@ -141,12 +141,12 @@ onMounted(() => {
 
 <style scoped>
 .wrapper {
-  width: 80%;
+  width: 100%;
   margin: auto;
   padding: 10px;
   margin-top: 20px;
   margin-bottom: 20px;
-  box-shadow: 1px 1px 8px 3px #ccc;
+  /* box-shadow: 1px 1px 8px 3px #ccc; */
 }
 
 .wrapper h1 {
@@ -179,7 +179,8 @@ onMounted(() => {
 }
 
 .chu-tin {
-  font-size: 15px;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 .mid img {
