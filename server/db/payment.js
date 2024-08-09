@@ -2,13 +2,6 @@ const mongoose = require('mongoose');
 const timeZone = require("mongoose-timezone");
 
 const paymentSchema = new mongoose.Schema({
-//   name: String,
-//  people: String,
-//   address:String,
-//   username: String,
-//   sanId: String,
-//   selectDate: String,
-//   selectTime: String,
   paymentId: String,
   paymentMethod: String,
   fromUser: String,
@@ -18,10 +11,11 @@ const paymentSchema = new mongoose.Schema({
     scheduleDate: Date,
     scheduleSlotHour: String
   },
-  purchaseData: {
+  purchaseData: [{
     productId: String,
-    amount: String
-  },
+    price: String,
+    quantity: String
+  }],
   price: String,
   status: String, // pending, error or paid
 });

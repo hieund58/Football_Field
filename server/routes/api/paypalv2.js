@@ -4,6 +4,7 @@ const paypal = require("@paypal/checkout-server-sdk");
 
 const Payment = require("../../db/payment"); // Import your Payment model
 const Schedule = require("../../db/schedule");
+const Product = require("../../db/product");
 
 const router = express.Router();
 
@@ -25,6 +26,11 @@ router.post("/create", async (req, res) => {
 
     let request = new paypal.orders.OrdersCreateRequest();
 
+    const url =
+      type === "booking"
+        ? `http://localhost:5173/detailball/${bookingData?.fieldId}`
+        : "http://localhost:5173/store";
+
     request.requestBody({
       intent: "CAPTURE",
       purchase_units: [
@@ -36,8 +42,8 @@ router.post("/create", async (req, res) => {
         },
       ],
       application_context: {
-        return_url: `http://localhost:5173/detailball/${bookingData?.fieldId}`,
-        cancel_url: `http://localhost:5173/detailball/${bookingData?.fieldId}`,
+        return_url: url,
+        cancel_url: url,
       },
     });
 
@@ -81,10 +87,11 @@ router.post("/execute", async (req, res) => {
     let response = await client.execute(request);
     // console.log(`Response: ${JSON.stringify(response)}`);
     // If call returns body in response, you can get the deserialized version from the result attribute of the response.
-    // console.log(`Capture: ${JSON.stringify(response.result)}`);
+    console.log(`Capture: ${JSON.stringify(response.result)}`);
 
     await Payment.findOneAndUpdate({ paymentId }, { status: "paid" });
     const paidPayment = await Payment.findOne({ paymentId });
+    console.log("🚀 ~ router.post ~ paidPayment:", paidPayment);
 
     if (paidPayment && paidPayment?.type === "booking") {
       const formattedDate = DateTime.fromJSDate(
@@ -97,6 +104,15 @@ router.post("/execute", async (req, res) => {
         "booked",
         paidPayment.fromUser
       );
+    }
+
+    if (paidPayment && paidPayment?.type === "purchase") {
+      paidPayment.purchaseData.forEach(async (purchased) => {
+        const product = await Product.findById(purchased?.productId);
+        console.log("🚀 ~ router.post ~ product:", product);
+        product.updateRemaining(purchased?.quantity);
+        await product.save();
+      });
     }
     res.json({ message: "Thanh toán thành công" });
   } catch (error) {

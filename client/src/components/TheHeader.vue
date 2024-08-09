@@ -128,7 +128,7 @@
                 />
               </div>
             </n-badge>
-            <div class="dropdown-content">
+            <div class="dropdown-content text-sm">
               <ul>
                 <li @click="$router.push('/user')">
                   <div class="flex items-center">
@@ -259,6 +259,7 @@ onMounted(() => {
 .dropdown {
   position: relative;
   display: inline-block;
+  margin-right: 2rem;
 }
 
 .avatar {

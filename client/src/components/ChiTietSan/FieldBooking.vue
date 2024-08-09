@@ -125,7 +125,6 @@ onMounted(async () => {
 
 .wrapper {
   height: auto;
-  max-width: 1500px;
   width: 100%;
   display: flex;
   padding-left: 40px;

@@ -215,7 +215,10 @@ const fetchSchedules = async () => {
 };
 
 const executePayment = async () => {
-  if (!route.query.token) return;
+  if (!route.query.token || !route.query.PayerID) {
+    router.replace({ query: {} });
+    return;
+  }
   const paymentId = route.query.token;
   try {
     const res = await axios.post('http://localhost:5000/api/paypal/execute', { paymentId });

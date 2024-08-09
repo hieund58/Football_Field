@@ -25,14 +25,18 @@
                 <p class="text-sm font-medium text-gray-700">
                   {{ product.name }}
                 </p>
-                <p class="text-sm font-medium text-gray-900">
+                <p class="text-sm font-medium text-orange-600">
                   {{ formatMoney(product.price) }}
                 </p>
               </div>
               <div class="mt-2 flex justify-between">
                 <p class="text-sm font-medium text-gray-700">Số lượng</p>
-                <p class="text-sm font-medium text-gray-900">
-                  {{ formatMoney(product.remaining, ',', '') }}
+                <p class="text-sm font-medium text-orange-600">
+                  {{
+                    product.remaining && Number(product.remaining) > 0
+                      ? formatMoney(product.remaining, ',', '')
+                      : 'Hết hàng'
+                  }}
                 </p>
               </div>
             </div>
@@ -106,7 +110,7 @@
                         <!-- Reviews -->
                         <div class="mt-8">
                           <h4 class="text-sm font-medium text-gray-900">Mô tả</h4>
-                          <p class="text-sm font-[400]">{{ selectedProduct.description }}</p>
+                          <p class="text-sm font-[400] mt-2">{{ selectedProduct.description }}</p>
                         </div>
                       </section>
 
@@ -117,7 +121,7 @@
                         <div>
                           <h4 class="text-sm font-medium text-gray-900">Chọn Màu</h4>
 
-                          <RadioGroup v-model="selectedColor" class="mt-4">
+                          <RadioGroup v-model="formProduct.color" class="mt-4">
                             <RadioGroupLabel class="sr-only">Choose a color</RadioGroupLabel>
                             <span class="flex items-center space-x-3">
                               <RadioGroupOption
@@ -157,7 +161,7 @@
                             <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Size guide</a>
                           </div>
 
-                          <RadioGroup v-model="selectedSize" class="mt-4">
+                          <RadioGroup v-model="formProduct.size" class="mt-4">
                             <RadioGroupLabel class="sr-only">Choose a size</RadioGroupLabel>
                             <div class="grid grid-cols-4 gap-4">
                               <RadioGroupOption
@@ -207,7 +211,16 @@
                           </RadioGroup>
                         </div>
 
-                        {{cartItems}}
+                        <div class="mt-10">
+                          <h4 class="text-sm font-medium text-gray-900">Số lượng</h4>
+                          <n-input-number
+                            v-model:value="formProduct.quantity"
+                            :min="1"
+                            :max="Number(selectedProduct?.remaining || 10)"
+                            placeholder="Số lượng"
+                            class="w-[50%] mt-2"
+                          />
+                        </div>
 
                         <button
                           @click="onAddToCart"
@@ -229,7 +242,7 @@
       <button @click="prevPage" :disabled="page === 1" class="icon-pagination">
         <font-awesome-icon :icon="['fas', 'arrow-left']" />
       </button>
-      <span>Trang {{ page }}</span>
+      <span>Trang {{ page }}/{{ totalPages }}</span>
       <button @click="nextPage" :disabled="page >= totalPages" class="icon-pagination">
         <font-awesome-icon :icon="['fas', 'arrow-right']" />
       </button>
@@ -239,6 +252,8 @@
 
 <script setup>
 import { ref, inject, computed, watch } from 'vue';
+import { useMessage } from 'naive-ui';
+import { useRouter } from 'vue-router';
 import {
   Dialog,
   DialogPanel,
@@ -250,21 +265,30 @@ import {
 } from '@headlessui/vue';
 import { XMarkIcon } from '@heroicons/vue/24/outline';
 
-import { getImgUrl, formatMoney } from '@/utils/common';
+import { getImgUrl, formatMoney, getUserData } from '@/utils/common';
 
 const props = defineProps({
   products: Array
 });
 
-const cartItems = inject('cartItems')
+const cartItems = inject('cartItems');
+
+const message = useMessage();
+const router = useRouter();
+
+const formInit = {
+  color: null,
+  size: null,
+  quantity: 1
+};
 
 const selectedProduct = ref(null);
 const dialogOpen = ref(false);
-const selectedColor = ref(null);
-const selectedSize = ref(null);
+const formProduct = ref({
+  ...formInit
+});
 const page = ref(1);
-const pageSize = 4;
-const filteredProducts = ref([]);
+const pageSize = 6;
 const products = ref([]);
 
 const openProductDialog = product => {
@@ -273,6 +297,9 @@ const openProductDialog = product => {
 };
 
 const closeProductDialog = () => {
+  formProduct.value = {
+    ...formInit
+  };
   dialogOpen.value = false;
 };
 
@@ -297,12 +324,21 @@ const currentPageProducts = computed(() => {
 });
 
 const onAddToCart = () => {
-  console.log(selectedColor.value, selectedSize.value);
+  const userData = getUserData();
+  if (!userData) {
+    message.warning('Vui lòng đăng nhập trước khi thêm hàng vào giỏ');
+    router.push('/login');
+    closeProductDialog();
+    return;
+  }
   cartItems.value.push({
     ...selectedProduct.value,
-    color: selectedColor.value,
-    size: selectedSize.value
-  })
+    color: formProduct.value.color?.name,
+    size: formProduct.value.size?.name,
+    quantity: formProduct.value.quantity || 1
+  });
+  message.success('Thêm vào giỏ hàng thành công');
+  closeProductDialog();
 };
 
 watch(

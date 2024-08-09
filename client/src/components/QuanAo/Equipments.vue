@@ -27,14 +27,18 @@
                 <p class="text-sm font-medium text-gray-700">
                   {{ product.name }}
                 </p>
-                <p class="text-sm font-medium text-gray-900">
+                <p class="text-sm font-medium text-orange-600">
                   {{ formatMoney(product.price) }}
                 </p>
               </div>
               <div class="mt-2 flex justify-between">
                 <p class="text-sm font-medium text-gray-700">Số lượng</p>
-                <p class="text-sm font-medium text-gray-900">
-                  {{ formatMoney(product.remaining, ',', '') }}
+                <p class="text-sm font-medium text-orange-600">
+                  {{
+                    product.remaining && Number(product.remaining) > 0
+                      ? formatMoney(product.remaining, ',', '')
+                      : 'Hết hàng'
+                  }}
                 </p>
               </div>
             </div>
@@ -93,129 +97,144 @@
                         class="object-cover object-center"
                       />
                     </div>
-                    <div class="sm:col-span-8 lg:col-span-7">
-                      <h2 class="text-2xl font-bold text-gray-900 sm:pr-12">
-                        {{ selectedProduct.name }}
-                      </h2>
+                    <div class="sm:col-span-8 lg:col-span-7 h-full flex flex-col justify-between">
+                      <div>
+                        <h2 class="text-2xl font-bold text-gray-900 sm:pr-12">
+                          {{ selectedProduct.name }}
+                        </h2>
 
-                      <section aria-labelledby="information-heading" class="mt-2">
-                        <h3 id="information-heading" class="sr-only">Product information</h3>
+                        <section aria-labelledby="information-heading" class="mt-2">
+                          <h3 id="information-heading" class="sr-only">Product information</h3>
 
-                        <p class="text-2xl text-gray-900">
-                          {{ formatMoney(selectedProduct.price) }}
-                        </p>
+                          <p class="text-2xl text-gray-900">
+                            {{ formatMoney(selectedProduct.price) }}
+                          </p>
 
-                        <!-- Reviews -->
-                        <div class="mt-8">
-                          <h4 class="text-sm font-medium text-gray-900">Mô tả</h4>
-                          <p class="text-sm font-[400]">{{ selectedProduct.description }}</p>
-                        </div>
-                      </section>
+                          <!-- Reviews -->
+                          <div class="mt-8">
+                            <h4 class="text-sm font-medium text-gray-900">Mô tả</h4>
+                            <p class="text-sm font-[400]">{{ selectedProduct.description }}</p>
+                          </div>
+                        </section>
 
-                      <section aria-labelledby="options-heading" class="mt-10">
-                        <h3 id="options-heading" class="sr-only">Product options</h3>
+                        <section aria-labelledby="options-heading" class="mt-10">
+                          <h3 id="options-heading" class="sr-only">Product options</h3>
 
-                        <!-- Colors -->
-                        <div>
-                          <h4 class="text-sm font-medium text-gray-900">Chọn Màu</h4>
+                          <!-- Colors -->
+                          <div v-if="!!selectedProduct.colors">
+                            <h4 class="text-sm font-medium text-gray-900">Chọn Màu</h4>
 
-                          <RadioGroup v-model="selectedColor" class="mt-4">
-                            <RadioGroupLabel class="sr-only">Choose a color</RadioGroupLabel>
-                            <span class="flex items-center space-x-3">
-                              <RadioGroupOption
-                                as="template"
-                                v-for="color in selectedProduct.colors"
-                                :key="color.name"
-                                :value="color"
-                                v-slot="{ active, checked }"
-                              >
-                                <div
-                                  :class="[
-                                    color.selectedClass,
-                                    active && checked ? 'ring ring-offset-1' : '',
-                                    !active && checked ? 'ring-2' : '',
-                                    '-m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 focus:outline-none'
-                                  ]"
+                            <RadioGroup v-model="formProduct.color" class="mt-4">
+                              <RadioGroupLabel class="sr-only">Choose a color</RadioGroupLabel>
+                              <span class="flex items-center space-x-3">
+                                <RadioGroupOption
+                                  as="template"
+                                  v-for="color in selectedProduct.colors"
+                                  :key="color.name"
+                                  :value="color"
+                                  v-slot="{ active, checked }"
                                 >
-                                  <RadioGroupLabel as="span" class="sr-only">{{ color.name }}</RadioGroupLabel>
-                                  <span
-                                    aria-hidden="true"
+                                  <div
                                     :class="[
-                                      // color.class,
-                                      'h-8 w-8 rounded-full border border-black border-opacity-10'
+                                      color.selectedClass,
+                                      active && checked ? 'ring ring-offset-1' : '',
+                                      !active && checked ? 'ring-2' : '',
+                                      '-m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 focus:outline-none'
                                     ]"
-                                    :style="{ background: color.name }"
-                                  />
-                                </div>
-                              </RadioGroupOption>
-                            </span>
-                          </RadioGroup>
-                        </div>
-
-                        <!-- Sizes -->
-                        <div class="mt-10">
-                          <div class="flex items-center justify-between">
-                            <h4 class="text-sm font-medium text-gray-900">Size</h4>
-                            <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Size guide</a>
+                                  >
+                                    <RadioGroupLabel as="span" class="sr-only">{{ color.name }}</RadioGroupLabel>
+                                    <span
+                                      aria-hidden="true"
+                                      :class="[
+                                        // color.class,
+                                        'h-8 w-8 rounded-full border border-black border-opacity-10'
+                                      ]"
+                                      :style="{ background: color.name }"
+                                    />
+                                  </div>
+                                </RadioGroupOption>
+                              </span>
+                            </RadioGroup>
                           </div>
 
-                          <RadioGroup v-model="selectedSize" class="mt-4">
-                            <RadioGroupLabel class="sr-only">Choose a size</RadioGroupLabel>
-                            <div class="grid grid-cols-4 gap-4">
-                              <RadioGroupOption
-                                as="template"
-                                v-for="size in selectedProduct.sizes"
-                                :key="size.name"
-                                :value="size"
-                                :disabled="!size.inStock"
-                                v-slot="{ active, checked }"
-                              >
-                                <div
-                                  :class="[
-                                    size.inStock
-                                      ? 'cursor-pointer bg-white text-gray-900 shadow-sm'
-                                      : 'cursor-not-allowed bg-gray-50 text-gray-200',
-                                    active ? 'ring-2 ring-indigo-500' : '',
-                                    'group relative flex items-center justify-center rounded-md border py-3 px-4 text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none sm:flex-1'
-                                  ]"
-                                >
-                                  <RadioGroupLabel as="span">{{ size.name }}</RadioGroupLabel>
-                                  <span
-                                    v-if="size.inStock"
-                                    :class="[
-                                      active ? 'border' : 'border-2',
-                                      checked ? 'border-indigo-500' : 'border-transparent',
-                                      'pointer-events-none absolute -inset-px rounded-md'
-                                    ]"
-                                    aria-hidden="true"
-                                  ></span>
-                                  <span
-                                    v-else
-                                    aria-hidden="true"
-                                    class="pointer-events-none absolute -inset-px rounded-md border-2 border-gray-200"
-                                  >
-                                    <svg
-                                      class="absolute inset-0 h-full w-full stroke-2 text-gray-200"
-                                      viewBox="0 0 100 100"
-                                      preserveAspectRatio="none"
-                                      stroke="currentColor"
-                                    >
-                                      <line x1="0" y1="100" x2="100" y2="0" vector-effect="non-scaling-stroke" />
-                                    </svg>
-                                  </span>
-                                </div>
-                              </RadioGroupOption>
+                          <!-- Sizes -->
+                          <div v-if="!!selectedProduct.sizes" class="mt-10">
+                            <div class="flex items-center justify-between">
+                              <h4 class="text-sm font-medium text-gray-900">Size</h4>
+                              <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                                Size guide
+                              </a>
                             </div>
-                          </RadioGroup>
-                        </div>
 
-                        <button
-                          @click="onAddToCart"
-                          class="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
-                          Thêm Vào Giỏ Hàng
-                        </button>
-                      </section>
+                            <RadioGroup v-model="formProduct.size" class="mt-4">
+                              <RadioGroupLabel class="sr-only">Choose a size</RadioGroupLabel>
+                              <div class="grid grid-cols-4 gap-4">
+                                <RadioGroupOption
+                                  as="template"
+                                  v-for="size in selectedProduct.sizes"
+                                  :key="size.name"
+                                  :value="size"
+                                  :disabled="!size.inStock"
+                                  v-slot="{ active, checked }"
+                                >
+                                  <div
+                                    :class="[
+                                      size.inStock
+                                        ? 'cursor-pointer bg-white text-gray-900 shadow-sm'
+                                        : 'cursor-not-allowed bg-gray-50 text-gray-200',
+                                      active ? 'ring-2 ring-indigo-500' : '',
+                                      'group relative flex items-center justify-center rounded-md border py-3 px-4 text-sm font-medium uppercase hover:bg-gray-50 focus:outline-none sm:flex-1'
+                                    ]"
+                                  >
+                                    <RadioGroupLabel as="span">{{ size.name }}</RadioGroupLabel>
+                                    <span
+                                      v-if="size.inStock"
+                                      :class="[
+                                        active ? 'border' : 'border-2',
+                                        checked ? 'border-indigo-500' : 'border-transparent',
+                                        'pointer-events-none absolute -inset-px rounded-md'
+                                      ]"
+                                      aria-hidden="true"
+                                    ></span>
+                                    <span
+                                      v-else
+                                      aria-hidden="true"
+                                      class="pointer-events-none absolute -inset-px rounded-md border-2 border-gray-200"
+                                    >
+                                      <svg
+                                        class="absolute inset-0 h-full w-full stroke-2 text-gray-200"
+                                        viewBox="0 0 100 100"
+                                        preserveAspectRatio="none"
+                                        stroke="currentColor"
+                                      >
+                                        <line x1="0" y1="100" x2="100" y2="0" vector-effect="non-scaling-stroke" />
+                                      </svg>
+                                    </span>
+                                  </div>
+                                </RadioGroupOption>
+                              </div>
+                            </RadioGroup>
+                          </div>
+
+                          <div class="mt-10">
+                            <h4 class="text-sm font-medium text-gray-900">Số lượng</h4>
+                            <n-input-number
+                              v-model:value="formProduct.quantity"
+                              :min="1"
+                              :max="Number(selectedProduct?.remaining || 10)"
+                              placeholder="Số lượng"
+                              class="mt-2 w-[50%]"
+                            />
+                          </div>
+                        </section>
+                      </div>
+                      <button
+                        @click="onAddToCart"
+                        class="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        style="display: block"
+                      >
+                        Thêm Vào Giỏ Hàng
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -229,7 +248,7 @@
       <button @click="prevPage" :disabled="page === 1" class="icon-pagination">
         <font-awesome-icon :icon="['fas', 'arrow-left']" />
       </button>
-      <span>Trang {{ page }}</span>
+      <span>Trang {{ page }}/{{ totalPages }}</span>
       <button @click="nextPage" :disabled="page >= totalPages" class="icon-pagination">
         <font-awesome-icon :icon="['fas', 'arrow-right']" />
       </button>
@@ -238,7 +257,9 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, inject, computed, watch } from 'vue';
+import { useMessage } from 'naive-ui';
+import { useRouter } from 'vue-router';
 import {
   Dialog,
   DialogPanel,
@@ -250,16 +271,28 @@ import {
 } from '@headlessui/vue';
 import { XMarkIcon } from '@heroicons/vue/24/outline';
 
-import { getImgUrl, formatMoney } from '@/utils/common';
+import { getImgUrl, formatMoney, getUserData } from '@/utils/common';
 
 const props = defineProps({
   products: Array
 });
 
+const cartItems = inject('cartItems');
+
+const message = useMessage();
+const router = useRouter();
+
+const formInit = {
+  color: null,
+  size: null,
+  quantity: 1
+};
+
 const selectedProduct = ref(null);
 const dialogOpen = ref(false);
-const selectedColor = ref(null);
-const selectedSize = ref(null);
+const formProduct = ref({
+  ...formInit
+});
 const page = ref(1);
 const pageSize = 6;
 const products = ref([]);
@@ -270,6 +303,9 @@ const openProductDialog = product => {
 };
 
 const closeProductDialog = () => {
+  formProduct.value = {
+    ...formInit
+  };
   dialogOpen.value = false;
 };
 
@@ -294,9 +330,21 @@ const currentPageProducts = computed(() => {
 });
 
 const onAddToCart = () => {
-  if (!selectedColor.value || !selectedSize.value) {
+  const userData = getUserData();
+  if (!userData) {
+    message.warning('Vui lòng đăng nhập trước khi thêm hàng vào giỏ');
+    router.push('/login');
+    closeProductDialog();
+    return;
   }
-  console.log(selectedColor.value, selectedSize.value);
+  cartItems.value.push({
+    ...selectedProduct.value,
+    color: formProduct.value.color?.name,
+    size: formProduct.value.size?.name,
+    quantity: formProduct.value.quantity || 1
+  });
+  message.success('Thêm vào giỏ hàng thành công');
+  closeProductDialog();
 };
 
 watch(

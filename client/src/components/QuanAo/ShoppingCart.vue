@@ -1,9 +1,9 @@
 <template>
   <n-drawer v-model:show="open" :width="502" placement="right" :on-update:show="onUpdateShow">
     <n-drawer-content title="Giỏ hàng" closable :native-scrollbar="false">
-      <div v-for="product in products" :key="product.id" class="flex py-6">
+      <div v-for="(product, index) in products" :key="product.id" class="flex py-6">
         <div class="h-20 w-20 sm:h-24 sm:w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-          <img :src="product.imageSrc" :alt="product.imageAlt" class="h-full w-full object-cover object-center" />
+          <n-image :src="product.imageSrc" :alt="product.imageAlt" object-fit="cover" />
         </div>
 
         <div class="ml-4 flex flex-1 flex-col">
@@ -12,27 +12,31 @@
               <h3>
                 <a :href="product.href">{{ product.name }}</a>
               </h3>
-              <p class="ml-4">{{ product.price }}</p>
+              <p class="ml-4">{{ formatMoney(product.price) }}</p>
             </div>
-            <p class="mt-1 text-sm text-gray-500">
-              {{ product.color }}
-            </p>
+            <p class="mt-1 text-sm text-gray-500">Màu: {{ product.color }}</p>
+            <p class="mt-1 text-sm text-gray-500">Cỡ: {{ product.size }}</p>
           </div>
-          <div class="flex flex-1 items-end justify-between text-sm">
-            <p class="text-gray-500">Số Lượng {{ product.quantity }}</p>
+          <div class="flex flex-1 items-end justify-between text-sm mt-1">
+            <p class="text-gray-500">Số Lượng: {{ product.quantity }}</p>
             <div class="flex">
-              <button type="button" class="font-medium text-indigo-600 hover:text-indigo-500">Xóa</button>
+              <button
+                type="button"
+                class="font-medium text-indigo-600 hover:text-indigo-500"
+                @click="onRemoveProduct(index)"
+              >
+                Xóa
+              </button>
             </div>
           </div>
         </div>
-        {{ cartItems }}
       </div>
       <template #footer>
         <div class="text-base sm:text-lg font-medium text-gray-900">
-          <p class="mr-2">Tổng: 300.000 Vnđ</p>
+          <p class="mr-2">Tổng: {{ formatMoney(sumMoney) }}</p>
         </div>
         <n-space class="items-center" :wrap="false">
-          <n-button type="info" color="#4f46e5">
+          <n-button type="info" :disabled="!products.length" color="#4f46e5" @click="openModalPayment">
             <template #icon>
               <n-icon>
                 <CashIcon />
@@ -41,7 +45,11 @@
             Thanh toán
           </n-button>
           <p>
-            <button type="button" class="font-medium text-indigo-600 hover:text-indigo-500" @click="open = false">
+            <button
+              type="button"
+              class="font-medium text-indigo-600 hover:text-indigo-500"
+              @click="onUpdateShow(false)"
+            >
               Tiếp Tục Mua
               <span aria-hidden="true">&rarr;</span>
             </button>
@@ -50,86 +58,67 @@
       </template>
     </n-drawer-content>
   </n-drawer>
+  <modal-payment
+      v-model:show="showModalPayment"
+      :data="paymentData"
+      @close="showModalPayment = false"
+    />
 </template>
 
 <script setup>
-import { ref, defineProps, watch, inject  } from 'vue';
+import { ref, computed, watch, inject } from 'vue';
 import { CardOutline as CashIcon } from '@vicons/ionicons5';
+
+import { getImgUrl, formatMoney } from '@/utils/common';
+
+import ModalPayment from './ShoppingCartModalPay.vue'
 
 const emits = defineEmits(['close']);
 const props = defineProps({
   open: Boolean
 });
 
-const cartItems = inject('cartItems')
-
-console.log(cartItems)
+const cartItems = inject('cartItems');
 
 const open = ref(false);
-const products = [
-  {
-    id: 1,
-    name: 'Áo Đá Việt Nam',
-    href: '#',
-    color: 'Red',
-    price: '300.000',
-    quantity: 1,
-    imageSrc:
-      'https://th.bing.com/th/id/R.50c7934bd6541abbb51e48f4d9a3f87e?rik=t%2bUklWGK5pLWJA&riu=http%3a%2f%2fbelo.vn%2fwp-content%2fuploads%2f2018%2f11%2fz1188384674228_416a3f7ef7a51b72f6098f6a68536743.jpg'
-  },
-  {
-    id: 2,
-    name: 'Áo Đá Việt Nam',
-    href: '#',
-    color: 'White',
-    price: '300.000',
-    quantity: 4,
-    imageSrc: 'https://belo.vn/wp-content/uploads/2018/11/z1188384711253_b6f0da3ac39aa5537f3536ff9e1d82b8.jpg'
-  },
-  {
-    id: 3,
-    name: 'Áo Đá Việt Nam',
-    href: '#',
-    color: 'White',
-    price: '300.000',
-    quantity: 4,
-    imageSrc: 'https://belo.vn/wp-content/uploads/2018/11/z1188384711253_b6f0da3ac39aa5537f3536ff9e1d82b8.jpg'
-  },
-  {
-    id: 4,
-    name: 'Áo Đá Việt Nam',
-    href: '#',
-    color: 'White',
-    price: '300.000',
-    quantity: 4,
-    imageSrc: 'https://belo.vn/wp-content/uploads/2018/11/z1188384711253_b6f0da3ac39aa5537f3536ff9e1d82b8.jpg'
-  },
-  {
-    id: 5,
-    name: 'Áo Đá Việt Nam',
-    href: '#',
-    color: 'White',
-    price: '300.000',
-    quantity: 4,
-    imageSrc: 'https://belo.vn/wp-content/uploads/2018/11/z1188384711253_b6f0da3ac39aa5537f3536ff9e1d82b8.jpg'
-  }
-];
+const showModalPayment = ref(false);
+const paymentData = ref(null)
+
+const products = computed(() =>
+  cartItems.value.map(item => ({
+    ...item,
+    imageSrc: getImgUrl(item.imageSrc)
+  }))
+);
+
+const sumMoney = computed(() =>
+  products.value?.map(product => product.price * product.quantity)?.reduce((acc, cur) => acc + cur, 0)
+);
 
 const onUpdateShow = show => {
   if (!show) {
     emits('close');
   }
 };
+
+const onRemoveProduct = index => {
+  cartItems.value.splice(index, 1);
+};
+
+const openModalPayment = async () => {
+  paymentData.value = {
+    products: products.value,
+    sumMoney: sumMoney.value
+  }
+  showModalPayment.value = true
+};
+
 watch(
   () => props.open,
   newValue => {
     open.value = newValue;
   }
 );
-
-watch(() => cartItems.value, val => {
-  console.log('dcm =>>>', val)
-})
 </script>
 
 <style scoped lang="scss">

@@ -73,7 +73,7 @@
       <button @click="prevPage" :disabled="page === 1">
         <font-awesome-icon class="icon-pagination" :icon="['fas', 'arrow-left']" />
       </button>
-      <span>Trang {{ page }}</span>
+      <span>Trang {{ page }}/{{ totalPages }}</span>
       <button @click="nextPage" :disabled="page >= totalPages">
         <font-awesome-icon class="icon-pagination" :icon="['fas', 'arrow-right']" />
       </button>
@@ -218,6 +218,7 @@ onMounted(async () => {
 .icon-pagination:hover {
   font-size: 17px;
   color: rgb(250, 69, 22);
+  cursor: pointer;
 }
 .n-button {
   padding: 15px;

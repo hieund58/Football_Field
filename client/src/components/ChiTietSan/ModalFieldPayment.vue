@@ -1,6 +1,6 @@
 <template>
   <n-modal v-model:show="show">
-    <n-card style="width: 400px" :title="modalTitle" :bordered="false" size="huge" role="dialog" aria-modal="true">
+    <n-card style="width: 600px" :title="modalTitle" :bordered="false" size="huge" role="dialog" aria-modal="true">
       <div v-if="!isCancel">
         <div class="w-full h-[60px] mb-2">
           <img
@@ -9,30 +9,32 @@
             style="width: 100%; height: 100%; object-fit: cover"
           />
         </div>
-
-        <span class="block font-[600] mb-2">Bạn có chắc chắn đặt sân?</span>
+        <div class="border-t border-b border-gray-200 py-4">
+          <span class="block font-[600] mb-2">Bạn có chắc chắn đặt sân?</span>
         <div class="flex flex-col w-full">
-          <div class="flex flex-row justify-between">
+          <div class="flex flex-row justify-between mt-2">
             <span class="font-[600]">Giá tiền</span>
             <span class="font-[700] text-[#f03131]">{{ formatMoney(data?.fieldPrice) }}</span>
           </div>
-          <div class="flex flex-row justify-between">
+          <div class="flex flex-row justify-between mt-2">
             <span class="font-[600]">Giá tiền tương ứng USD</span>
-            <span class="font-[700] text-[#f03131]">{{ vndToUsd(data?.fieldPrice) }}</span>
+            <span class="font-[700] text-[#f03131]">${{ vndToUsd(data?.fieldPrice) }} USD</span>
           </div>
-          <div class="flex flex-row justify-between">
+          <div class="flex flex-row justify-between mt-2">
             <span class="font-[600]">Vào ngày</span>
             <span class="font-[700] text-[#f03131]">{{ formatDateVn(data?.scheduleDate) }}</span>
           </div>
-          <div class="flex flex-row justify-between">
+          <div class="flex flex-row justify-between mt-2">
             <span class="font-[600]">Khung giờ</span>
             <span class="font-[700] text-[#f03131]">{{ data?.slot?.name }}</span>
           </div>
         </div>
+        </div>
+
       </div>
-      <div v-else>
+      <div v-else class="border-t border-b border-gray-200 py-4">
         <span class="block font-[600] mb-2">Sân đã được đặt bởi {{ data?.slot?.bookedBy }}</span>
-        <span class="block font-[600] mb-2">Bạn có chắc chắn hủy sân?</span>
+        <span class="block font-[600]">Bạn có chắc chắn hủy sân?</span>
       </div>
       <template #footer>
         <n-button v-if="!isCancel" :loading="loading" type="info" @click="handlePayment">
@@ -47,7 +49,7 @@
           </template>
           Hủy sân
         </n-button>
-        <n-button class="ml-2" @click="emits('close')">
+        <n-button class="!ml-2" @click="emits('close')">
           <template #icon>
             <n-icon><CloseOutline /></n-icon>
           </template>
