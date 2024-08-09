@@ -126,9 +126,9 @@ library.add(
   faCreditCard,
 );
 const app = createApp(App);
-// Tạo biến isLoggedIn để theo dõi trạng thái đăng nhập
-const isLoggedIn = ref(false);
-app.config.globalProperties.$isLoggedIn = isLoggedIn;
+
+const cartItems = ref([]);
+app.provide('cartItems', cartItems)
 
 const meta = document.createElement('meta')
 meta.name = 'naive-ui-style'
@@ -139,4 +139,3 @@ app.use(naive);
 app.use(create());
 app.use(router);
 app.mount("#app");
-// app.component(NPagination.name, NPagination);

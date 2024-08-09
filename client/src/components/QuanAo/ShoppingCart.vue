@@ -25,6 +25,7 @@
             </div>
           </div>
         </div>
+        {{ cartItems }}
       </div>
       <template #footer>
         <div class="text-base sm:text-lg font-medium text-gray-900">
@@ -52,13 +53,17 @@
 </template>
 
 <script setup>
-import { ref, defineProps, watch } from 'vue';
+import { ref, defineProps, watch, inject  } from 'vue';
 import { CardOutline as CashIcon } from '@vicons/ionicons5';
 
 const emits = defineEmits(['close']);
 const props = defineProps({
   open: Boolean
 });
+
+const cartItems = inject('cartItems')
+
+console.log(cartItems)
 
 const open = ref(false);
 const products = [
@@ -121,6 +126,10 @@ watch(
     open.value = newValue;
   }
 );
+
+watch(() => cartItems.value, val => {
+  console.log('dcm =>>>', val)
+})
 </script>
 
 <style scoped lang="scss">

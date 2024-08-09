@@ -207,6 +207,8 @@
                           </RadioGroup>
                         </div>
 
+                        {{cartItems}}
+
                         <button
                           @click="onAddToCart"
                           class="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -236,8 +238,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
-import axios from 'axios';
+import { ref, inject, computed, watch } from 'vue';
 import {
   Dialog,
   DialogPanel,
@@ -255,39 +256,7 @@ const props = defineProps({
   products: Array
 });
 
-const products2 = [
-  {
-    id: 1,
-    name: 'Áo Đá Việt Nam',
-    href: '#',
-    imageAlt: "Front of men's Basic Tee in black.",
-    price: '300.000 Vnd',
-    color: 'Black',
-    rating: 3.9,
-    reviewCount: 117,
-    href: '#',
-    imageSrc:
-      'https://th.bing.com/th/id/R.50c7934bd6541abbb51e48f4d9a3f87e?rik=t%2bUklWGK5pLWJA&riu=http%3a%2f%2fbelo.vn%2fwp-content%2fuploads%2f2018%2f11%2fz1188384674228_416a3f7ef7a51b72f6098f6a68536743.jpg&ehk=c%2fSM4moCTUr04VPvYN%2bT6incwFEJHXADwZ6kJmDKyHA%3d&risl=&pid=ImgRaw&r=0',
-    imageAlt: 'Two each of gray, white, and black shirts arranged on table.',
-    colors: [
-      { name: 'White', class: 'bg-white', selectedClass: 'ring-gray-400' },
-      { name: 'Gray', class: 'bg-gray-200', selectedClass: 'ring-gray-400' },
-      { name: 'Black', class: 'bg-gray-900', selectedClass: 'ring-gray-900' }
-    ],
-    sizes: [
-      { name: 'XXS', inStock: true },
-      { name: 'XS', inStock: true },
-      { name: 'S', inStock: true },
-      { name: 'M', inStock: true },
-      { name: 'L', inStock: true },
-      { name: 'XL', inStock: true },
-      { name: 'XXL', inStock: true },
-      { name: 'XXXL', inStock: false }
-    ]
-  }
-];
-
-const allSizes = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+const cartItems = inject('cartItems')
 
 const selectedProduct = ref(null);
 const dialogOpen = ref(false);
@@ -329,6 +298,11 @@ const currentPageProducts = computed(() => {
 
 const onAddToCart = () => {
   console.log(selectedColor.value, selectedSize.value);
+  cartItems.value.push({
+    ...selectedProduct.value,
+    color: selectedColor.value,
+    size: selectedSize.value
+  })
 };
 
 watch(

@@ -112,14 +112,22 @@
 
       <div class="hidden md:flex flex-1 justify-end">
         <div v-if="!isLoggedIn || user?.role === 'user'">
-          <button v-if="!isLoggedIn" class="text-sm font-semibold leading-6 text-gray-900 hover:cursor-pointer mr-10" @click="redirectToLogin">Đăng nhập</button>
+          <button
+            v-if="!isLoggedIn"
+            class="text-sm font-semibold leading-6 text-gray-900 hover:cursor-pointer mr-10"
+            @click="redirectToLogin"
+          >
+            Đăng nhập
+          </button>
           <div class="dropdown" v-else>
-            <div class="avatar" @click="toggleDropdown">
-              <img
-                src="https://th.bing.com/th/id/R.168824d10e82ec611011d572adb57d33?rik=ckwL%2fl%2f3xh1cFw&pid=ImgRaw&r=0"
-                alt="Avatar"
-              />
-            </div>
+            <n-badge :value="hasItemsInCart" :max="9">
+              <div class="avatar" @click="toggleDropdown">
+                <img
+                  src="https://th.bing.com/th/id/R.168824d10e82ec611011d572adb57d33?rik=ckwL%2fl%2f3xh1cFw&pid=ImgRaw&r=0"
+                  alt="Avatar"
+                />
+              </div>
+            </n-badge>
             <div class="dropdown-content">
               <ul>
                 <li @click="$router.push('/user')">
@@ -132,7 +140,8 @@
                 <li @click="openShoppingCart">
                   <div class="flex items-center">
                     <font-awesome-icon :icon="['fas', 'cart-shopping']" class="icon mr-2" />
-                    Giỏ hàng
+                    <div class="mr-2">Giỏ hàng</div>
+                    <n-badge :value="hasItemsInCart" :max="9"></n-badge>
                   </div>
                 </li>
 
@@ -153,7 +162,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, inject, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { onMounted } from 'vue';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
@@ -173,9 +182,24 @@ const toggleDropdown = () => {
   toggleMenu.classList.toggle('active');
 };
 
-// Khai báo biến isLoggedIn và cập nhật ban đầu
 const isLoggedIn = ref(false);
-const user = ref(null); // Thay thế bằng null ban đầu
+const user = ref(null);
+
+const redirectToLogin = () => {
+  router.push('/login');
+};
+
+const logout = () => {
+  // Xóa thông tin người dùng từ sessionStorage
+  sessionStorage.removeItem('userData');
+  isLoggedIn.value = false;
+  user.value = null;
+  redirectToLogin();
+};
+
+const cartItems = inject('cartItems');
+const hasItemsInCart = computed(() => cartItems.value?.length);
+
 onMounted(() => {
   const loginSuccessHandler = () => {
     // Đoạn code khôi phục thông tin người dùng từ sessionStorage
@@ -197,19 +221,6 @@ onMounted(() => {
     isLoggedIn.value = true;
   }
 });
-
-const redirectToLogin = () => {
-  router.push('/login');
-};
-
-const logout = () => {
-  // Xóa thông tin người dùng từ sessionStorage
-  sessionStorage.removeItem('userData');
-  isLoggedIn.value = false;
-  user.value = null;
-  redirectToLogin();
-};
-
 </script>
 <style scoped>
 .header-content {
@@ -285,7 +296,7 @@ const logout = () => {
 }
 
 .dropdown-content li {
-  width: 130px;
+  width: 140px;
   padding: 7px 10px;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 5px;
