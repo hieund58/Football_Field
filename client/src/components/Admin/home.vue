@@ -15,8 +15,8 @@
           Quản lý sân bóng
         </p>
         <p
-          :class="`block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4 ${activeTab === 'fieldsInUse' ? 'bg-gray-700' : ''}`"
-          @click="activeTab = 'fieldsInUse'"
+          :class="`block text-gray-300 hover:bg-gray-700 hover:cursor-pointer py-2 px-4 ${activeTab === 'fieldsBooked' ? 'bg-gray-700' : ''}`"
+          @click="activeTab = 'fieldsBooked'"
         >
           Sân đang được đặt
         </p>
@@ -36,7 +36,8 @@
       </div>
     </div>
     <div class="sm:w-full md:w-4/5 bg-white p-4">
-      <fields v-if="activeTab === 'fields'" />
+      <field-management v-if="activeTab === 'fields'" />
+      <field-booked v-else-if="activeTab === 'fieldsBooked'" />
       <user-management v-else-if="activeTab === 'users'" />
       <product-management v-else-if="activeTab === 'products'" />
     </div>
@@ -48,7 +49,8 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useMessage } from 'naive-ui';
 
-import Fields from './Fields.vue';
+import FieldManagement from './Field/FieldManagement.vue';
+import FieldBooked from './Field/FieldBooked.vue'
 import UserManagement from './UserManagement.vue';
 import ProductManagement from './Product/ProductManagement.vue';
 

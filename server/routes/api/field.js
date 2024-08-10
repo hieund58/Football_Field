@@ -1,11 +1,50 @@
 const express = require('express');
-const router = express.Router();
-const Field = require('../../db/field');
 const multer = require('multer');
 const path = require('path');
 
+const Field = require('../../db/field');
+const Schedule = require('../../db/schedule')
 
-// Lấy danh sách sản phẩm
+const router = express.Router();
+
+router.get("/fields-and-schedules/", async (req, res) => {
+  try {
+    const { fieldName, dateFrom, dateTo } = req.query;
+    let fields = await Field.find({ name : { $regex: '.*' + fieldName + '.*', $options: 'i' }});
+    console.log("🚀 ~ router.get ~ fields:", fields)
+
+    fields = await Promise.all(fields.map(async field => {
+      const schedules = await Schedule.find({
+        fieldId: field?._id,
+        date: {
+          $gte: dateFrom,
+          $lte: dateTo,
+        },
+      });
+      let numOfBookedSlots = 0;
+      schedules.forEach(schedule => {
+        schedule.slots.forEach(slot => {
+          if (slot.status === 'booked') numOfBookedSlots++
+        })
+      })
+      return {
+        id: field._id,
+        name: field.name,
+        address: field.address,
+        area: field.area,
+        numOfBookedDays: schedules?.length || 0,
+        numOfBookedSlots
+      }
+    }))
+    console.log("🚀 ~ router.get ~ fields:", fields)
+    res.status(200).json(fields);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Đã xảy ra lỗi' });
+  }
+});
+
+
 router.get('/', async (req, res) => {
   try {
     const fields = await Field.find(); 
@@ -19,7 +58,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const id = req.params.id; // Lấy giá trị của tham số từ route
-    const fieldDetail = await Field.findById(id); // Tìm sản phẩm bằng ID
+    const fieldDetail = await Field.findById(id);
     res.status(200).json(fieldDetail);
   } catch (error) {
     console.error(error);
@@ -113,6 +152,4 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ message: 'Đã xảy ra lỗi' });
   }
 });
-
-
 module.exports = router;

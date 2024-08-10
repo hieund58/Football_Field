@@ -12,12 +12,28 @@ export const formatMoney = (moneyNum, separator = ',', suffix = ' VNĐ') => {
 };
 
 export const formatDateVn = date => {
-  const luxonDate = typeof date === 'string' ?  DateTime.fromFormat(date, 'yyyy-MM-dd') : date;
+  const luxonDate = typeof date === 'string' ? DateTime.fromFormat(date, 'yyyy-MM-dd') : date;
   return luxonDate?.setLocale('vi-VI')?.toLocaleString();
 };
 
 export const formatQueryDate = date => {
-  const luxonDate = typeof date === 'string' ? DateTime.fromISO(date) : date;
+  console.log(typeof date);
+  let luxonDate;
+  // const luxonDate = typeof date === 'string' ? DateTime.fromISO(date) : typeof date === 'object' ? DateTime.fromJSDate(date) : date;
+  switch (typeof date) {
+    case 'string':
+      luxonDate = DateTime.fromISO(date);
+      break;
+    case 'object':
+      luxonDate = DateTime.isDateTime(date) ? date : DateTime.fromJSDate(date);
+      break;
+    case 'number':
+      luxonDate = DateTime.fromMillis(date);
+      break;
+    default:
+      luxonDate = date;
+      break;
+  }
   return luxonDate?.toFormat('yyyy-MM-dd');
 };
 

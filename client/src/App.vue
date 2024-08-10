@@ -23,6 +23,6 @@ import FooterBall from "./components/FooterBall.vue";
 }
 .view-container {
   padding-top: 70px;
-  min-height: 100%;
+  min-height: calc(100vh - 300px);
 }
 </style>
