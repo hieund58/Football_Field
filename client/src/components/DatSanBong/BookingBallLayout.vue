@@ -1,7 +1,7 @@
 <template>
   <div class="warraper">
     <div class="search-content bg-slate-100 rounded-lg px-4 sm:p-1 lg:p-2">
-      <n-grid cols="1 l:4" responsive="screen" :x-gap="10">
+      <n-grid cols="1 l:4" responsive="screen" :x-gap="10" :y-gap="10">
         <n-gi :span="1">
           <n-select v-model:value="searchForm.area" :options="areaList" multiple clearable placeholder="Chọn khu vực" />
         </n-gi>

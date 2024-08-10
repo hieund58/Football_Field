@@ -90,21 +90,46 @@
       </div>
 
       <div class="hidden md:flex gap-x-12 items-center">
-        <router-link to="/home" class="header-btn text-lg font-semibold leading -6 text-gray-900">
+        <router-link
+          to="/home"
+          class="header-btn text-lg font-semibold leading -6 text-gray-900"
+          :style="routePath === '/home' ? { color: 'rgb(235, 25, 25)', borderBottom: '1px solid #000' } : ''"
+        >
           Trang chủ
         </router-link>
-        <router-link to="/bookingball" class="header-btn text-lg font-semibold leading -6 text-gray-900">
+        <router-link
+          to="/bookingball"
+          class="header-btn text-lg font-semibold leading -6 text-gray-900"
+          :style="routePath === '/bookingball' ? { color: 'rgb(235, 25, 25)', borderBottom: '1px solid #000' } : ''"
+        >
           Đặt Sân
         </router-link>
-        <router-link to="/store" class="header-btn text-lg font-semibold leading-6 text-gray-900">Cửa hàng</router-link>
-        <router-link to="/aboutus" class="header-btn text-lg font-semibold leading-6 text-gray-900">
+        <router-link
+          to="/store"
+          class="header-btn text-lg font-semibold leading-6 text-gray-900"
+          :style="routePath === '/store' ? { color: 'rgb(235, 25, 25)', borderBottom: '1px solid #000' } : ''"
+        >
+          Cửa hàng
+        </router-link>
+        <router-link
+          to="/aboutus"
+          class="header-btn text-lg font-semibold leading-6 text-gray-900"
+          :style="routePath === '/aboutus' ? { color: 'rgb(235, 25, 25)', borderBottom: '1px solid #000' } : ''"
+        >
           Liên Hệ
         </router-link>
-        <router-link to="/contact" class="header-btn text-lg font-semibold leading-6 text-gray-900">Hỗ trợ</router-link>
+        <router-link
+          to="/contact"
+          class="header-btn text-lg font-semibold leading-6 text-gray-900"
+          :style="routePath === '/contact' ? { color: 'rgb(235, 25, 25)', borderBottom: '1px solid #000' } : ''"
+        >
+          Hỗ trợ
+        </router-link>
         <router-link
           v-if="user?.role === 'admin'"
           to="/admin/home"
           class="header-btn text-lg font-semibold leading-6 text-gray-900"
+          :style="routePath === '/admin/home' ? { color: 'rgb(235, 25, 25)', borderBottom: '1px solid #000' } : ''"
         >
           Admin
         </router-link>
@@ -163,27 +188,36 @@
 
 <script setup>
 import { ref, inject, computed } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { onMounted } from 'vue';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
 import { Bars3Icon } from '@heroicons/vue/24/outline';
 import ShoppingCart from '../components/QuanAo/ShoppingCart.vue';
 
 const router = useRouter();
+const route = useRoute();
+console.log('🚀 ~ route:', route);
+
+const cartItems = inject('cartItems');
+
 const open = ref(false);
+const isDropdownOpen = ref(false);
+const isLoggedIn = ref(false);
+const user = ref(null);
+
+const hasItemsInCart = computed(() => cartItems.value?.length);
+const routePath = computed(() => route.path);
+console.log('🚀 ~ routePath:', routePath);
 
 const openShoppingCart = () => {
   open.value = true;
 };
-const isDropdownOpen = ref(false);
+
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
   const toggleMenu = document.querySelector('.dropdown-content');
   toggleMenu.classList.toggle('active');
 };
-
-const isLoggedIn = ref(false);
-const user = ref(null);
 
 const redirectToLogin = () => {
   router.push('/login');
@@ -197,12 +231,8 @@ const logout = () => {
   redirectToLogin();
 };
 
-const cartItems = inject('cartItems');
-const hasItemsInCart = computed(() => cartItems.value?.length);
-
 onMounted(() => {
   const loginSuccessHandler = () => {
-    // Đoạn code khôi phục thông tin người dùng từ sessionStorage
     const userData = sessionStorage.getItem('userData');
     if (userData) {
       user.value = JSON.parse(userData);
