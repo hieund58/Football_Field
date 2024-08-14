@@ -4,15 +4,15 @@
       <n-message-provider>
         <TheHeader />
         <router-view class="view-container" />
-        <FooterBall />
+        <TheFooter />
       </n-message-provider>
     </n-loading-bar-provider>
   </div>
 </template>
 
 <script setup>
-import TheHeader from "./components/TheHeader.vue";
-import FooterBall from "./components/FooterBall.vue";
+import TheHeader from "./layout/TheHeader.vue";
+import TheFooter from "./layout/TheFooter.vue";
 </script>
 <style scoped>
 .wrapper-all {

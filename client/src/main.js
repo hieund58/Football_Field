@@ -60,26 +60,20 @@ library.add(
   faGear,
 );
 import { createRouter, createWebHistory } from "vue-router";
-import BookingBallLayout from "./components/DatSanBong/BookingBallLayout.vue";
-// import DetailBall from "./components/ChiTietSan/DetailBall.vue";
-import FieldBooking from "./components/ChiTietSan/FieldBooking.vue";
+
 import Home from "./views/index.vue";
-import AboutUsVue from "./components/AboutUs.vue";
-import ThanhToanBall from "./components/ThanhToan/ThanhToanBall.vue";
-import Login from "./components/Account/Login.vue";
-import Register from "./components/Account/Register.vue";
-import UserProfile from "./components/Profile/User/UserProfile.vue";
-import ManageProfile from "./components/Profile/Manager/ManageProfile.vue";
-import LoginAdmin from "./components/Admin/login.vue";
-import HomeAdmin from "./components/Admin/home.vue";
-import Fields from "./components/Admin/Fields.vue";
-import BookingDetail from "./components/Admin/Bookings.vue";
-import Revenue from "./components/Admin/Revenue.vue";
-import FieldRevenue from "./components/Admin/FieldRevenue.vue";
-import ConTact from "./components/ConTact.vue";
-import userManager from "./components/Admin/userManager.vue";
-import DetailNew from "./components/FootBallNews/DetailNew.vue";
-import Store from "./components/QuanAo/Store.vue";
+import FieldBooking from "./views/field-booking/index.vue";
+import FieldBookingDetail from "./views/field-booking/components/Booking.vue";
+import Store from "./views/store/index.vue";
+import NewsDetail from "./views/home/components/NewsDetail.vue";
+import AboutUs from "./views/home/components/AboutUs.vue";
+import Login from "./views/login/components/LoginUser.vue";
+import LoginAdmin from "./views/login/components/LoginAdmin.vue";
+import Register from "./views/login/components/Register.vue";
+import Contact from "./views/contact/index.vue";
+import UserProfile from "./views/profile/index.vue";
+import HomeAdmin from "./views/admin/index.vue";
+
 import { create } from "naive-ui";
 const router = createRouter({
   history: createWebHistory(),
@@ -89,29 +83,17 @@ const router = createRouter({
       component: Home,
       alias: "/home",
     },
-    { path: "/bookingball", component: BookingBallLayout },
-    { path: "/detailball/:id", component: FieldBooking },
-    {
-      path: "/detailball/:id/thanhtoanball/:sanId/:selectDate/:selectTime",
-      component: ThanhToanBall,
-      name: "thanhtoanball",
-      props: true,
-    },
-    { path: "/aboutus", component: AboutUsVue },
-    { path: "/login", component: Login },
-    { path: "/register", component: Register },
-    { path: "/contact", component: ConTact },
-    { path: "/user", component: UserProfile },
-    { path: "/manage", component: ManageProfile },
-    { path: "/admin", component: LoginAdmin },
-    { path: "/admin/home", component: HomeAdmin },
-    { path: "/Fields", component: Fields },
-    { path: "/bookingDetail", component: BookingDetail },
-    { path: "/Revenue", component: Revenue },
-    { path: "/userManager", component: userManager },
-    { path: "/Revenue/:name", name: "FieldRevenue", component: FieldRevenue },
-    { path: "/tintuc", component: DetailNew },
+    { path: "/bookingball", component: FieldBooking },
+    { path: "/detailball/:id", component: FieldBookingDetail },
     { path: "/store", component: Store },
+    { path: "/tintuc", component: NewsDetail },
+    { path: "/aboutus", component: AboutUs },
+    { path: "/login", component: Login },
+    { path: "/admin", component: LoginAdmin },
+    { path: "/register", component: Register },
+    { path: "/contact", component: Contact },
+    { path: "/user", component: UserProfile },
+    { path: "/admin/home", component: HomeAdmin }
   ],
 });
 
