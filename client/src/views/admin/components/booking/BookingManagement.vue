@@ -21,11 +21,11 @@
       </div>
 
       <BookingManagementDetail
-          v-else-if="detailOpened"
-          :detail-data="rowData"
-          @success="() => fetchProductData()"
-          @close="detailOpened = false"
-        />
+        v-else-if="detailOpened"
+        :detail-data="rowData"
+        @success="() => fetchProductData()"
+        @close="detailOpened = false"
+      />
     </Transition>
   </div>
 </template>
@@ -34,10 +34,11 @@
 import { h, ref, onMounted } from 'vue';
 import { DateTime } from 'luxon';
 import axios from 'axios';
-import { NButton, NIcon, NPopconfirm, useMessage, useLoadingBar } from 'naive-ui';
-import { Eye, CreateOutline, TrashOutline, AddOutline, SearchOutline, ReloadOutline } from '@vicons/ionicons5';
+import { NButton, NIcon, useMessage, useLoadingBar } from 'naive-ui';
+import { Eye, SearchOutline, ReloadOutline } from '@vicons/ionicons5';
 
-import { formatDateVn, formatQueryDate } from '@/utils/common';
+import { formatQueryDate } from '@/utils/common';
+import { getPagination } from '@/utils/pagination';
 
 import BookingManagementDetail from './BookingManagementDetail.vue';
 
@@ -58,7 +59,7 @@ function openDetail(data) {
     ...data,
     dateFrom: formatQueryDate(searchDateRange.value[0]),
     dateTo: formatQueryDate(searchDateRange.value[1])
-};
+  };
 }
 
 function renderIcon(icon) {
@@ -67,7 +68,14 @@ function renderIcon(icon) {
   });
 }
 
+const pagination = getPagination();
+
 const columns = [
+  {
+    title: 'STT',
+    render: (_rowData, rowIndex) => rowIndex + (pagination.page - 1) * pagination.pageSize + 1,
+    width: 60
+  },
   {
     title: 'Tên sân',
     key: 'name'
@@ -82,11 +90,13 @@ const columns = [
   },
   {
     title: 'Số ngày sân được đặt',
-    key: 'numOfBookedDays'
+    key: 'numOfBookedDays',
+    sorter: 'default',
   },
   {
     title: 'Số buổi sân được đặt',
-    key: 'numOfBookedSlots'
+    key: 'numOfBookedSlots',
+    sorter: 'default',
   },
   {
     title: 'Thao tác',
@@ -114,10 +124,6 @@ const columns = [
     }
   }
 ];
-
-const pagination = {
-  pageSize: 10
-};
 
 const fetchProductData = async () => {
   try {

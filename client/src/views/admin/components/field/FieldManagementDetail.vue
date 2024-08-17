@@ -39,7 +39,15 @@
           <span v-else>{{ formModel.area }}</span>
         </n-form-item-gi>
         <n-form-item-gi :span="1" path="price" label="Giá">
-          <n-input-number v-if="!detailMode" v-model:value="formModel.price" :show-button="false" placeholder="Giá" class="w-full">
+          <n-input-number
+            v-if="!detailMode"
+            v-model:value="formModel.price"
+            :format="val => val?.toString()?.replace(/^[+-]?\d+/, int => int.replace(/(\d)(?=(\d{3})+$)/g, `$1,`))"
+            :parse="val => Number(val?.toString()?.replaceAll(',', '') || 0)"
+            :show-button="false"
+            placeholder="Giá"
+            class="w-full"
+          >
             <template #suffix>VNĐ</template>
           </n-input-number>
           <span v-else>{{ formatMoney(formModel.price) }}</span>
@@ -139,7 +147,7 @@ const formInit = {
   name: '',
   address: '',
   area: undefined,
-  price: '',
+  price: null,
   playerNum: '',
   description: {
     facilities: '',
@@ -194,7 +202,7 @@ const handleUploadDetailImg = fileListData => {
       message.error('Kích thước tệp quá lớn. Vui lòng chọn một tệp nhỏ hơn 5MB.');
       return;
     }
-  } 
+  }
   detailImages.value = fileListData;
 };
 
@@ -207,8 +215,8 @@ const handleSave = () => {
       try {
         const formData = new FormData();
         const formValues = omit(formModel.value, ['avatar', 'avatarSrc', 'detailImgSrc']);
-        const detailImgKeep = detailImages.value.filter(img => !!img.url).map(img => last(img.url.split('/')))
-        formValues.detailImgKeep = detailImgKeep
+        const detailImgKeep = detailImages.value.filter(img => !!img.url).map(img => last(img.url.split('/')));
+        formValues.detailImgKeep = detailImgKeep;
 
         formData.append('fieldData', JSON.stringify(formValues));
         if (formModel.value.avatar?.[0]) formData.append('avatar', formModel.value.avatar[0].file);
@@ -264,18 +272,19 @@ watch(
         avatarSrc: val?.avatarSrc,
         detailImgSrc: val?.detailImgSrc
       };
-      if (val?.avatarSrc) formModel.value.avatar.push({
-        id: 'image',
-        status: 'finished',
-        url: getImgUrl(val.avatarSrc)
-      })
-      if (val?.detailImgSrc) detailImages.value = detailImagesSrc.value?.map((src, index) => ({
-        id: index,
-        status: 'finished',
-        url: getImgUrl(src)
-      }))
+      if (val?.avatarSrc)
+        formModel.value.avatar.push({
+          id: 'image',
+          status: 'finished',
+          url: getImgUrl(val.avatarSrc)
+        });
+      if (val?.detailImgSrc)
+        detailImages.value = detailImagesSrc.value?.map((src, index) => ({
+          id: index,
+          status: 'finished',
+          url: getImgUrl(src)
+        }));
     }
-
   },
   {
     immediate: true,
@@ -287,10 +296,10 @@ watch(
 <style scoped lang="scss">
 :deep(.n-upload-file-list .n-upload-file.n-upload-file--image-card-type) {
   width: 200px;
-  height: 200px
+  height: 200px;
 }
 :deep(.n-upload-trigger.n-upload-trigger--image-card) {
   width: 200px;
-  height: 200px
+  height: 200px;
 }
 </style>

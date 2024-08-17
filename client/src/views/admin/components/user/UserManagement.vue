@@ -53,6 +53,7 @@ import {
 } from '@vicons/ionicons5';
 
 import UserManagementDetail from './UserManagementDetail.vue';
+import { getPagination } from '@/utils/pagination';
 
 const message = useMessage();
 const loadingBar = useLoadingBar();
@@ -75,7 +76,14 @@ function renderIcon(icon) {
   });
 }
 
+const pagination = getPagination();
+
 const columns = [
+  {
+    title: 'STT',
+    render: (_rowData, rowIndex) => rowIndex + (pagination.page - 1) * pagination.pageSize + 1,
+    width: 60
+  },
   {
     title: 'Tên đăng nhập/Email',
     key: 'email',
@@ -185,10 +193,6 @@ const columns = [
   }
 ];
 
-const pagination = {
-  pageSize: 10
-};
-
 const deleteUser = async id => {
   try {
     await axios.delete(`http://localhost:5000/api/users/${id}`);
@@ -231,8 +235,8 @@ const handleSearch = () => {
 
 const resetSearch = () => {
   searchInput.value = '';
-  fetchUsers()
-}
+  fetchUsers();
+};
 
 onMounted(async () => {
   await fetchUsers();

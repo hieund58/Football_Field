@@ -30,6 +30,8 @@
             v-if="!detailMode"
             v-model:value="formModel.price"
             :show-button="false"
+            :format="val => val?.toString()?.replace(/^[+-]?\d+/, int => int.replace(/(\d)(?=(\d{3})+$)/g, `$1,`))"
+            :parse="val => Number(val?.toString()?.replaceAll(',', '') || 0)"
             placeholder="Giá"
             class="w-full"
           >
@@ -49,7 +51,6 @@
           <span v-else>{{ formatMoney(formModel.remaining, ',', '') }}</span>
         </n-form-item-gi>
 
-        
         <n-form-item-gi :span="2" path="type" label="Thuộc loại">
           <n-select
             v-if="!detailMode"
@@ -58,7 +59,7 @@
             :options="productTypes"
             clearable
           />
-          <span v-else>{{ formModel.type }}</span>
+          <span v-else>{{ getNameByCode('productType', formModel.type) }}</span>
         </n-form-item-gi>
 
         <n-form-item-gi :span="2" path="sizes" label="Kích cỡ">
@@ -84,9 +85,8 @@
             :options="productColors"
             clearable
           />
-          <span v-else>{{ arrayToText(formModel.colors) }}</span>
+          <span v-else>{{ arrayToText(formModel.colors, item => getNameByCode('productColor', item) ) }}</span>
         </n-form-item-gi>
-
 
         <n-form-item-gi :span="4" path="description" label="Mô tả">
           <n-input
@@ -131,7 +131,7 @@ import axios from 'axios';
 import { cloneDeep, omit } from 'lodash';
 import { SaveOutline, CloseOutline } from '@vicons/ionicons5';
 
-import { productTypes, productColors, productClothesSizes, productShoeSizes } from '@/utils/constant';
+import { productTypes, productColors, productClothesSizes, productShoeSizes, getNameByCode } from '@/utils/constant';
 import { formatMoney, getImgUrl } from '@/utils/common';
 
 const props = defineProps({
@@ -173,8 +173,8 @@ const title = computed(() => {
       : 'Sửa thông tin sản phẩm';
 });
 
-const productSizes = computed(() => formModel.value.type === 'clothes' ? productClothesSizes : productShoeSizes)
-const disableSizeAndColor = computed(() => formModel.value.type !== 'clothes' &&  formModel.value.type !== 'shoe')
+const productSizes = computed(() => (formModel.value.type === 'clothes' ? productClothesSizes : productShoeSizes));
+const disableSizeAndColor = computed(() => formModel.value.type !== 'clothes' && formModel.value.type !== 'shoe');
 
 const detailMode = computed(() => props.mode === 'detail');
 
@@ -204,7 +204,7 @@ const handleSave = () => {
         const formData = new FormData();
         const formValues = omit(formModel.value, ['avatar', 'avatarSrc']);
         formValues.colors = formValues.colors?.length ? JSON.stringify(formValues.colors) : undefined;
-        formValues.sizes = formValues.sizes?.length ?  JSON.stringify(formValues.sizes) : undefined;
+        formValues.sizes = formValues.sizes?.length ? JSON.stringify(formValues.sizes) : undefined;
         formData.append('productData', JSON.stringify(formValues));
         if (formModel.value.avatar?.[0]) formData.append('image', formModel.value.avatar[0].file);
 
@@ -242,8 +242,9 @@ const parseArray = JSONstring => {
   return JSON.parse(JSONstring.replaceAll('\\', ''));
 };
 
-const arrayToText = array => {
+const arrayToText = (array, mapFn) => {
   if (!array || !Array.isArray(array)) return '';
+  if (mapFn) array = array.map(item => mapFn(item));
   return array.join(', ');
 };
 
@@ -276,13 +277,16 @@ watch(
   }
 );
 
-watch(() => disableSizeAndColor.value, val => {
-  console.log("🚀 ~ watch ~ val:", val)
-  if (val) {
-    formModel.value.sizes = [];
-    formModel.value.colors = [];
+watch(
+  () => disableSizeAndColor.value,
+  val => {
+    console.log('🚀 ~ watch ~ val:', val);
+    if (val) {
+      formModel.value.sizes = [];
+      formModel.value.colors = [];
+    }
   }
-})
+);
 </script>
 
 <style scoped lang="scss">

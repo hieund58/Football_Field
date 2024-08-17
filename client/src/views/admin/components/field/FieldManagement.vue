@@ -1,7 +1,7 @@
 <template>
     <div class="field-management">
       <Transition name="fade" :duration="300" mode="out-in">
-        <div v-if="!drawerOpen">
+        <div v-if="!detailOpenned">
           <h1>Quản lý sân</h1>
           <div class="flex justify-between mb-2">
             <n-input-group>
@@ -17,7 +17,7 @@
                 </template>
               </n-button>
             </n-input-group>
-            <n-button type="success" @click="openDrawer('create')">
+            <n-button type="success" @click="goDetail('create')">
               <template #icon>
                 <n-icon><AddOutline /></n-icon>
               </template>
@@ -29,11 +29,11 @@
         </div>
   
         <FieldManagementDetail
-          v-else-if="drawerOpen"
-          :mode="drawerMode"
+          v-else
+          :mode="detailMode"
           :detail-data="rowData"
           @success="() => fetchProductData()"
-          @close="drawerOpen = false"
+          @close="detailOpenned = false"
         />
       </Transition>
     </div>
@@ -46,6 +46,7 @@
   import { Eye, CreateOutline, TrashOutline, AddOutline, SearchOutline, ReloadOutline } from '@vicons/ionicons5';
   
   import { formatMoney } from '@/utils/common'
+  import { getPagination } from '@/utils/pagination';
   
   import FieldManagementDetail from './FieldManagementDetail.vue';
   
@@ -55,14 +56,14 @@
   const userData = JSON.parse(sessionStorage.getItem('userData'));
   const tableData = ref([]);
   
-  const drawerOpen = ref(false);
-  const drawerMode = ref('');
+  const detailOpenned = ref(false);
+  const detailMode = ref('');
   const rowData = ref();
   const searchInput = ref('');
   
-  function openDrawer(mode, data) {
-    drawerOpen.value = true;
-    drawerMode.value = mode;
+  function goDetail(mode, data) {
+    detailOpenned.value = true;
+    detailMode.value = mode;
     rowData.value = data;
   }
   
@@ -71,8 +72,15 @@
       default: () => h(icon)
     });
   }
-  
+
+  const pagination = getPagination();
+
   const columns = [
+  {
+    title: 'STT',
+    render: (_rowData, rowIndex) => rowIndex + (pagination.page - 1) * pagination.pageSize + 1,
+    width: 60
+  },
     {
       title: 'Tên sân',
       key: 'name'
@@ -118,7 +126,7 @@
                 title: 'Chi tiết',
                 style: { marginRight: '2px' },
                 renderIcon: () => renderIcon(Eye),
-                onClick: () => openDrawer('detail', row)
+                onClick: () => goDetail('detail', row)
               },
               null
             ),
@@ -132,7 +140,7 @@
                 title: 'Sửa',
                 style: { marginRight: '2px' },
                 renderIcon: () => renderIcon(CreateOutline),
-                onClick: () => openDrawer('edit', row)
+                onClick: () => goDetail('edit', row)
               },
               null
             ),
@@ -166,10 +174,6 @@
       }
     }
   ];
-  
-  const pagination = {
-    pageSize: 10
-  };
   
   const deleteField = async row => {
     try {

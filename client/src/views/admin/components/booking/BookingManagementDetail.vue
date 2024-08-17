@@ -14,20 +14,23 @@
       </div>
     </div>
     <n-divider class="!my-3" />
-    <div v-for="schedule in schedules">
-      <div class="text-lg font-bold">Ngày {{ formatDateVn(formatQueryDate(schedule.date)) }}, đã đặt: {{ getBookedNum(schedule.slots) }}</div>
-      <n-data-table :columns="columns" :data="schedule.slots" :pagination="pagination" />
+    <div v-for="(schedule, index) in schedules">
+      <div class="text-lg font-bold pb-2">
+        Ngày {{ formatDateVn(formatQueryDate(schedule.date)) }}, đã đặt: {{ getBookedNum(schedule.slots) }}
+      </div>
+      <n-data-table :columns="getColumn(index)" :data="schedule.slots" :pagination="paginations[index]" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, h, ref, onMounted } from 'vue';
+import { computed, h, ref, onMounted } from 'vue';
 import { CloseOutline } from '@vicons/ionicons5';
 import axios from 'axios';
 import { NButton, NIcon, useLoadingBar } from 'naive-ui';
 
 import { formatDateVn, formatQueryDate } from '@/utils/common';
+import { getPagination } from '@/utils/pagination';
 
 const props = defineProps({
   detailData: Object
@@ -38,49 +41,59 @@ const schedules = ref([]);
 
 const loadingBar = useLoadingBar();
 
-const columns = [
-  { title: 'STT', render: (_rowData, rowIndex) => rowIndex + (pagination.page - 1) * pagination.pageSize + 1, width: 80 },
-  { title: 'Khung giờ', key: 'hour', minWidth: 120 },
-  { title: 'Trạng thái', key: 'status', minWidth: 120,
-    render: (rowData) => {
-        return h('div', {
-            style: rowData.status === 'available' ? {  color: 'green', fontWeight: 'bold' } : {color: 'red', fontWeight: 'bold' }
-        }, rowData.status === 'available' ? 'Còn trống': 'Đã đặt')
-    }
-   },
-  { title: 'Đặt bởi', key: 'bookedBy', minWidth: 120 }
-];
-
-const pagination = reactive({
-  page: 1,
-  pageSize: 6,
-  showSizePicker: true,
-  pageSizes: [
-    {
-      label: '6 / page',
-      value: 6
-    },
-    {
-      label: '10 / page',
-      value: 10
-    },
-    {
-      label: '20 / page',
-      value: 20
-    }
-  ],
-  onChange: page => {
-    pagination.page = page;
-  },
-  onUpdatePageSize: pageSize => {
-    pagination.pageSize = pageSize;
-    pagination.page = 1;
-  }
+const paginations = computed(() => {
+  return Array.from(schedules.value, _schedule =>
+    getPagination(6, [
+      {
+        label: '6 / trang',
+        value: 6
+      },
+      {
+        label: '10 / trang',
+        value: 10
+      },
+      {
+        label: '20 / trang',
+        value: 20
+      }
+    ])
+  );
 });
 
-const getBookedNum = (slots) => {
-    return slots?.filter(slot => slot?.status === 'booked')?.length
-}
+const getColumn = index => {
+  return [
+    {
+      title: 'STT',
+      render: (_rowData, rowIndex) =>
+        rowIndex + (paginations.value[index]?.page - 1) * paginations.value[index]?.pageSize + 1,
+      width: 60
+    },
+    { title: 'Khung giờ', key: 'hour', minWidth: 120 },
+    {
+      title: 'Trạng thái',
+      key: 'status',
+      sorter: 'default',
+      minWidth: 120,
+      render: rowData => {
+        return h(
+          'div',
+          {
+            style:
+              rowData.status === 'available'
+                ? { color: 'green', fontWeight: 'bold' }
+                : { color: 'red', fontWeight: 'bold' }
+          },
+          rowData.status === 'available' ? 'Còn trống' : 'Đã đặt'
+        );
+      }
+    },
+    { title: 'Đặt bởi', key: 'bookedBy', sorter: 'default', minWidth: 120 }
+  ];
+};
+
+const getBookedNum = slots => {
+  return slots?.filter(slot => slot?.status === 'booked')?.length;
+};
 
 onMounted(async () => {
   try {
