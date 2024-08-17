@@ -100,28 +100,28 @@
         <router-link
           to="/bookingball"
           class="header-btn text-lg font-semibold leading -6 text-gray-900"
-          :style="routePath === '/bookingball' ? { color: 'rgb(235, 25, 25)', borderBottom: '1px solid #000' } : ''"
+          :style="routePath === '/bookingball' ? { color: 'rgb(235, 25, 25)' } : ''"
         >
           Đặt Sân
         </router-link>
         <router-link
           to="/store"
           class="header-btn text-lg font-semibold leading-6 text-gray-900"
-          :style="routePath === '/store' ? { color: 'rgb(235, 25, 25)', borderBottom: '1px solid #000' } : ''"
+          :style="routePath === '/store' ? { color: 'rgb(235, 25, 25)' } : ''"
         >
           Cửa hàng
         </router-link>
         <router-link
           to="/aboutus"
           class="header-btn text-lg font-semibold leading-6 text-gray-900"
-          :style="routePath === '/aboutus' ? { color: 'rgb(235, 25, 25)', borderBottom: '1px solid #000' } : ''"
+          :style="routePath === '/aboutus' ? { color: 'rgb(235, 25, 25)' } : ''"
         >
           Liên Hệ
         </router-link>
         <router-link
           to="/contact"
           class="header-btn text-lg font-semibold leading-6 text-gray-900"
-          :style="routePath === '/contact' ? { color: 'rgb(235, 25, 25)', borderBottom: '1px solid #000' } : ''"
+          :style="routePath === '/contact' ? { color: 'rgb(235, 25, 25)' } : ''"
         >
           Hỗ trợ
         </router-link>
@@ -129,7 +129,7 @@
           v-if="user?.role === 'admin'"
           to="/admin/home"
           class="header-btn text-lg font-semibold leading-6 text-gray-900"
-          :style="routePath === '/admin/home' ? { color: 'rgb(235, 25, 25)', borderBottom: '1px solid #000' } : ''"
+          :style="routePath === '/admin/home' ? { color: 'rgb(235, 25, 25)' } : ''"
         >
           Admin
         </router-link>
@@ -144,39 +144,43 @@
           >
             Đăng nhập
           </button>
-          <div class="dropdown" v-else>
-            <n-badge :value="hasItemsInCart" :max="9">
-              <div class="avatar" @click="toggleDropdown">
+          <div v-else class="flex flex-row items-center">
+            <n-badge :value="hasItemsInCart" :max="9" class="mr-4">
+              <div class="avatar" title="Giỏ hàng" @click="openShoppingCart">
                 <img
-                  src="https://th.bing.com/th/id/R.168824d10e82ec611011d572adb57d33?rik=ckwL%2fl%2f3xh1cFw&pid=ImgRaw&r=0"
+                  src="@/assets/images/shopping-cart.png"
                   alt="Avatar"
+                  class="w-[30px] h-[30px] object-contain m-auto mt-[6px]"
                 />
               </div>
             </n-badge>
-            <div class="dropdown-content text-sm">
-              <ul>
-                <li @click="$router.push('/user')">
-                  <div class="flex items-center">
-                    <font-awesome-icon :icon="['fas', 'user']" class="icon mr-2" />
-                    Profile
-                  </div>
-                </li>
 
-                <li @click="openShoppingCart">
-                  <div class="flex items-center">
-                    <font-awesome-icon :icon="['fas', 'cart-shopping']" class="icon mr-2" />
-                    <div class="mr-2">Giỏ hàng</div>
-                    <n-badge :value="hasItemsInCart" :max="9"></n-badge>
-                  </div>
-                </li>
+            <div class="dropdown">
+              <div class="avatar" @click="toggleDropdown">
+                <img
+                  src="@/assets/images/user.png"
+                  alt="Avatar"
+                  class="w-[30px] h-[30px] object-contain m-auto mt-[5px]"
+                />
+              </div>
 
-                <li @click="logout">
-                  <div class="flex items-center">
-                    <font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']" class="icon mr-2" />
-                    Đăng xuất
-                  </div>
-                </li>
-              </ul>
+              <div class="dropdown-content text-sm">
+                <ul>
+                  <li @click="$router.push('/user')">
+                    <div class="flex items-center">
+                      <font-awesome-icon :icon="['fas', 'user']" class="icon mr-2" />
+                      Profile
+                    </div>
+                  </li>
+
+                  <li @click="logout">
+                    <div class="flex items-center">
+                      <font-awesome-icon :icon="['fas', 'arrow-right-from-bracket']" class="icon mr-2" />
+                      Đăng xuất
+                    </div>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -252,7 +256,7 @@ onMounted(() => {
   }
 });
 </script>
-<style scoped>
+<style scoped lang="scss">
 .header-content {
   box-shadow: 0 1px 8px 3px #ccc;
 }
@@ -293,13 +297,16 @@ onMounted(() => {
 }
 
 .avatar {
-  cursor: pointer;
+  border-radius: 50%;
   height: 40px;
   width: 40px;
+  overflow: hidden;
+  object-fit: contain;
+  background-color: #d4d4d4;
 }
 
-.avatar img {
-  border-radius: 50%;
+.avatar:hover {
+  cursor: pointer;
 }
 
 .dropdown-content {
