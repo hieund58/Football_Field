@@ -189,9 +189,6 @@
     padding: 0 0 15px 15px;
   }
   
-  .bg-white {
-  }
-  
   .group {
     border-radius: 0.5rem;
     box-shadow: 0 1px 8px 3px #ccc;

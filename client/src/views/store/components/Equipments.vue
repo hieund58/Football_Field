@@ -1,10 +1,46 @@
 <template>
   <div class="wrapper">
     <div class="bg-white">
-      <div class="mx-auto max-w-[90%] px-4 py-8 sm:px-6 sm:py-6 lg:px-8">
-        <h2 class="text-2xl font-bold tracking-tight text-gray-900 bg-slate-100 rounded-lg px-2 py-1">
-          Dụng cụ thể thao
-        </h2>
+      <div class="mx-auto max-w-[95%] px-4 py-8 sm:px-6 sm:py-6 lg:px-8">
+        <div class="bg-slate-100 rounded-lg sm:p-2 lg:p-4">
+          <h2 class="text-2xl font-bold tracking-tight text-gray-900 mb-2">Dụng cụ thể thao</h2>
+
+          <n-grid cols="1 l:5" responsive="screen" :x-gap="10" :y-gap="10">
+            <n-gi :span="1">
+              <n-input v-model:value="formSearch.name" clearable placeholder="Tên sản phẩm" />
+            </n-gi>
+            <n-gi :span="1">
+              <n-select
+                v-model:value="formSearch.priceRange"
+                :options="priceRange"
+                clearable
+                placeholder="Chọn khoảng giá"
+              />
+            </n-gi>
+            <n-gi :span="1">
+              <n-select v-model:value="formSearch.sort" :options="productSort" clearable placeholder="Sắp xếp" />
+            </n-gi>
+            <n-gi :span="1">
+              <n-select v-model:value="formSearch.status" :options="productStatus" clearable placeholder="Trạng thái" />
+            </n-gi>
+            <n-gi :span="1">
+              <n-space>
+                <n-button type="info" ghost @click="handleSearch">
+                  <template #icon>
+                    <n-icon><SearchOutline /></n-icon>
+                  </template>
+                  Tìm sản phẩm
+                </n-button>
+                <n-button type="error" ghost @click="handleReset">
+                  <template #icon>
+                    <n-icon><ReloadOutline /></n-icon>
+                  </template>
+                  Xóa tìm kiếm
+                </n-button>
+              </n-space>
+            </n-gi>
+          </n-grid>
+        </div>
 
         <div class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:gap-x-8">
           <div
@@ -34,11 +70,7 @@
               <div class="mt-2 flex justify-between">
                 <p class="text-sm font-medium text-gray-700">Số lượng</p>
                 <p class="text-sm font-medium text-orange-600">
-                  {{
-                    product.remaining && Number(product.remaining) > 0
-                      ? formatMoney(product.remaining, ',', '')
-                      : 'Hết hàng'
-                  }}
+                  {{ outOfStock(product.remaining) ? 'Hết hàng' : formatMoney(product.remaining, ',', '') }}
                 </p>
               </div>
             </div>
@@ -117,7 +149,14 @@
                           </div>
                         </section>
 
-                        <section aria-labelledby="options-heading" class="mt-10">
+                        <div
+                        v-if="outOfStock(selectedProduct.remaining)"
+                        class="mt-10 text-xl font-bold tracking-tight text-red-600"
+                      >
+                        Sản phẩm đã hết hàng!
+                      </div>
+
+                        <section v-else aria-labelledby="options-heading" class="mt-10">
                           <h3 id="options-heading" class="sr-only">Product options</h3>
 
                           <!-- Colors -->
@@ -244,7 +283,10 @@
         </div>
       </Dialog>
     </TransitionRoot>
-    <div class="pagination flex justify-center items-center px-4 lg:px-8">
+    <div v-if="!products.length" class="pb-2">
+      <n-empty description="Không có sản phẩm nào" />
+    </div>
+    <div v-else class="pagination flex justify-center items-center px-4 lg:px-8">
       <button @click="prevPage" :disabled="page === 1" class="icon-pagination">
         <font-awesome-icon :icon="['fas', 'arrow-left']" />
       </button>
@@ -270,8 +312,12 @@ import {
   TransitionRoot
 } from '@headlessui/vue';
 import { XMarkIcon } from '@heroicons/vue/24/outline';
+import { SearchOutline, ReloadOutline } from '@vicons/ionicons5';
+import { cloneDeep } from 'lodash';
 
 import { getImgUrl, formatMoney, getUserData } from '@/utils/common';
+import { productSort, priceRange, productStatus } from '@/utils/constant';
+
 
 const props = defineProps({
   products: Array
@@ -282,17 +328,25 @@ const cartItems = inject('cartItems');
 const message = useMessage();
 const router = useRouter();
 
-const formInit = {
+const formProductInit = {
   color: null,
   size: null,
   quantity: 1
 };
+const formProduct = ref({
+  ...formProductInit
+});
+
+const formSearchInit = {
+  priceRange: null,
+  sort: null,
+  status: null,
+  name: ''
+};
+const formSearch = ref(cloneDeep(formSearchInit));
 
 const selectedProduct = ref(null);
 const dialogOpen = ref(false);
-const formProduct = ref({
-  ...formInit
-});
 const page = ref(1);
 const pageSize = 6;
 const products = ref([]);
@@ -304,7 +358,7 @@ const openProductDialog = product => {
 
 const closeProductDialog = () => {
   formProduct.value = {
-    ...formInit
+    ...formProductInit
   };
   dialogOpen.value = false;
 };
@@ -329,6 +383,48 @@ const currentPageProducts = computed(() => {
   return products.value.slice(startIdx, endIdx);
 });
 
+const outOfStock = remaining => {
+  return !remaining || Number(remaining) <= 0;
+};
+
+const handleSearch = () => {
+  const searchValues = formSearch.value;
+  products.value = cloneDeep(props.products)
+    .filter(product => {
+      if (!searchValues.name) return true;
+      return product.name?.toLowerCase()?.includes(searchValues.name.toLowerCase());
+    })
+    .filter(product => {
+      if (!searchValues.priceRange) return true;
+      const [priceFrom, priceTo] = searchValues.priceRange.split(',');
+      if (priceFrom === '0') return product.price < Number(priceTo);
+      if (priceTo === '0') return product.price > Number(priceFrom);
+      return Number(priceFrom) <= product.price && product.price <= Number(priceTo);
+    })
+    .filter(product => {
+      if (!searchValues.status) return true;
+      const isOutOfStock = outOfStock(product.remaining)
+      return searchValues.status === 'outOfStock' ? isOutOfStock : !isOutOfStock
+    })
+    .sort((a, b) => {
+      switch (searchValues.sort) {
+        case 'priceAsc':
+          return a.price - b.price;
+        case 'priceDesc':
+          return b.price - a.price;
+        case 'nameAsc':
+          return a?.toLowerCase()?.localeCompare(b?.toLowerCase());
+        default:
+          return 0;
+      }
+    });
+};
+
+const handleReset = () => {
+  formSearch.value = { ...formSearchInit };
+  products.value = cloneDeep(props.products);
+};
+
 const onAddToCart = () => {
   const userData = getUserData();
   if (!userData) {
@@ -350,7 +446,7 @@ const onAddToCart = () => {
 watch(
   () => props.products,
   val => {
-    products.value = val;
+    products.value = cloneDeep(val);
   },
   {
     deep: true,

@@ -74,6 +74,40 @@ export const productTypes = [
     }
 ]
 
+export const productSort = [
+    {
+        label: 'Giá từ thấp đến cao',
+        value: 'priceAsc'
+    },
+    {
+        label: 'Giá từ cao đến thấp',
+        value: 'priceDesc'
+    },
+    {
+        label: 'Mới nhất',
+        value: 'newest'
+    },
+    {
+        label: 'Cũ nhất',
+        value: 'oldest'
+    },
+    {
+        label: 'Tên sản phẩm từ A -> Z',
+        value: 'nameAsc'
+    }
+]
+
+export const productStatus = [
+    {
+        label: 'Còn hàng',
+        value: 'inStock'
+    },
+    {
+        label: 'Hết hàng',
+        value: 'outOfStock'
+    }
+]
+
 
 export const productClothesSizes = [
     { label: 'XXS', value: 'XXS' },
