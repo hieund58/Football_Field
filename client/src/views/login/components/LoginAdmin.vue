@@ -1,65 +1,118 @@
 <template>
   <div>
-    <div v-if="!adminLoggedIn" class="login-container">
-      <h2>Đăng nhập admin</h2>
-      <input type="text" v-model="loginData.email" placeholder="Username" />
-      <input type="password" v-model="loginData.password" placeholder="Password" />
-      <button @click="login">Đăng nhập</button>
+    <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+      <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-[#FA4516]">Đăng Nhập Admin</h2>
     </div>
-    <div v-else class="login-container">
-      <h2>Bạn đã đăng nhập!</h2>
-      <p>Xin chào, {{ getUsernameFromSession }}</p>
-      <router-link to="/admin/home" class="block py-2 px-4 text-blue-500 underline">Truy cập trang chủ admin</router-link>
-      <!-- Nút logout -->
+
+    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      <div class="mb-2 ml-1">
+        <span style="font-size: 14px">Tên tài khoản</span>
+        <span style="color: #d03050">&nbsp;*</span>
+      </div>
+
+      <n-form ref="formRef" :model="user" :rules="rules">
+        <n-form-item path="email" label="Email" :show-label="false">
+          <n-input v-model:value="user.email" placeholder="Email" @keydown.enter.prevent />
+        </n-form-item>
+
+          <div class="mb-2 ml-1">
+            <span style="font-size: 14px">Mật khẩu</span>
+            <span style="color: #d03050">&nbsp;*</span>
+          </div>
+
+        <n-form-item path="password" :show-label="false">
+          <n-input v-model:value="user.password" type="password" placeholder="Mật khẩu" show-password-on="click" />
+        </n-form-item>
+
+        <n-button type="info" block @click="handleLogin">Đăng nhập</n-button>
+      </n-form>
+
+      <div class="text-center mt-3">
+      <div class="font-semibold leading-6 text-indigo-600 hover:text-indigo-500 hover:cursor-pointer" @click="emits('go-user')">
+          Đăng Nhập User
+      </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import axios from 'axios';
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import { useLoadingBar, useMessage } from 'naive-ui';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
+import { useLoadingBar, useMessage } from 'naive-ui';
 
+const emits = defineEmits(['go-user'])
+
+const router = useRouter();
 const loadingBar = useLoadingBar();
 const message = useMessage();
-const router = useRouter();
 
-const loginData = ref({
+const formRef = ref(null);
+const user = ref({
   email: '',
   password: ''
 });
 
-async function login() {
-  sessionStorage.removeItem('userData');
-  sessionStorage.removeItem('userToken');
-
-  loadingBar.start();
-  try {
-    const response = await axios.post('http://localhost:5000/api/login/admin', loginData.value);
-    message.success('Đăng nhập admin thành công');
-    sessionStorage.setItem('userToken', response.data.token); // Lưu token trong sessionStorage
-    sessionStorage.setItem('userData', JSON.stringify(response.data.user)); // Lưu thông tin người dùng trong sessionStorage
-    const userChangeEvent = new Event('user-data-change');
-    window.dispatchEvent(userChangeEvent);
-    router.push('/admin/home');
-  } catch (error) {
-    message.error(error?.response?.data?.message || 'Đăng nhập thất bại');
-  } finally {
-    loadingBar.finish();
-  }
-}
-const adminLoggedIn = computed(() => {
-  if (!sessionStorage.getItem('userData')) return false;
-  const userData = JSON.parse(sessionStorage.getItem('userData'));
-  return userData?.role === 'admin';
-});
-
-const getUsernameFromSession = computed(() => (adminLoggedIn.value ? 'Admin' : ''));
+const rules = {
+  email: [
+    {
+      required: true,
+      message: 'Tên tài khoản bắt buộc',
+      trigger: ['input', 'blur']
+    }
+  ],
+  password: [
+    {
+      required: true,
+      message: 'Mật khẩu bắt buộc',
+      trigger: ['input', 'blur']
+    }
+  ]
+};
+const handleLogin = () => {
+  formRef.value
+    ?.validate(errors => {
+      if (errors) return;
+      loadingBar.start();
+      // Tạo một đối tượng user để đăng nhập
+      const loginUser = {
+        email: user.value.email,
+        password: user.value.password
+      };
+      // Gửi yêu cầu đăng nhập đến backend
+      axios
+        .post('http://localhost:5000/api/login/admin', loginUser)
+        .then(response => {
+          if (response.status === 200) {
+            message.success('Đăng nhập thành công');
+            // Lưu token và thông tin người dùng vào sessionStorage
+            sessionStorage.setItem('userToken', response.data.token); // Lưu token trong sessionStorage
+            sessionStorage.setItem('userData', JSON.stringify(response.data.user)); // Lưu thông tin người dùng trong sessionStorage
+            const userChangeEvent = new Event('user-data-change');
+            window.dispatchEvent(userChangeEvent);
+            // Chuyển hướng đến trang sau khi đăng nhập thành công
+            loadingBar.finish();
+            router.push('/admin/home');
+          } else {
+            message.error(response.data.message);
+          }
+        })
+        .catch(error => {
+          // Xử lý lỗi nếu có
+          console.error('Đăng nhập thất bại:', error);
+          message.error(error?.response?.data?.message || 'Đăng nhập thất bại');
+        })
+        .finally(() => {
+          loadingBar.finish();
+        });
+    })
+    .catch(() => {});
+};
 
 function onKeyUpEnter(event) {
   if (event?.keyCode === 13) {
-    login();
+    handleLogin();
   }
 }
 
@@ -71,35 +124,3 @@ onBeforeUnmount(() => {
   window.removeEventListener('keyup', onKeyUpEnter, true);
 });
 </script>
-
-<style>
-.login-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-  margin: auto;
-}
-.login-container h2 {
-  margin-bottom: 10px;
-  padding: 10px;
-  font-size: 20px;
-  font-weight: bold;
-}
-.login-container input {
-  margin-bottom: 20px;
-  padding: 10px;
-  width: 200px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-.login-container button {
-  padding: 10px 20px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-</style>

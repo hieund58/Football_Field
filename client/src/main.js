@@ -67,9 +67,7 @@ import FieldBookingDetail from "./views/field-booking/components/Booking.vue";
 import Store from "./views/store/index.vue";
 import NewsDetail from "./views/home/components/NewsDetail.vue";
 import AboutUs from "./views/home/components/AboutUs.vue";
-import Login from "./views/login/components/LoginUser.vue";
-import LoginAdmin from "./views/login/components/LoginAdmin.vue";
-import Register from "./views/login/components/Register.vue";
+import Login from "./views/login/index.vue";
 import Contact from "./views/contact/index.vue";
 import UserProfile from "./views/profile/index.vue";
 import HomeAdmin from "./views/admin/index.vue";
@@ -89,8 +87,6 @@ const router = createRouter({
     { path: "/tintuc", component: NewsDetail },
     { path: "/aboutus", component: AboutUs },
     { path: "/login", component: Login },
-    { path: "/admin", component: LoginAdmin },
-    { path: "/register", component: Register },
     { path: "/contact", component: Contact },
     { path: "/user", component: UserProfile },
     { path: "/admin/home", component: HomeAdmin }

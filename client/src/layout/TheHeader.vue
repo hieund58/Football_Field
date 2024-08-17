@@ -136,15 +136,22 @@
       </div>
 
       <div class="hidden md:flex flex-1 justify-end">
-        <div v-if="!isLoggedIn || user?.role === 'user'" class="flex items-center">
+        <div class="flex items-center">
           <button
-            v-if="!isLoggedIn"
+            v-if="!user?.role"
             class="text-lg font-semibold leading-6 text-gray-900 hover:cursor-pointer mr-10"
             @click="redirectToLogin"
           >
             Đăng nhập
           </button>
-          <div v-else class="flex flex-row items-center">
+          <button
+            v-else-if="user?.role === 'admin'"
+            class="text-lg font-semibold leading-6 text-gray-900 hover:cursor-pointer mr-10"
+            @click="logout"
+          >
+            Đăng xuất
+          </button>
+          <div v-else-if="user?.role === 'user'" class="flex flex-row items-center">
             <n-badge :value="hasItemsInCart" :max="9" class="mr-4">
               <div class="avatar" title="Giỏ hàng" @click="openShoppingCart">
                 <img
@@ -200,7 +207,6 @@ import ShoppingCart from '../components/shopping-cart/ShoppingCart.vue';
 
 const router = useRouter();
 const route = useRoute();
-console.log('🚀 ~ route:', route);
 
 const cartItems = inject('cartItems');
 
