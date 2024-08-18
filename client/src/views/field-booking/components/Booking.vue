@@ -12,7 +12,7 @@
       </h2>
       <n-grid cols="1 m:3" responsive="screen" :x-gap="10">
         <n-gi :span="2">
-          <n-carousel effect="fade" style="min-height: 400px" autoplay :interval="3000">
+          <n-carousel effect="fade" style="min-height: 400px" autoplay :interval="3000" show-arrow :show-dots="false">
             <n-carousel-item v-for="imgSrc in detail.detailImgSrc" :style="{ width: '100%' }">
               <img class="carousel-img" :src="getImgUrl(imgSrc)" />
             </n-carousel-item>
