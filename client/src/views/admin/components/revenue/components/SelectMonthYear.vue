@@ -14,14 +14,24 @@
         size="small"
         :is-date-disabled="dateDisabled"
       />
-      <n-date-picker v-else v-model:value="form.timestamp" type="year" clearable size="small" :is-date-disabled="dateDisabled"/>
+      <n-date-picker
+        v-else
+        v-model:value="form.timestamp"
+        type="year"
+        clearable
+        size="small"
+        :is-date-disabled="dateDisabled"
+      />
     </n-gi>
   </n-grid>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { DateTime } from 'luxon';
+import { formatQueryDate } from '@/utils/common';
+
+const emits = defineEmits(['time-change']);
 
 const options = [
   { label: 'Tháng', value: 'month' },
@@ -29,9 +39,9 @@ const options = [
 ];
 
 function dateDisabled(ts) {
-        const date = new Date(ts)
-        return date > new Date()
-      }
+  const date = new Date(ts);
+  return date > new Date();
+}
 
 const form = ref({
   type: 'month',
@@ -39,4 +49,21 @@ const form = ref({
 });
 
 const showMonth = computed(() => form.value.type === 'month');
+
+watch(
+  () => form.value,
+  val => {
+    const date = DateTime.fromMillis(val.timestamp);
+    const dateFrom = val.type === 'month' ? date.startOf('month') : date.startOf('year');
+    const dateTo = val.type === 'month' ? date.endOf('month') : date.endOf('year');
+    emits('time-change', {
+      dateFrom: formatQueryDate(dateFrom),
+      dateTo: formatQueryDate(dateTo)
+    });
+  },
+  {
+    immediate: true,
+    deep: true
+  }
+);
 </script>

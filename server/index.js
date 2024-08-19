@@ -35,6 +35,7 @@ const returnurl = require('../server/routes/api/returnurl');
 const users = require('../server/routes/api/users');
 const paypal = require('../server/routes/api/paypalv2');
 const field = require('../server/routes/api/field')
+const revenue = require('../server/routes/api/revenue')
 
 app.use('/api/vnpay_ipn', ipnurl);
 app.use('/api/vnpay_return', returnurl);
@@ -49,6 +50,7 @@ app.use('/api/process-payment', payment);
 app.use('/api/users', users);
 app.use('/api/paypal', paypal);
 app.use('/api/field', field);
+app.use('/api/revenue', revenue);
 // ... Các phần khác của ứng dụng ...
 
 // Biến folder uploads thành tĩnh để truy cập ảnh

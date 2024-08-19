@@ -17,9 +17,7 @@ export const formatDateVn = date => {
 };
 
 export const formatQueryDate = date => {
-  console.log(typeof date);
   let luxonDate;
-  // const luxonDate = typeof date === 'string' ? DateTime.fromISO(date) : typeof date === 'object' ? DateTime.fromJSDate(date) : date;
   switch (typeof date) {
     case 'string':
       luxonDate = DateTime.fromISO(date);
