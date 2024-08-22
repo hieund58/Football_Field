@@ -14,7 +14,7 @@
         <n-gi :span="2">
           <n-carousel effect="fade" style="min-height: 400px" autoplay :interval="3000" show-arrow :show-dots="false">
             <n-carousel-item v-for="imgSrc in detail.detailImgSrc" :style="{ width: '100%' }">
-              <img class="carousel-img" :src="getImgUrl(imgSrc)" />
+              <n-image object-fit="cover" :src="getImgUrl(imgSrc)" class="rounded-[10px]" />
             </n-carousel-item>
           </n-carousel>
         </n-gi>
@@ -115,13 +115,6 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
-.carousel-img {
-  margin: 0 auto;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 10px;
-}
 
 .wrapper {
   height: auto;

@@ -24,10 +24,10 @@
             </div>
             <div class="mt-4 flex justify-center">
               <div>
-                <h3 class="text-sm text-gray-1000 text-lg font-semibold">
+                <h3 class="text-lg text-gray-1000 font-semibold">
                   {{ product.name }}
                 </h3>
-                <p class="mt-1 text-sm text-gray-500">{{ product.title }}</p>
+                <p class="mt-1 text-base text-gray-500">{{ product.title }}</p>
               </div>
             </div>
           </router-link>
