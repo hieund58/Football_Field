@@ -3,7 +3,7 @@
     <n-spin :show="loading">
       <n-grid cols="1 l:2" responsive="screen" x-gap="10" y-gap="10" class="w-full items-center mb-4">
         <n-gi :span="1">
-          <span class="text-lg font-[500]">5 sân được đặt nhiều nhất</span>
+          <span class="text-lg font-[500]"> Biểu đồ 5 sân được đặt nhiều nhất</span>
         </n-gi>
         <n-gi :span="1">
           <SelectMonthYear @time-change="onTimeChange" />

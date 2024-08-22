@@ -14,6 +14,10 @@ export const areaList = [
   {
     value: 'Định Công',
     label: 'Định Công'
+  },
+  {
+    value: 'Ba Đình',
+    label: 'Ba Đình'
   }
 ];
 
