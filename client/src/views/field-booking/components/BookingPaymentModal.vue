@@ -11,14 +11,18 @@
         </div>
         <div class="border-t border-b border-gray-200 py-4">
           <span class="block font-[600] mb-2">Bạn có chắc chắn đặt sân?</span>
-        <div class="flex flex-col w-full">
+        <div class="flex flex-col w-full text-base">
           <div class="flex flex-row justify-between mt-2">
-            <span class="font-[600]">Giá tiền</span>
+            <span class="font-[600]">Giá tiền VNĐ</span>
             <span class="font-[700] text-[#f03131]">{{ formatMoney(data?.fieldPrice) }}</span>
           </div>
           <div class="flex flex-row justify-between mt-2">
-            <span class="font-[600]">Giá tiền tương ứng USD</span>
+            <span class="font-[600]">Giá tiền USD</span>
             <span class="font-[700] text-[#f03131]">${{ vndToUsd(data?.fieldPrice) }} USD</span>
+          </div>
+          <div class="flex flex-row justify-between mt-2">
+            <span class="font-[600]">Tỷ giá </span>
+            <span class="font-[700] text-[#f03131]">{{ formatMoney(VND_TO_USD_RATE, ',', '') }}</span>
           </div>
           <div class="flex flex-row justify-between mt-2">
             <span class="font-[600]">Vào ngày</span>
@@ -67,7 +71,7 @@ import { useMessage } from 'naive-ui';
 import { LogoPaypal, CloseOutline, CloseCircleOutline } from '@vicons/ionicons5';
 import { useRouter } from 'vue-router';
 
-import { getUserData, vndToUsd, formatMoney, formatDateVn } from '@/utils/common';
+import { getUserData, vndToUsd, formatMoney, formatDateVn, VND_TO_USD_RATE } from '@/utils/common';
 
 const emits = defineEmits(['close', 'cancel-success']);
 

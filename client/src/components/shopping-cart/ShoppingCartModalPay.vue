@@ -16,15 +16,19 @@
         />
       </div>
 
-      <div class="flex flex-col w-full border-t border-b border-gray-200 py-4">
+      <div class="flex flex-col w-full border-t border-b border-gray-200 py-4 text-base">
         <div class="flex flex-row justify-between">
-          <span class="font-[600]">Giá tiền</span>
+          <span class="font-[600]">Giá tiền VNĐ</span>
           <span class="font-[700] text-[#f03131]">{{ formatMoney(data?.sumMoney) }}</span>
         </div>
         <div class="flex flex-row justify-between mt-2">
-          <span class="font-[600]">Giá tiền tương ứng USD</span>
+          <span class="font-[600]">Giá tiền USD</span>
           <span class="font-[700] text-[#f03131]">${{ vndToUsd(data?.sumMoney) }} USD</span>
         </div>
+        <div class="flex flex-row justify-between mt-2">
+            <span class="font-[600]">Tỷ giá </span>
+            <span class="font-[700] text-[#f03131]">{{ formatMoney(VND_TO_USD_RATE, ',', '') }}</span>
+          </div>
       </div>
 
       <template #footer>
@@ -51,7 +55,7 @@ import axios from 'axios';
 import { useMessage } from 'naive-ui';
 import { LogoPaypal, CloseOutline } from '@vicons/ionicons5';
 
-import { getUserData, vndToUsd, formatMoney, formatDateVn } from '@/utils/common';
+import { getUserData, vndToUsd, formatMoney, VND_TO_USD_RATE } from '@/utils/common';
 
 const emits = defineEmits(['close', 'cancel-success']);
 

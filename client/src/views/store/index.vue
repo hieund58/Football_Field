@@ -8,7 +8,7 @@
   <script setup>
   import axios from 'axios';
   import { ref, computed, onMounted } from 'vue';
-  import { useLoadingBar } from 'naive-ui';
+  import { useLoadingBar, useMessage } from 'naive-ui';
   import { useRoute, useRouter } from 'vue-router';
   
   import { productClothesSizes, productShoeSizes } from '@/utils/constant';
@@ -17,6 +17,7 @@
   import Equipments from './components/Equipments.vue';
   
   const loadingBar = useLoadingBar();
+  const message = useMessage();
   const route = useRoute();
   const router = useRouter();
   

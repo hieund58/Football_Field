@@ -18,6 +18,9 @@ const paymentSchema = new mongoose.Schema({
   }],
   price: String,
   status: String, // pending, error or paid
+  createdDate: Date,
+  finishedDate: Date,
+  paymentDetail: Object
 });
 
 // paymentSchema.plugin(timeZone);

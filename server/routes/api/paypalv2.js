@@ -66,6 +66,7 @@ router.post("/create", async (req, res) => {
       price,
       paymentMethod: paymentMethod || "banking",
       status: "pending",
+      createdDate: new Date(),
     });
 
     await newPayment.save();
@@ -89,7 +90,14 @@ router.post("/execute", async (req, res) => {
     // If call returns body in response, you can get the deserialized version from the result attribute of the response.
     console.log(`Capture: ${JSON.stringify(response.result)}`);
 
-    await Payment.findOneAndUpdate({ paymentId }, { status: "paid" });
+    await Payment.findOneAndUpdate(
+      { paymentId },
+      {
+        status: "paid",
+        finishedDate: new Date(),
+        paymentDetail: response.result,
+      }
+    );
     const paidPayment = await Payment.findOne({ paymentId });
     console.log("🚀 ~ router.post ~ paidPayment:", paidPayment);
 

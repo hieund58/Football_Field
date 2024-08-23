@@ -55,7 +55,9 @@ export const getUserData = () => {
   return userDataString ? JSON.parse(userDataString) : null;
 };
 
+export const VND_TO_USD_RATE = 25217.5;
+
 export const vndToUsd = vnd => {
   if (isNaN(parseFloat(vnd))) return null;
-  return String((Number(vnd) / 25217.5).toFixed(2));
+  return String((Number(vnd) / VND_TO_USD_RATE).toFixed(2));
 };
