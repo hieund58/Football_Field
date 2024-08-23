@@ -1,57 +1,40 @@
-import { createRouter, createWebHistory } from "vue-router";
-import App from "../App.vue";
+import { createRouter, createWebHistory } from 'vue-router';
+
+import { getUserData } from '@/utils/common';
+
 const routes = [
   {
-    path: "/app",
-    component: App,
-    children: [
-      {
-        path: "bookingball",
-        name: "BookingBall",
-        component: () =>
-          import("../components/DatSanBong/BookingBallLayout.vue"),
-      },
-      {
-        path: "detailball/:id",
-        component: () => import("../components/ChiTietSan/DetailBall.vue"),
-      },
-      {
-        path: "detailball/:id/thanhtoanball/:sanId/:selectDate/:selectTime",
-        name: "thanhtoanball",
-        component: () => import("../components/ThanhToan/ThanhToanBall.vue"),
-        props: true,
-      },
-      {
-        path: "aboutus",
-        component: () => import("../components/AboutUs.vue"),
-      },
-      {
-        path: "contact",
-        component: () => import("../components/ConTact.vue"),
-      },
-      {
-        path: "login",
-        component: () => import("../components/Account/Login.vue"),
-      },
-      {
-        path: "register",
-        component: () => import("../components/Account/Register.vue"),
-      },
-      {
-        path: "UserManager",
-        component: () => import("../components/Admin/UserManager.vue"),
-      },
-      {
-        path: "quanao",
-        component: () => import("../components/QuanAo/Category.vue"),
-      },
-    ],
+    path: '/',
+    component: () => import('@/views/index.vue'),
+    alias: '/home'
   },
+  { path: '/bookingball', component: () => import('@/views/field-booking/index.vue') },
+  { path: '/detailball/:id', component: () => import('@/views/field-booking/components/Booking.vue') },
+  { path: '/store', component: () => import('@/views/store/index.vue') },
+  { path: '/tintuc', component: () => import('@/views/home/components/NewsDetail.vue') },
+  { path: '/aboutus', component: () => import('@/views/home/components/AboutUs.vue') },
+  { path: '/login', component: () => import('@/views/login/index.vue') },
+  { path: '/contact', component: () => import('@/views/contact/index.vue') },
+  { path: '/user', component: () => import('@/views/profile/index.vue') },
+  {
+    path: '/admin/home',
+    component: () => import('@/views/admin/index.vue'),
+    meta: {
+      requiresAuth: true
+    }
+  }
 ];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes
+});
+
+router.beforeEach((to, _from) => {
+  if (to.meta.requiresAuth && getUserData()?.role !== 'admin') {
+    console.log('Không có quyền vào trang này');
+    return { path: '/' };
+  }
 });
 
 export default router;

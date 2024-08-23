@@ -236,6 +236,7 @@ const redirectToLogin = () => {
 const logout = () => {
   // Xóa thông tin người dùng từ sessionStorage
   sessionStorage.removeItem('userData');
+  sessionStorage.removeItem('userToken');
   isLoggedIn.value = false;
   user.value = null;
   redirectToLogin();
