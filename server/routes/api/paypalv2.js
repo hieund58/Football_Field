@@ -130,14 +130,4 @@ router.post("/execute", async (req, res) => {
   }
 });
 
-// Lấy danh sách đơn hàng
-router.get("/list", async (req, res) => {
-  try {
-    const payments = await Payment.find();
-    res.json(payments);
-  } catch (error) {
-    res.status(500).json({ error: "Lỗi khi lấy danh sách đơn hàng" });
-  }
-});
-
 module.exports = router;
