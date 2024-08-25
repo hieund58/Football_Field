@@ -21,11 +21,17 @@
     <n-form ref="formRef" size="small" :model="formModel" :rules="!detailMode ? rules : {}" class="w-full">
       <n-grid cols="2 md:1" responsive="screen" :x-gap="10">
         <n-form-item-gi :span="1" path="name" label="Tên sân">
-          <n-input v-if="!detailMode" v-model:value="formModel.name" placeholder="Tên sân" />
+          <n-input v-if="!detailMode" v-model:value="formModel.name" placeholder="Tên sân" maxlength="255" show-count />
           <span v-else>{{ formModel.name }}</span>
         </n-form-item-gi>
         <n-form-item-gi :span="1" path="address" label="Địa chỉ">
-          <n-input v-if="!detailMode" v-model:value="formModel.address" placeholder="Địa chỉ" />
+          <n-input
+            v-if="!detailMode"
+            v-model:value="formModel.address"
+            placeholder="Địa chỉ"
+            maxlength="255"
+            show-count
+          />
           <span v-else>{{ formModel.address }}</span>
         </n-form-item-gi>
         <n-form-item-gi :span="1" path="area" label="Thuộc khu vực">
@@ -43,7 +49,7 @@
             v-if="!detailMode"
             v-model:value="formModel.price"
             :format="val => val?.toString()?.replace(/^[+-]?\d+/, int => int.replace(/(\d)(?=(\d{3})+$)/g, `$1,`))"
-            :parse="val => Number(val?.toString()?.replaceAll(',', '') || 0)"
+            :parse="val => Number(/^\d*$/.test(val) ? val?.toString()?.replaceAll(',', '') : 0)"
             :show-button="false"
             placeholder="Giá"
             class="w-full"
@@ -146,7 +152,7 @@ const message = useMessage();
 const formInit = {
   name: '',
   address: '',
-  area: undefined,
+  area: null,
   price: null,
   playerNum: '',
   description: {
@@ -165,7 +171,33 @@ const loading = ref(false);
 
 const rules = {
   name: [{ required: true, message: 'Thông tin bắt buộc', trigger: ['change', 'blur'] }],
-  avatar: [{ required: true, message: 'Thông tin bắt buộc', type: 'array', trigger: ['change', 'blur'] }]
+  avatar: [{ required: true, message: 'Thông tin bắt buộc', type: 'array', trigger: ['change', 'blur'] }],
+  address: [{ required: true, message: 'Thông tin bắt buộc', trigger: ['change', 'blur'] }],
+  area: [{ required: true, message: 'Thông tin bắt buộc', trigger: ['change', 'blur'] }],
+  price: [
+    {
+      required: true,
+      validator(rule, value) {
+        if (!value) return new Error('Thông tin bắt buộc là kiểu số > 0');
+        else if (!/^\d*$/.test(value)) return new Error('Giá trị phải là kiểu số');
+        return true;
+      },
+      trigger: ['input', 'blur']
+    }
+  ],
+  playerNum: [
+    {
+      required: true,
+      validator(rule, value) {
+        if (!value || Number(value) === 0) return new Error('Thông tin bắt buộc');
+        else if (!/^\d*$/.test(value)) return new Error('Giá trị phải là kiểu số');
+        else if (Number(value) > 30) return new Error('Số người từ 5 đến 30 người');
+        else if (Number(value) < 5) return new Error('Số người từ 5 đến 30 người');
+        return true;
+      },
+      trigger: ['input', 'blur']
+    }
+  ]
 };
 
 const title = computed(() => {
