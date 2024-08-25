@@ -1,26 +1,26 @@
 <template>
   <div class="flex flex-col justify-between h-full">
     <div>
-      <h1 class="text-lg font-bold mb-2">Thông tin sân đã đặt</h1>
+      <h1 class="text-lg font-bold mb-2">Thông tin sản phẩm đã mua</h1>
       <n-input-group>
         <n-date-picker v-model:value="searchDateRange" type="daterange" format="dd-MM-yyyy" class="!w-[300px]" />
         <n-button ghost @click="handleSearch">
-            <template #icon>
-              <n-icon><SearchOutline /></n-icon>
-            </template>
-          </n-button>
-          <n-button ghost @click="handleReset">
-            <template #icon>
-              <n-icon><ReloadOutline /></n-icon>
-            </template>
-          </n-button>
+          <template #icon>
+            <n-icon><SearchOutline /></n-icon>
+          </template>
+        </n-button>
+        <n-button ghost @click="handleReset">
+          <template #icon>
+            <n-icon><ReloadOutline /></n-icon>
+          </template>
+        </n-button>
       </n-input-group>
       <table class="transaction-table">
         <thead>
           <tr class="header">
             <th>STT</th>
-            <th>Tên Sân</th>
-            <th>Địa Chỉ</th>
+            <th>Tên Sản phẩm</th>
+            <th>Số lượng</th>
             <th>Thời Gian Giao Dịch</th>
             <th>Số tiền</th>
             <th>Trạng thái giao dịch</th>
@@ -31,18 +31,17 @@
         <tbody class="w-full">
           <tr v-for="(san, index) in filteredData" :key="index" class="content-tt">
             <td>{{ index + (page - 1) * pageSize + 1 }}</td>
-            <td>{{ san?.fieldDetail?.name }}</td>
-            <td>{{ san?.fieldDetail?.address }}</td>
-            <td>{{ DateTime.fromISO(san.createdDate).toFormat('dd-MM-yyyy HH:mm:ss') }}</td>
-            <td>{{ formatMoney(san?.fieldDetail?.price) }}</td>
-            <td>{{ san.status }}</td>
+            <td>{{ san?.name }}</td>
+            <td>{{ san?.quantity }}</td>
+            <td>{{ DateTime.fromISO(san.paymentInfo.createdDate).toFormat('dd-MM-yyyy HH:mm:ss') }}</td>
+            <td>{{ formatMoney(Number(san?.price || 0) * Number(san?.quantity || 0)) }}</td>
+            <td>{{ san.paymentInfo.status }}</td>
             <td>
               <button @click="viewInvoice(san)">Xem Hoá Đơn</button>
               <!-- Thêm nút Xem Hoá Đơn -->
             </td>
           </tr>
         </tbody>
-
       </table>
       <div v-if="!filteredData.length" class="w-full h-[50px] flex justify-center items-center">Không có dữ liệu</div>
     </div>
@@ -81,45 +80,51 @@
           <div class="invoice-header">
             <p class="invoice-title">Hoá Đơn Thanh Toán</p>
             <p class="invoice-date">
-              Ngày: {{ DateTime.fromISO(selectedReservation.createdDate).toFormat('dd-MM-yyyy') }}
+              Ngày: {{ DateTime.fromISO(selectedReservation.paymentInfo.createdDate).toFormat('dd-MM-yyyy') }}
             </p>
           </div>
           <div class="invoice-body">
             <p>
-              <strong>Tên Sân:</strong>
-              {{ selectedReservation ? selectedReservation.fieldDetail.name : '' }}
+              <strong>Tên Sản phẩm:</strong>
+              {{ selectedReservation ? selectedReservation.name : '' }}
             </p>
             <p>
-              <strong>Địa Chỉ:</strong>
-              {{ selectedReservation ? selectedReservation.fieldDetail.address : '' }}
+              <strong>Số lượng:</strong>
+              {{ selectedReservation ? selectedReservation.quantity : '' }}
             </p>
             <p>
               <strong>Thời Gian Giao Dịch:</strong>
               {{
                 selectedReservation
-                  ? DateTime.fromISO(selectedReservation.createdDate).toFormat('dd-MM-yyyy HH:mm:ss')
+                  ? DateTime.fromISO(selectedReservation.paymentInfo.createdDate).toFormat('dd-MM-yyyy HH:mm:ss')
                   : ''
               }}
             </p>
             <p>
               <strong>Người giao dịch:</strong>
-              {{
-                selectedReservation?.fromUser
-              }}
+              {{ selectedReservation?.paymentInfo.fromUser }}
             </p>
             <p>
               <strong>Số tiền:</strong>
-              {{ selectedReservation ? formatMoney(selectedReservation.fieldDetail.price) : '' }}
+              {{
+                selectedReservation
+                  ? formatMoney(Number(selectedReservation.price) * Number(selectedReservation.quantity))
+                  : ''
+              }}
             </p>
             <p>
               <strong>Trạng thái giao dịch:</strong>
-              {{ selectedReservation ? selectedReservation.status : '' }}
+              {{ selectedReservation ? selectedReservation.paymentInfo.status : '' }}
             </p>
           </div>
           <div class="invoice-footer">
             <p class="total-amount">
               <strong>Tổng cộng:</strong>
-              {{ selectedReservation ? formatMoney(selectedReservation.fieldDetail.price) : '' }}
+              {{
+                selectedReservation
+                  ? formatMoney(Number(selectedReservation.price) * Number(selectedReservation.quantity))
+                  : ''
+              }}
             </p>
           </div>
         </div>
@@ -129,10 +134,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import axios from 'axios';
 import { DateTime } from 'luxon';
-import { Eye, SearchOutline, ReloadOutline } from '@vicons/ionicons5';
+import { SearchOutline, ReloadOutline } from '@vicons/ionicons5';
 
 import { getUserData, formatQueryDate, formatDateVn, formatMoney } from '@/utils/common';
 
@@ -154,7 +159,6 @@ const nextPage = () => {
     page.value++;
   }
 };
-
 
 let filteredData = computed(() => {
   const startIdx = (page.value - 1) * pageSize;
@@ -179,19 +183,18 @@ const handleSearch = async () => {
       fromUser: getUserData()?.email,
       dateFrom: formatQueryDate(searchDateRange.value[0]),
       dateTo: formatQueryDate(searchDateRange.value[1]),
-      type: 'booking'
+      type: 'purchase'
     };
     const response = await axios.get('http://localhost:5000/api/process-payment', { params });
     data.value = response.data;
   } catch (error) {
-    console.error('Lỗi khi lấy thông tin các sân đã được đặt:', error);
+    console.error('Lỗi khi lấy thông tin sản phẩm đã mua:', error);
   }
-}
+};
 
 const handleReset = () => {
-  data.value = []
-}
-
+  data.value = [];
+};
 </script>
 
 <style lang="scss" scoped>
@@ -200,7 +203,7 @@ const handleReset = () => {
   border-collapse: collapse;
   border: 1px solid #e0e0e0;
   margin: 10px 0px;
-  display: table
+  display: table;
 }
 
 .transaction-table th,

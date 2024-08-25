@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Payment = require("../../db/payment");
 const Field = require("../../db/field");
+const Product = require("../../db/product");
 
 router.post("/", async (req, res) => {
   try {
@@ -77,11 +78,48 @@ router.get("/", async (req, res) => {
         $lte: dateTo,
       },
     });
-    const result = await Promise.all(payments.map(async item => {
-      const fieldDetail = await Field.findById(item.bookingData.fieldId);
-      return { ...item._doc, fieldDetail }
-    }))
-    
+    let result;
+    if (type === "booking") {
+      result = await Promise.all(
+        payments.map(async (item) => {
+          const fieldDetail = await Field.findById(item.bookingData.fieldId);
+          return { ...item._doc, fieldDetail };
+        })
+      );
+    } else {
+      const purchaseData = payments.flatMap(payment => {
+        return payment.purchaseData.map(item => ({
+          ...item._doc,
+          paymentInfo: payment,
+
+        }))
+        // return {
+        //   ...payment.purchaseData,
+        //   createdDate: payment.createdDate,
+        //   finishedDate: payment.finishedDate,
+        //   status: payment.status,
+        //   detail: payment.detail
+        // }
+      })
+      result = await Promise.all(purchaseData.map(async item => {
+        const productDetail = await Product.findById(item.productId);
+        return { ...item, name: productDetail.name };
+      }))
+
+      console.log("🚀 ~ purchaseData ~ purchaseData:", result)
+
+      // for (const payment of payments) {
+      //   const purchaseData = await Promise.all(
+      //     payment.purchaseData.map(async (item) => {
+      //       const productDetail = await Product.findById(item.productId);
+      //       return { ...item._doc, productDetail };
+      //     })
+      //   );
+      //   payment.purchaseData = purchaseData;
+      // }
+      // result = payments;
+    }
+
     res.status(200).json(result);
   } catch (error) {
     console.error("Lỗi khi lấy thông tin các sân đã được đặt:", error);

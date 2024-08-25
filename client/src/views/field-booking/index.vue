@@ -100,7 +100,7 @@ const initSearchForm = {
 };
 const searchForm = ref(cloneDeep(initSearchForm));
 const page = ref(1);
-const pageSize = 12;
+const pageSize = 10;
 const fields = ref([
   {
     name: '',

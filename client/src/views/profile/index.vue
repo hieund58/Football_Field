@@ -19,7 +19,7 @@
           </li>
           <li @click="selectedTab = 'transactions'" :class="{ active: selectedTab === 'transactions' }">
             <font-awesome-icon :icon="['fas', 'file-invoice-dollar']" class="icon" />
-            Lịch Sử Giao Dịch
+            Lịch Sử Mua Hàng
           </li>
           <li @click="selectedTab = 'promotions'" :class="{ active: selectedTab === 'promotions' }">
             <font-awesome-icon :icon="['fas', 'tag']" class="icon" />
@@ -38,7 +38,7 @@
         <Account />
       </div>
       <BookingInfo v-if="selectedTab === 'bookings'" />
-      <div v-if="selectedTab === 'transactions'">Nội dung Lịch Sử Giao Dịch</div>
+      <StoreHistory v-if="selectedTab === 'transactions'"/>
       <div v-if="selectedTab === 'promotions'">Nội dung Ưu Đãi Và Khuyến Mãi</div>
       <div v-if="selectedTab === 'support'">Nội dung Hỗ Trợ</div>
     </div>
@@ -49,6 +49,7 @@
 import { ref, onBeforeMount } from 'vue';
 import Account from './components/Account.vue';
 import BookingInfo from './components/BookingInfo.vue';
+import StoreHistory from './components/StoreHistory.vue'
 
 const selectedTab = ref('account');
 const userImage = ref({
