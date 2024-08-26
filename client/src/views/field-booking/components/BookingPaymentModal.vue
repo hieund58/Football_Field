@@ -104,7 +104,7 @@ function checkPermission() {
   }
   return true;
 }
-
+//tạo ra lịch sân khi vào đặt sân
 const createDefaultSchedule = async () => {
   const payload = {
     fieldId: props.data?.fieldId,
@@ -116,7 +116,7 @@ const createDefaultSchedule = async () => {
     message.error(error?.response?.data?.message || 'Đặt lịch thất bại');
   }
 };
-
+//approvalUrl = link xác nhận thanh toán
 const handlePayment = async () => {
   if (!checkPermission()) return;
   const requestBody = {
@@ -135,7 +135,7 @@ const handlePayment = async () => {
     await createDefaultSchedule();
     const res = await axios.post('http://localhost:5000/api/paypal/create', requestBody);
     loading.value = false;
-    window.location.assign(res?.data?.approvalUrl);
+    window.location.assign(res?.data?.approvalUrl); // chuyển đến trang thanh toán
   } catch (error) {
     loading.value = false;
     message.error(error?.response?.data?.message || 'Đặt lịch thất bại');

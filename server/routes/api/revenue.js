@@ -1,3 +1,4 @@
+// doanh thu
 const express = require("express");
 const router = express.Router();
 const Payment = require("../../db/payment");
@@ -32,21 +33,24 @@ router.get("/most-booked-fields", async (req, res) => {
     const bookedNumbers = await getFieldsBookedNumber(dateFrom, dateTo);
 
     const top5Fields = Object.entries(bookedNumbers) // Tìm 5 fields có lần xuất hiện nhiều nhất, tương đương 5 fields đc đặt nhiều nhất
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
-
+    .sort((a, b) => b[1] - a[1])
+    console.log('top5Fields',top5Fields);
+    
     // trả về mảng có tên field tương ứng
-    const fieldNumber = await Promise.all(
+    let fieldNumber = await Promise.all(
       top5Fields?.map(async (field) => {
         const fieldDetail = await Field.findById(field[0]); // Tìm field detail theo id
+        console.log('fieldDetail',fieldDetail);
         return {
           fieldId: field[0],
-          fieldName: fieldDetail.name,
+          fieldName: fieldDetail?.name,
           bookedTimes: field[1],
         };
       })
     );
-
+    fieldNumber = fieldNumber.filter(field => !!field.fieldName)
+    .slice(0, 5);
+    
     return res.status(201).json(fieldNumber);
   } catch (error) {
     console.error(error);
@@ -61,16 +65,17 @@ router.get("/field-area-income", async (req, res) => {
     const bookedNumbers = await getFieldsBookedNumber(dateFrom, dateTo);
 
     // trả về mảng có tên field tương ứng
-    const fieldNumber = await Promise.all(
+    let fieldNumber = await Promise.all(
       Object.entries(bookedNumbers)?.map(async (field) => {
         const fieldDetail = await Field.findById(field[0]); // Tìm field detail theo id
         return {
           fieldId: field[0],
-          area: fieldDetail.area,
-          totalIncome: Number(field[1]) * fieldDetail.price,
+          area: fieldDetail?.area,
+          totalIncome: Number(field[1]) * fieldDetail?.price || 0,
         };
       })
     );
+    fieldNumber = fieldNumber.filter(field => !!field.area)
 
     const result = [];
 

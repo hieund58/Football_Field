@@ -20,7 +20,7 @@ const routes = [
     path: '/admin/home',
     component: () => import('@/views/admin/index.vue'),
     meta: {
-      requiresAuth: true
+      requiresAuth: true// không phải admin lưu ở local thì cook
     }
   }
 ];

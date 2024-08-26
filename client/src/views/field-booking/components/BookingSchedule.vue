@@ -215,8 +215,8 @@ const fetchSchedules = async () => {
 };
 
 const executePayment = async () => {
-  if (!route.query.token || !route.query.PayerID) {
-    router.replace({ query: {} });
+  if (!route.query.token || !route.query.PayerID) {// paypal trả về token(id của giao dịch), PayerID(id của người trả tiền)
+    router.replace({ query: {} });//nếu không thanh toán mà back về thì xóa token giao địch đi
     return;
   }
   const paymentId = route.query.token;

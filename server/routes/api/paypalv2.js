@@ -23,7 +23,7 @@ router.post("/create", async (req, res) => {
   try {
     const { bookingData, purchaseData, type, fromUser, price, paymentMethod } =
       req.body;
-
+    // yêu cầu tạo giao dịch
     let request = new paypal.orders.OrdersCreateRequest();
 
     const url =
@@ -42,23 +42,21 @@ router.post("/create", async (req, res) => {
         },
       ],
       application_context: {
-        return_url: url,
-        cancel_url: url,
+        return_url: url,// thanh toàn thành công thì đưa về địa chỉ này
+        cancel_url: url,// không thanh toán thì đưa để chỉ này
       },
     });
-
+    //await gọi api giao dịch
     let response = await client.execute(request);
-    // console.log(`Response: ${JSON.stringify(response)}`);
+    // response là cái trả về "đã được tạo"
 
-    // If call returns body in response, you can get the deserialized version from the result attribute of the response.
-    // console.log(`Order: ${JSON.stringify(response.result)}`);
-
+    // cho người confirm thanh toán
     const approvalUrl = response?.result?.links?.find(
       (link) => link.rel === "approve"
     ).href;
 
     const newPayment = new Payment({
-      paymentId: response.result?.id,
+      paymentId: response.result?.id,//Lưu id giao dịch vào DB
       bookingData,
       purchaseData,
       type,
@@ -70,7 +68,7 @@ router.post("/create", async (req, res) => {
     });
 
     await newPayment.save();
-    res.json({ approvalUrl });
+    res.json({ approvalUrl });//Trả FE link tới trang thanh toán
   } catch (error) {
     console.log("🚀 ~ router.post ~ error:", error);
     res.status(500).json({ error: "Lỗi khi tạo đơn hàng" });
@@ -84,22 +82,18 @@ router.post("/execute", async (req, res) => {
   try {
     request = new paypal.orders.OrdersCaptureRequest(paymentId);
     request.requestBody({});
-    // Call API with your client and get a response for your call
+    //BE gọi api để lưu thông tin giao dịch trên sever của paypal
     let response = await client.execute(request);
-    // console.log(`Response: ${JSON.stringify(response)}`);
-    // If call returns body in response, you can get the deserialized version from the result attribute of the response.
-    console.log(`Capture: ${JSON.stringify(response.result)}`);
 
     await Payment.findOneAndUpdate(
       { paymentId },
       {
-        status: "paid",
-        finishedDate: new Date(),
-        paymentDetail: response.result,
+        status: "paid",//update trạng thái là đã thanh toán
+        finishedDate: new Date(),//ngày thanh toán thành công
+        paymentDetail: response.result,// thông tin riêng của paypal ( hóa đơn của paypal)
       }
     );
     const paidPayment = await Payment.findOne({ paymentId });
-    console.log("🚀 ~ router.post ~ paidPayment:", paidPayment);
 
     if (paidPayment && paidPayment?.type === "booking") {
       const formattedDate = DateTime.fromJSDate(
