@@ -93,31 +93,11 @@ router.get("/", async (req, res) => {
           paymentInfo: payment,
 
         }))
-        // return {
-        //   ...payment.purchaseData,
-        //   createdDate: payment.createdDate,
-        //   finishedDate: payment.finishedDate,
-        //   status: payment.status,
-        //   detail: payment.detail
-        // }
       })
       result = await Promise.all(purchaseData.map(async item => {
         const productDetail = await Product.findById(item.productId);
         return { ...item, name: productDetail.name };
       }))
-
-      console.log("🚀 ~ purchaseData ~ purchaseData:", result)
-
-      // for (const payment of payments) {
-      //   const purchaseData = await Promise.all(
-      //     payment.purchaseData.map(async (item) => {
-      //       const productDetail = await Product.findById(item.productId);
-      //       return { ...item._doc, productDetail };
-      //     })
-      //   );
-      //   payment.purchaseData = purchaseData;
-      // }
-      // result = payments;
     }
 
     res.status(200).json(result);

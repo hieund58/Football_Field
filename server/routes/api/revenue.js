@@ -32,15 +32,13 @@ router.get("/most-booked-fields", async (req, res) => {
 
     const bookedNumbers = await getFieldsBookedNumber(dateFrom, dateTo);
 
-    const top5Fields = Object.entries(bookedNumbers) // Tìm 5 fields có lần xuất hiện nhiều nhất, tương đương 5 fields đc đặt nhiều nhất
-    .sort((a, b) => b[1] - a[1])
-    console.log('top5Fields',top5Fields);
+    const sortedFields = Object.entries(bookedNumbers)
+    .sort((a, b) => b[1] - a[1]) // Sắp xếp theo số lần sân được đặt
     
     // trả về mảng có tên field tương ứng
-    let fieldNumber = await Promise.all(
-      top5Fields?.map(async (field) => {
+    const fieldNumber = await Promise.all(
+      sortedFields?.map(async (field) => {
         const fieldDetail = await Field.findById(field[0]); // Tìm field detail theo id
-        console.log('fieldDetail',fieldDetail);
         return {
           fieldId: field[0],
           fieldName: fieldDetail?.name,
@@ -48,10 +46,10 @@ router.get("/most-booked-fields", async (req, res) => {
         };
       })
     );
-    fieldNumber = fieldNumber.filter(field => !!field.fieldName)
-    .slice(0, 5);
+    const top5Fields = fieldNumber.filter(field => !!field.fieldName) // Lọc các sân đã bị xóa
+    .slice(0, 5);  // Tìm 5 fields có lần xuất hiện nhiều nhất, tương đương 5 fields đc đặt nhiều nhất
     
-    return res.status(201).json(fieldNumber);
+    return res.status(201).json(top5Fields);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Đã xảy ra lỗi" });

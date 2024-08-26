@@ -34,11 +34,11 @@
     </div>
 
     <div class="p-4 rounded-lg bg-white border-solid border-[2px] border-gray-200 m-[10px] !mr-[15px] w-full">
-      <div v-if="selectedTab === 'account'">
+      <div v-show="selectedTab === 'account'">
         <Account />
       </div>
-      <BookingInfo v-if="selectedTab === 'bookings'" />
-      <StoreHistory v-if="selectedTab === 'transactions'"/>
+      <BookingInfo v-show="selectedTab === 'bookings'" />
+      <StoreHistory v-show="selectedTab === 'transactions'"/>
       <div v-if="selectedTab === 'promotions'">Nội dung Ưu Đãi Và Khuyến Mãi</div>
       <div v-if="selectedTab === 'support'">Nội dung Hỗ Trợ</div>
     </div>

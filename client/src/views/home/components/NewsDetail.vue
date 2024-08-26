@@ -1,10 +1,10 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper1">
     <div>
       <h1 class="text-2xl font-bold tracking-tight text-gray-900 text-center">
         HLV Gong Oh Kyun chính thức dẫn dắt CLB Công an Hà Nội, bao giờ ra mắt?
       </h1>
-      <small
+      <small class="block pb-4"
         >Sự kiện: <b style="color: #fa4516">HLV Gong Oh-Kyun</b> |
         <b style="color: #fa4516">V-League 2023-24: Cuộc đua nóng bỏng</b>
       </small>
@@ -19,8 +19,9 @@
       <img
         src="https://icdn.24h.com.vn/upload/4-2023/images/2023-10-31/368062530_848196136981500_2273071336428518557_n-740-1698745266-742-width740height451.jpg "
         alt=""
+        class="block mx-auto w-[50%] pt-4"
       />
-      <small
+      <small class="block pb-4"
         >HLV Gong Oh Kyun đạt thoả thuận để dẫn dắt CLB Công an Hà Nội.</small
       >
 
@@ -44,8 +45,9 @@
       <img
         src="https://icdn.24h.com.vn/upload/4-2023/images/2023-10-31/c2-1698735482-516-width740height519.jpg"
         alt=""
+        class="block mx-auto w-[50%] pt-4"
       />
-      <small
+      <small class="block pb-4"
         >Ông Gong Oh Kyun mặc áo đấu của CLB Công an Hà Nội khi thăm trung tâm
         đào tạo PVF sáng 31/10.</small
       >
@@ -98,10 +100,12 @@
 
 <script></script>
 <style scoped>
-.wrapper {
-  padding-top: 50px;
+.wrapper1 {
+  padding-top: 100px;
   padding-bottom: 50px;
-  width: 60%;
+  padding-left: 20px;
+  padding-right: 20px;
+  width: 100%;
   margin: auto;
   text-align: center;
   display: flex;
